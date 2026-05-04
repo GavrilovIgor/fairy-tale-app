@@ -114,18 +114,11 @@ function StoryView({
         <h2 className="text-3xl font-bold text-purple-800 print:text-black">{story.title}</h2>
       </div>
 
-      <div className="space-y-14 print:space-y-8">
+      <div className="space-y-12 print:space-y-8">
         {story.scenes.map((scene, i) => (
-          <div
-            key={i}
-            className={`flex gap-8 items-start print:gap-4 ${i % 2 === 1 ? 'flex-row-reverse' : ''}`}
-          >
-            <div className="flex-shrink-0 w-56 print:w-40">
-              <StoryImage prompt={scene.imagePrompt} index={i} />
-            </div>
-            <div className="flex-1">
-              <p className="text-gray-700 leading-relaxed text-lg print:text-base">{scene.text}</p>
-            </div>
+          <div key={i} className="flex flex-col gap-5">
+            <StoryImage prompt={scene.imagePrompt} index={i} />
+            <p className="text-gray-700 leading-relaxed text-lg print:text-base">{scene.text}</p>
           </div>
         ))}
       </div>
