@@ -161,7 +161,7 @@ export default function Home() {
   const [alreadySaved, setAlreadySaved] = useState(false)
   const [form, setForm] = useState<FormData>({
     childName: '',
-    age: '5-6 лет',
+    age: '3-4 года',
     hero: '',
     fear: '',
     favorites: '',
@@ -268,9 +268,11 @@ export default function Home() {
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-300 text-gray-800"
                   >
-                    <option>3-4 лет</option>
+                    <option>1-2 года</option>
+                    <option>3-4 года</option>
                     <option>5-6 лет</option>
                     <option>7-8 лет</option>
+                    <option>9-10 лет</option>
                   </select>
                 </div>
               </div>
