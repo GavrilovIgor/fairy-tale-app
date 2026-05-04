@@ -12,6 +12,13 @@ interface Story {
   scenes: Scene[]
 }
 
+interface SavedStory {
+  id: string
+  savedAt: string
+  childName: string
+  story: Story
+}
+
 interface FormData {
   childName: string
   age: string
@@ -19,6 +26,20 @@ interface FormData {
   fear: string
   favorites: string
   lesson: string
+}
+
+const STORAGE_KEY = 'fairy-tale-saved-stories'
+
+function loadSaved(): SavedStory[] {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function saveTos(stories: SavedStory[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(stories))
 }
 
 function imageUrl(prompt: string, index: number): string {
@@ -32,7 +53,6 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
   const [retry, setRetry] = useState(0)
   const [active, setActive] = useState(index === 0)
 
-  // Stagger image requests: 0s, 4s, 8s
   useEffect(() => {
     if (index > 0) {
       const t = setTimeout(() => setActive(true), index * 4000)
@@ -77,10 +97,75 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
   )
 }
 
+function StoryView({
+  story,
+  onBack,
+  onSave,
+  alreadySaved,
+}: {
+  story: Story
+  onBack: () => void
+  onSave: () => void
+  alreadySaved: boolean
+}) {
+  return (
+    <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
+      <div className="text-center mb-12 print:mb-6">
+        <h2 className="text-3xl font-bold text-purple-800 print:text-black">{story.title}</h2>
+      </div>
+
+      <div className="space-y-14 print:space-y-8">
+        {story.scenes.map((scene, i) => (
+          <div
+            key={i}
+            className={`flex gap-8 items-start print:gap-4 ${i % 2 === 1 ? 'flex-row-reverse' : ''}`}
+          >
+            <div className="flex-shrink-0 w-56 print:w-40">
+              <StoryImage prompt={scene.imagePrompt} index={i} />
+            </div>
+            <div className="flex-1">
+              <p className="text-gray-700 leading-relaxed text-lg print:text-base">{scene.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 flex gap-4 justify-center print:hidden flex-wrap">
+        <button
+          onClick={onBack}
+          className="px-6 py-3 rounded-xl border border-purple-300 text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
+        >
+          ← Новая сказка
+        </button>
+        <button
+          onClick={onSave}
+          disabled={alreadySaved}
+          className={`px-6 py-3 rounded-xl transition-colors cursor-pointer ${
+            alreadySaved
+              ? 'bg-green-100 text-green-600 border border-green-300'
+              : 'bg-amber-500 text-white hover:bg-amber-600'
+          }`}
+        >
+          {alreadySaved ? '✓ Сохранено' : '🔖 Сохранить сказку'}
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="px-6 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer"
+        >
+          🖨️ Распечатать
+        </button>
+      </div>
+    </main>
+  )
+}
+
 export default function Home() {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'library' | 'reading'>('idle')
   const [story, setStory] = useState<Story | null>(null)
+  const [currentChildName, setCurrentChildName] = useState('')
   const [error, setError] = useState('')
+  const [savedStories, setSavedStories] = useState<SavedStory[]>([])
+  const [alreadySaved, setAlreadySaved] = useState(false)
   const [form, setForm] = useState<FormData>({
     childName: '',
     age: '5-6 лет',
@@ -90,6 +175,10 @@ export default function Home() {
     lesson: '',
   })
 
+  useEffect(() => {
+    setSavedStories(loadSaved())
+  }, [])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
@@ -98,6 +187,7 @@ export default function Home() {
     e.preventDefault()
     setStatus('loading')
     setError('')
+    setAlreadySaved(false)
 
     try {
       const res = await fetch('/api/generate', {
@@ -115,18 +205,46 @@ export default function Home() {
       }
 
       setStory(data)
+      setCurrentChildName(form.childName)
       setStatus('done')
     } catch {
-      setError('Не удалось подключиться. Проверьте что Ollama запущен.')
+      setError('Не удалось подключиться к серверу.')
       setStatus('idle')
     }
+  }
+
+  const handleSave = () => {
+    if (!story) return
+    const entry: SavedStory = {
+      id: Date.now().toString(),
+      savedAt: new Date().toLocaleDateString('ru-RU'),
+      childName: currentChildName,
+      story,
+    }
+    const updated = [entry, ...savedStories]
+    setSavedStories(updated)
+    saveTos(updated)
+    setAlreadySaved(true)
+  }
+
+  const handleDelete = (id: string) => {
+    const updated = savedStories.filter(s => s.id !== id)
+    setSavedStories(updated)
+    saveTos(updated)
+  }
+
+  const handleOpenSaved = (saved: SavedStory) => {
+    setStory(saved.story)
+    setCurrentChildName(saved.childName)
+    setAlreadySaved(true)
+    setStatus('reading')
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-rose-50 to-purple-50 print:bg-white">
       <header className="text-center py-10 print:py-4">
         <h1 className="text-4xl font-bold text-purple-800 print:text-black">✨ Волшебная Сказка</h1>
-        {status !== 'done' && (
+        {status === 'idle' && (
           <p className="text-purple-400 mt-2">Персональная сказка для вашего ребёнка</p>
         )}
       </header>
@@ -226,6 +344,40 @@ export default function Home() {
               </button>
             </form>
           </div>
+
+          {savedStories.length > 0 && (
+            <div className="mt-10">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-purple-800">📚 Мои сказки</h2>
+                <span className="text-sm text-purple-400">{savedStories.length} сохранено</span>
+              </div>
+              <div className="space-y-3">
+                {savedStories.map(saved => (
+                  <div
+                    key={saved.id}
+                    className="bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between gap-4"
+                  >
+                    <button
+                      onClick={() => handleOpenSaved(saved)}
+                      className="flex-1 text-left"
+                    >
+                      <div className="font-medium text-gray-800">{saved.story.title}</div>
+                      <div className="text-sm text-gray-400 mt-0.5">
+                        {saved.childName} · {saved.savedAt}
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(saved.id)}
+                      className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer text-xl leading-none"
+                      title="Удалить"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </main>
       )}
 
@@ -248,43 +400,13 @@ export default function Home() {
         </main>
       )}
 
-      {status === 'done' && story && (
-        <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
-          <div className="text-center mb-12 print:mb-6">
-            <h2 className="text-3xl font-bold text-purple-800 print:text-black">{story.title}</h2>
-          </div>
-
-          <div className="space-y-14 print:space-y-8">
-            {story.scenes.map((scene, i) => (
-              <div
-                key={i}
-                className={`flex gap-8 items-start print:gap-4 ${i % 2 === 1 ? 'flex-row-reverse' : ''}`}
-              >
-                <div className="flex-shrink-0 w-56 print:w-40">
-                  <StoryImage prompt={scene.imagePrompt} index={i} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-700 leading-relaxed text-lg print:text-base">{scene.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 flex gap-4 justify-center print:hidden">
-            <button
-              onClick={() => { setStatus('idle'); setStory(null) }}
-              className="px-6 py-3 rounded-xl border border-purple-300 text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
-            >
-              ← Новая сказка
-            </button>
-            <button
-              onClick={() => window.print()}
-              className="px-6 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer"
-            >
-              🖨️ Распечатать
-            </button>
-          </div>
-        </main>
+      {(status === 'done' || status === 'reading') && story && (
+        <StoryView
+          story={story}
+          onBack={() => { setStatus('idle'); setStory(null) }}
+          onSave={handleSave}
+          alreadySaved={alreadySaved}
+        />
       )}
     </div>
   )
