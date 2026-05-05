@@ -108,17 +108,19 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
 function StoryView({
   story,
   onBack,
+  onSave,
+  alreadySaved,
   storyRef,
   onDownloadPDF,
   pdfLoading,
-  pdfDone,
 }: {
   story: Story
   onBack: () => void
+  onSave: () => void
+  alreadySaved: boolean
   storyRef: React.RefObject<HTMLDivElement | null>
   onDownloadPDF: () => void
   pdfLoading: boolean
-  pdfDone: boolean
 }) {
   return (
     <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
@@ -172,16 +174,22 @@ function StoryView({
           ← Новая сказка
         </button>
         <button
+          onClick={onSave}
+          disabled={alreadySaved}
+          className={`px-5 py-3 rounded-xl transition-colors cursor-pointer ${
+            alreadySaved
+              ? 'bg-green-100 text-green-600 border border-green-300'
+              : 'bg-amber-500 text-white hover:bg-amber-600'
+          }`}
+        >
+          {alreadySaved ? '✓ Сохранено' : '🔖 Сохранить'}
+        </button>
+        <button
           onClick={onDownloadPDF}
           disabled={pdfLoading}
-          className={`px-5 py-3 rounded-xl transition-colors cursor-pointer disabled:opacity-60 ${
-            pdfDone
-              ? 'bg-green-100 text-green-700 border border-green-300'
-              : 'text-white hover:opacity-90'
-          }`}
-          style={pdfDone ? {} : { background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
+          className="px-5 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-60"
         >
-          {pdfLoading ? '⏳ Создаём PDF...' : pdfDone ? '✓ PDF скачан' : '📄 Сохранить PDF'}
+          {pdfLoading ? '⏳ Создаём...' : '📄 Скачать PDF'}
         </button>
       </div>
     </main>
@@ -194,8 +202,8 @@ export default function Home() {
   const [currentChildName, setCurrentChildName] = useState('')
   const [error, setError] = useState('')
   const [savedStories, setSavedStories] = useState<SavedStory[]>([])
+  const [alreadySaved, setAlreadySaved] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
-  const [pdfDone, setPdfDone] = useState(false)
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -220,7 +228,7 @@ export default function Home() {
     e.preventDefault()
     setStatus('loading')
     setError('')
-    setPdfDone(false)
+    setAlreadySaved(false)
 
     try {
       const res = await fetch('/api/generate', {
@@ -239,12 +247,26 @@ export default function Home() {
 
       setStory(data)
       setCurrentChildName(form.childName)
-      setPdfDone(false)
+      setAlreadySaved(false)
       setStatus('done')
     } catch {
       setError('Не удалось подключиться к серверу.')
       setStatus('idle')
     }
+  }
+
+  const handleSave = () => {
+    if (!story) return
+    const entry: SavedStory = {
+      id: Date.now().toString(),
+      savedAt: new Date().toLocaleDateString('ru-RU'),
+      childName: currentChildName,
+      story,
+    }
+    const updated = [entry, ...savedStories]
+    setSavedStories(updated)
+    saveTos(updated)
+    setAlreadySaved(true)
   }
 
   const handleDelete = (id: string) => {
@@ -256,7 +278,7 @@ export default function Home() {
   const handleOpenSaved = (saved: SavedStory) => {
     setStory(saved.story)
     setCurrentChildName(saved.childName)
-    setPdfDone(false)
+    setAlreadySaved(true)
     setStatus('reading')
   }
 
@@ -289,23 +311,17 @@ export default function Home() {
         pdf.addImage(imgData, 'JPEG', margin, margin - page * usableH, imgW, imgH)
       }
 
-      pdf.save(`${story.title}.pdf`)
-
-      // автосохранение в библиотеку при скачивании
-      const alreadyIn = savedStories.some(s => s.story.title === story.title && s.childName === currentChildName)
-      if (!alreadyIn) {
-        const entry: SavedStory = {
-          id: Date.now().toString(),
-          savedAt: new Date().toLocaleDateString('ru-RU'),
-          childName: currentChildName,
-          story,
-        }
-        const updated = [entry, ...savedStories]
-        setSavedStories(updated)
-        saveTos(updated)
+      const isTelegram = !!window.Telegram?.WebApp
+      if (isTelegram) {
+        // В Telegram открываем PDF как превью — пользователь сам сохранит/отправит
+        const blob = pdf.output('blob')
+        const url = URL.createObjectURL(blob)
+        window.open(url, '_blank')
+        setTimeout(() => URL.revokeObjectURL(url), 30000)
+      } else {
+        // В браузере — скачиваем файл на диск
+        pdf.save(`${story.title}.pdf`)
       }
-
-      setPdfDone(true)
     } finally {
       setPdfLoading(false)
     }
@@ -493,10 +509,11 @@ export default function Home() {
         <StoryView
           story={story}
           onBack={() => { setStatus('idle'); setStory(null) }}
+          onSave={handleSave}
+          alreadySaved={alreadySaved}
           storyRef={storyRef}
           onDownloadPDF={handleDownloadPDF}
           pdfLoading={pdfLoading}
-          pdfDone={pdfDone}
         />
       )}
     </div>
