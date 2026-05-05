@@ -114,6 +114,8 @@ function StoryView({
   onDownloadPDF,
   pdfLoading,
   pdfError,
+  onShare,
+  shareStatus,
 }: {
   story: Story
   onBack: () => void
@@ -123,6 +125,8 @@ function StoryView({
   onDownloadPDF: () => void
   pdfLoading: boolean
   pdfError: string
+  onShare: () => void
+  shareStatus: 'idle' | 'copied'
 }) {
   return (
     <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
@@ -187,6 +191,16 @@ function StoryView({
           {alreadySaved ? '✓ Сохранено' : '🔖 Сохранить'}
         </button>
         <button
+          onClick={onShare}
+          className={`px-5 py-3 rounded-xl transition-colors cursor-pointer ${
+            shareStatus === 'copied'
+              ? 'bg-green-100 text-green-600 border border-green-300'
+              : 'bg-sky-500 text-white hover:bg-sky-600'
+          }`}
+        >
+          {shareStatus === 'copied' ? '✓ Скопировано' : '↗ Поделиться'}
+        </button>
+        <button
           onClick={onDownloadPDF}
           disabled={pdfLoading}
           className="px-5 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-60"
@@ -210,6 +224,7 @@ export default function Home() {
   const [alreadySaved, setAlreadySaved] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState('')
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle')
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -288,17 +303,29 @@ export default function Home() {
     setStatus('reading')
   }
 
+  const handleShare = async () => {
+    if (!story) return
+    const text = `${story.title}\n\n${story.scenes.map(s => s.text).join('\n\n')}`
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: story.title, text })
+      } catch {
+        // user cancelled — do nothing
+      }
+    } else {
+      await navigator.clipboard.writeText(text)
+      setShareStatus('copied')
+      setTimeout(() => setShareStatus('idle'), 2500)
+    }
+  }
+
   const handleDownloadPDF = async () => {
     if (!story) return
     setPdfLoading(true)
     setPdfError('')
 
-    // Контейнер создаём заранее — finally гарантирует удаление
-    const container = document.createElement('div')
-    document.body.appendChild(container)
-
     try {
-      // Скачиваем картинки как data URL напрямую по URL из данных сказки
+      // 1. Скачиваем картинки как data URL
       const dataUrls = await Promise.all(
         story.scenes.map(async (scene, i) => {
           try {
@@ -315,98 +342,171 @@ export default function Home() {
         })
       )
 
-      // Строим DOM с чистыми inline-стилями — без Tailwind/oklch, иначе html2canvas падает
-      Object.assign(container.style, {
-        position: 'fixed', top: '0', left: '0',
-        opacity: '0.01', zIndex: '-9999', pointerEvents: 'none',
-        width: '794px', padding: '48px', background: '#ffffff',
-        fontFamily: 'Arial, Helvetica, sans-serif',
-        color: '#222222', boxSizing: 'border-box',
-      } as CSSStyleDeclaration)
+      // 2. Загружаем Image-объекты
+      const images = await Promise.all(dataUrls.map(url => {
+        if (!url) return Promise.resolve(null)
+        return new Promise<HTMLImageElement | null>(resolve => {
+          const img = new Image()
+          img.onload = () => resolve(img)
+          img.onerror = () => resolve(null)
+          img.src = url
+        })
+      }))
 
-      const add = (tag: string, styles: string, text?: string): HTMLElement => {
-        const el = document.createElement(tag)
-        el.style.cssText = styles
-        if (text !== undefined) el.textContent = text
-        return el
+      // 3. Рисуем PDF через нативный Canvas (поддерживает кириллицу, без html2canvas)
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      const SCALE = isMobile ? 1.5 : 2
+      const W = 794
+      const M = 48
+      const CW = W - M * 2
+      const LH = 22
+      const IMG_H = Math.round(CW * 2 / 3)
+
+      const rrect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+        ctx.beginPath()
+        ctx.moveTo(x + r, y)
+        ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+        ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+        ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+        ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y)
+        ctx.closePath()
       }
 
-      container.appendChild(add('h1',
-        'text-align:center;font-size:26px;font-weight:700;margin:0 0 36px;color:#1a1a1a;font-family:Arial,Helvetica,sans-serif',
-        story.title
-      ))
+      const wrap = (ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] => {
+        const words = text.split(' ')
+        const lines: string[] = []
+        let line = ''
+        for (const word of words) {
+          const test = line ? `${line} ${word}` : word
+          if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word }
+          else line = test
+        }
+        if (line) lines.push(line)
+        return lines
+      }
 
+      // Измеряем высоту контента
+      const tmp = document.createElement('canvas')
+      tmp.width = W; tmp.height = 1
+      const tCtx = tmp.getContext('2d')!
+      let totalH = M + 56
       for (let i = 0; i < story.scenes.length; i++) {
-        if (dataUrls[i]) {
-          const img = document.createElement('img')
-          img.src = dataUrls[i]!
-          img.style.cssText = 'width:100%;display:block;margin-bottom:18px;border-radius:10px'
-          container.appendChild(img)
-        }
-        container.appendChild(add('p',
-          'font-size:15px;line-height:1.8;margin:0 0 36px;color:#333;font-family:Arial,Helvetica,sans-serif',
-          story.scenes[i].text
-        ))
+        totalH += IMG_H + 16
+        tCtx.font = '15px Arial'
+        totalH += wrap(tCtx, story.scenes[i].text, CW).length * LH + 36
       }
-
       if (story.discussion?.length) {
-        container.appendChild(add('div',
-          'background:#7c3aed;color:#fff;font-size:16px;font-weight:700;text-align:center;padding:14px;border-radius:12px;margin:12px 0 20px;font-family:Arial,Helvetica,sans-serif',
-          'Поговорите с ребёнком'
-        ))
+        totalH += 56
+        for (const q of story.discussion) {
+          tCtx.font = '14px Arial'
+          totalH += Math.max(32, wrap(tCtx, q, CW - 44).length * 20) + 14
+        }
+      }
+      if (story.anchor) {
+        tCtx.font = '13px Arial'
+        totalH += wrap(tCtx, story.anchor.description, CW - 24).length * 20 + 70
+      }
+      totalH += M
+
+      // Создаём canvas нужного размера
+      const canvas = document.createElement('canvas')
+      canvas.width = W * SCALE
+      canvas.height = totalH * SCALE
+      const ctx = canvas.getContext('2d')!
+      ctx.scale(SCALE, SCALE)
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, W, totalH)
+
+      let y = M
+
+      // Заголовок
+      ctx.fillStyle = '#1a1a1a'
+      ctx.font = 'bold 24px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText(story.title, W / 2, y + 30)
+      y += 56
+      ctx.textAlign = 'left'
+
+      // Сцены
+      for (let i = 0; i < story.scenes.length; i++) {
+        if (images[i]) {
+          ctx.save()
+          rrect(ctx, M, y, CW, IMG_H, 10)
+          ctx.clip()
+          ctx.drawImage(images[i]!, M, y, CW, IMG_H)
+          ctx.restore()
+        } else {
+          ctx.fillStyle = '#f3e8ff'
+          ctx.fillRect(M, y, CW, IMG_H)
+        }
+        y += IMG_H + 16
+        ctx.fillStyle = '#333333'
+        ctx.font = '15px Arial'
+        for (const line of wrap(ctx, story.scenes[i].text, CW)) {
+          ctx.fillText(line, M, y + 15); y += LH
+        }
+        y += 36
+      }
+
+      // Вопросы для обсуждения
+      if (story.discussion?.length) {
+        ctx.fillStyle = '#7c3aed'
+        rrect(ctx, M, y, CW, 40, 10); ctx.fill()
+        ctx.fillStyle = '#ffffff'
+        ctx.font = 'bold 15px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText('Поговорите с ребёнком', W / 2, y + 26)
+        y += 54
+        ctx.textAlign = 'left'
         for (let i = 0; i < story.discussion.length; i++) {
-          const row = add('div', 'overflow:hidden;margin-bottom:16px')
-          row.appendChild(add('div',
-            'float:left;width:28px;height:28px;background:#7c3aed;color:#fff;border-radius:50%;text-align:center;line-height:28px;font-size:13px;font-weight:700;margin-right:12px;font-family:Arial,Helvetica,sans-serif',
-            String(i + 1)
-          ))
-          row.appendChild(add('p',
-            'margin:0 0 0 40px;font-size:14px;line-height:1.7;color:#333;padding-top:4px;font-family:Arial,Helvetica,sans-serif',
-            story.discussion[i]
-          ))
-          container.appendChild(row)
+          ctx.fillStyle = '#7c3aed'
+          ctx.beginPath(); ctx.arc(M + 14, y + 14, 14, 0, Math.PI * 2); ctx.fill()
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 12px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText(String(i + 1), M + 14, y + 19)
+          ctx.textAlign = 'left'
+          ctx.fillStyle = '#333333'
+          ctx.font = '14px Arial'
+          const qLines = wrap(ctx, story.discussion[i], CW - 44)
+          let qy = y + 2
+          for (const line of qLines) { ctx.fillText(line, M + 36, qy + 14); qy += 20 }
+          y += Math.max(32, qLines.length * 20) + 14
         }
       }
 
+      // Предмет-якорь
       if (story.anchor) {
-        const box = add('div', 'border:2px solid #f59e0b;border-radius:12px;padding:18px 22px;background:#fffbeb;margin-top:16px')
-        box.appendChild(add('h4',
-          'color:#b45309;font-weight:700;font-size:14px;margin:0 0 8px;font-family:Arial,Helvetica,sans-serif',
-          `Предмет-якорь: ${story.anchor.title}`
-        ))
-        box.appendChild(add('p',
-          'color:#555;font-size:13px;line-height:1.6;margin:0;font-family:Arial,Helvetica,sans-serif',
-          story.anchor.description
-        ))
-        container.appendChild(box)
+        y += 14
+        ctx.font = '13px Arial'
+        const aLines = wrap(ctx, story.anchor.description, CW - 24)
+        const boxH = 20 + 22 + aLines.length * 20 + 16
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2
+        rrect(ctx, M, y, CW, boxH, 10)
+        ctx.fillStyle = '#fffbeb'; ctx.fill(); ctx.stroke()
+        y += 14
+        ctx.fillStyle = '#b45309'; ctx.font = 'bold 13px Arial'
+        ctx.fillText(`Предмет-якорь: ${story.anchor.title}`, M + 12, y + 13)
+        y += 26
+        ctx.fillStyle = '#555'; ctx.font = '13px Arial'
+        for (const line of aLines) { ctx.fillText(line, M + 12, y + 13); y += 20 }
       }
 
-      const html2canvas = (await import('html2canvas')).default
+      // 4. Экспортируем в PDF
       const { jsPDF } = await import('jspdf')
-
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: false,
-        allowTaint: false,
-        logging: false,
-        backgroundColor: '#ffffff',
-        width: 794,
-        windowWidth: 794,
-      })
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.85)
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const pageW = pdf.internal.pageSize.getWidth()
       const pageH = pdf.internal.pageSize.getHeight()
-      const margin = 10
-      const imgW = pageW - margin * 2
+      const pdfMargin = 10
+      const imgW = pageW - pdfMargin * 2
       const imgH = (canvas.height * imgW) / canvas.width
-      const usableH = pageH - margin * 2
+      const usableH = pageH - pdfMargin * 2
       const totalPages = Math.ceil(imgH / usableH)
+      const imgData = canvas.toDataURL('image/jpeg', 0.85)
 
       for (let page = 0; page < totalPages; page++) {
         if (page > 0) pdf.addPage()
-        pdf.addImage(imgData, 'JPEG', margin, margin - page * usableH, imgW, imgH)
+        pdf.addImage(imgData, 'JPEG', pdfMargin, pdfMargin - page * usableH, imgW, imgH)
       }
 
       const isTelegram = !!window.Telegram?.WebApp
@@ -422,9 +522,8 @@ export default function Home() {
     } catch (err) {
       console.error('PDF error:', err)
       const msg = err instanceof Error ? err.message : String(err)
-      setPdfError(`Не удалось создать PDF: ${msg.slice(0, 100)}`)
+      setPdfError(`Ошибка PDF: ${msg.slice(0, 120)}`)
     } finally {
-      document.body.removeChild(container)
       setPdfLoading(false)
     }
   }
@@ -617,6 +716,8 @@ export default function Home() {
           onDownloadPDF={handleDownloadPDF}
           pdfLoading={pdfLoading}
           pdfError={pdfError}
+          onShare={handleShare}
+          shareStatus={shareStatus}
         />
       )}
     </div>
