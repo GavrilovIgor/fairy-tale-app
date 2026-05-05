@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 
 declare global {
   interface Window {
-    Telegram?: { WebApp: { ready: () => void; expand: () => void } }
+    Telegram?: { WebApp: { ready: () => void; expand: () => void; switchInlineQuery?: (query: string, chatTypes?: string[]) => void } }
   }
 }
 
@@ -126,7 +126,7 @@ function StoryView({
   pdfLoading: boolean
   pdfError: string
   onShare: () => void
-  shareStatus: 'idle' | 'copied'
+  shareStatus: 'idle' | 'copied' | 'copied-tg'
 }) {
   return (
     <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
@@ -193,12 +193,16 @@ function StoryView({
         <button
           onClick={onShare}
           className={`px-5 py-3 rounded-xl transition-colors cursor-pointer ${
-            shareStatus === 'copied'
+            shareStatus !== 'idle'
               ? 'bg-green-100 text-green-600 border border-green-300'
               : 'bg-sky-500 text-white hover:bg-sky-600'
           }`}
         >
-          {shareStatus === 'copied' ? '✓ Скопировано' : '↗ Поделиться'}
+          {shareStatus === 'copied-tg'
+            ? '✓ Скопировано — вставьте в чат'
+            : shareStatus === 'copied'
+            ? '✓ Скопировано'
+            : '↗ Поделиться'}
         </button>
         <button
           onClick={onDownloadPDF}
@@ -224,7 +228,7 @@ export default function Home() {
   const [alreadySaved, setAlreadySaved] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState('')
-  const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle')
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'copied-tg'>('idle')
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -306,7 +310,8 @@ export default function Home() {
   const handleShare = async () => {
     if (!story) return
     const text = `${story.title}\n\n${story.scenes.map(s => s.text).join('\n\n')}`
-    if (navigator.share) {
+    const isTelegram = !!window.Telegram?.WebApp
+    if (!isTelegram && navigator.share) {
       try {
         await navigator.share({ title: story.title, text })
       } catch {
@@ -314,8 +319,8 @@ export default function Home() {
       }
     } else {
       await navigator.clipboard.writeText(text)
-      setShareStatus('copied')
-      setTimeout(() => setShareStatus('idle'), 2500)
+      setShareStatus(isTelegram ? 'copied-tg' : 'copied')
+      setTimeout(() => setShareStatus('idle'), 3000)
     }
   }
 
@@ -329,7 +334,8 @@ export default function Home() {
       const dataUrls = await Promise.all(
         story.scenes.map(async (scene, i) => {
           try {
-            const res = await fetch(imageUrl(scene.imagePrompt, i))
+            // &retry=0 совпадает с URL из StoryImage — берём из браузерного кеша
+            const res = await fetch(imageUrl(scene.imagePrompt, i) + '&retry=0')
             if (!res.ok) return null
             const blob = await res.blob()
             return await new Promise<string>((resolve, reject) => {
