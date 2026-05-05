@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         headers: {
           'Content-Type': res.headers.get('Content-Type') ?? 'image/jpeg',
           'Cache-Control': 'public, max-age=86400',
+          'Access-Control-Allow-Origin': '*',
         },
       })
     } catch (err) {

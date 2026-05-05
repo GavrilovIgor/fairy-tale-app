@@ -113,6 +113,7 @@ function StoryView({
   storyRef,
   onDownloadPDF,
   pdfLoading,
+  pdfError,
 }: {
   story: Story
   onBack: () => void
@@ -121,6 +122,7 @@ function StoryView({
   storyRef: React.RefObject<HTMLDivElement | null>
   onDownloadPDF: () => void
   pdfLoading: boolean
+  pdfError: string
 }) {
   return (
     <main className="max-w-3xl mx-auto px-4 pb-16 print:px-0">
@@ -192,6 +194,9 @@ function StoryView({
           {pdfLoading ? '⏳ Создаём...' : '📄 Скачать PDF'}
         </button>
       </div>
+      {pdfError && (
+        <p className="mt-4 text-center text-sm text-red-500 print:hidden">{pdfError}</p>
+      )}
     </main>
   )
 }
@@ -204,6 +209,7 @@ export default function Home() {
   const [savedStories, setSavedStories] = useState<SavedStory[]>([])
   const [alreadySaved, setAlreadySaved] = useState(false)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfError, setPdfError] = useState('')
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -285,16 +291,48 @@ export default function Home() {
   const handleDownloadPDF = async () => {
     if (!storyRef.current || !story) return
     setPdfLoading(true)
+    setPdfError('')
+
+    // Сохраняем ссылки на img-элементы и их оригинальные src
+    const imgElements = [...storyRef.current.querySelectorAll<HTMLImageElement>('img')]
+    const origSrcs = imgElements.map(img => img.src)
+    const restoreImgs = () => imgElements.forEach((img, i) => { img.src = origSrcs[i] })
+
     try {
+      // Скачиваем картинки как data URL — обходим ограничение tainted canvas
+      const dataUrls = await Promise.all(imgElements.map(async (_, i) => {
+        const src = origSrcs[i]
+        if (!src) return null
+        try {
+          const res = await fetch(src)
+          if (!res.ok) return null
+          const blob = await res.blob()
+          return await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result as string)
+            reader.onerror = reject
+            reader.readAsDataURL(blob)
+          })
+        } catch {
+          return null
+        }
+      }))
+
+      // Временно заменяем src на data URL — html2canvas рендерит без CORS-проблем
+      imgElements.forEach((img, i) => { if (dataUrls[i]) img.src = dataUrls[i]! })
+
       const html2canvas = (await import('html2canvas')).default
       const { jsPDF } = await import('jspdf')
 
       const canvas = await html2canvas(storyRef.current, {
         scale: 2,
-        useCORS: true,
+        useCORS: false,
+        allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
       })
+
+      restoreImgs()
 
       const imgData = canvas.toDataURL('image/jpeg', 0.85)
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
@@ -313,15 +351,18 @@ export default function Home() {
 
       const isTelegram = !!window.Telegram?.WebApp
       if (isTelegram) {
-        // В Telegram открываем PDF как превью — пользователь сам сохранит/отправит
         const blob = pdf.output('blob')
         const url = URL.createObjectURL(blob)
-        window.open(url, '_blank')
+        const opened = window.open(url, '_blank')
+        if (!opened) pdf.save(`${story.title}.pdf`)
         setTimeout(() => URL.revokeObjectURL(url), 30000)
       } else {
-        // В браузере — скачиваем файл на диск
         pdf.save(`${story.title}.pdf`)
       }
+    } catch (err) {
+      restoreImgs()
+      console.error('PDF error:', err)
+      setPdfError('Не удалось создать PDF. Дождитесь загрузки иллюстраций и попробуйте снова.')
     } finally {
       setPdfLoading(false)
     }
@@ -514,6 +555,7 @@ export default function Home() {
           storyRef={storyRef}
           onDownloadPDF={handleDownloadPDF}
           pdfLoading={pdfLoading}
+          pdfError={pdfError}
         />
       )}
     </div>
