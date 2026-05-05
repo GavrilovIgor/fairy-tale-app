@@ -289,50 +289,110 @@ export default function Home() {
   }
 
   const handleDownloadPDF = async () => {
-    if (!storyRef.current || !story) return
+    if (!story) return
     setPdfLoading(true)
     setPdfError('')
 
-    // Сохраняем ссылки на img-элементы и их оригинальные src
-    const imgElements = [...storyRef.current.querySelectorAll<HTMLImageElement>('img')]
-    const origSrcs = imgElements.map(img => img.src)
-    const restoreImgs = () => imgElements.forEach((img, i) => { img.src = origSrcs[i] })
+    // Контейнер создаём заранее — finally гарантирует удаление
+    const container = document.createElement('div')
+    document.body.appendChild(container)
 
     try {
-      // Скачиваем картинки как data URL — обходим ограничение tainted canvas
-      const dataUrls = await Promise.all(imgElements.map(async (_, i) => {
-        const src = origSrcs[i]
-        if (!src) return null
-        try {
-          const res = await fetch(src)
-          if (!res.ok) return null
-          const blob = await res.blob()
-          return await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onload = () => resolve(reader.result as string)
-            reader.onerror = reject
-            reader.readAsDataURL(blob)
-          })
-        } catch {
-          return null
-        }
-      }))
+      // Скачиваем картинки как data URL напрямую по URL из данных сказки
+      const dataUrls = await Promise.all(
+        story.scenes.map(async (scene, i) => {
+          try {
+            const res = await fetch(imageUrl(scene.imagePrompt, i))
+            if (!res.ok) return null
+            const blob = await res.blob()
+            return await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader()
+              reader.onload = () => resolve(reader.result as string)
+              reader.onerror = reject
+              reader.readAsDataURL(blob)
+            })
+          } catch { return null }
+        })
+      )
 
-      // Временно заменяем src на data URL — html2canvas рендерит без CORS-проблем
-      imgElements.forEach((img, i) => { if (dataUrls[i]) img.src = dataUrls[i]! })
+      // Строим DOM с чистыми inline-стилями — без Tailwind/oklch, иначе html2canvas падает
+      Object.assign(container.style, {
+        position: 'fixed', top: '0', left: '0',
+        opacity: '0.01', zIndex: '-9999', pointerEvents: 'none',
+        width: '794px', padding: '48px', background: '#ffffff',
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        color: '#222222', boxSizing: 'border-box',
+      } as CSSStyleDeclaration)
+
+      const add = (tag: string, styles: string, text?: string): HTMLElement => {
+        const el = document.createElement(tag)
+        el.style.cssText = styles
+        if (text !== undefined) el.textContent = text
+        return el
+      }
+
+      container.appendChild(add('h1',
+        'text-align:center;font-size:26px;font-weight:700;margin:0 0 36px;color:#1a1a1a;font-family:Arial,Helvetica,sans-serif',
+        story.title
+      ))
+
+      for (let i = 0; i < story.scenes.length; i++) {
+        if (dataUrls[i]) {
+          const img = document.createElement('img')
+          img.src = dataUrls[i]!
+          img.style.cssText = 'width:100%;display:block;margin-bottom:18px;border-radius:10px'
+          container.appendChild(img)
+        }
+        container.appendChild(add('p',
+          'font-size:15px;line-height:1.8;margin:0 0 36px;color:#333;font-family:Arial,Helvetica,sans-serif',
+          story.scenes[i].text
+        ))
+      }
+
+      if (story.discussion?.length) {
+        container.appendChild(add('div',
+          'background:#7c3aed;color:#fff;font-size:16px;font-weight:700;text-align:center;padding:14px;border-radius:12px;margin:12px 0 20px;font-family:Arial,Helvetica,sans-serif',
+          'Поговорите с ребёнком'
+        ))
+        for (let i = 0; i < story.discussion.length; i++) {
+          const row = add('div', 'overflow:hidden;margin-bottom:16px')
+          row.appendChild(add('div',
+            'float:left;width:28px;height:28px;background:#7c3aed;color:#fff;border-radius:50%;text-align:center;line-height:28px;font-size:13px;font-weight:700;margin-right:12px;font-family:Arial,Helvetica,sans-serif',
+            String(i + 1)
+          ))
+          row.appendChild(add('p',
+            'margin:0 0 0 40px;font-size:14px;line-height:1.7;color:#333;padding-top:4px;font-family:Arial,Helvetica,sans-serif',
+            story.discussion[i]
+          ))
+          container.appendChild(row)
+        }
+      }
+
+      if (story.anchor) {
+        const box = add('div', 'border:2px solid #f59e0b;border-radius:12px;padding:18px 22px;background:#fffbeb;margin-top:16px')
+        box.appendChild(add('h4',
+          'color:#b45309;font-weight:700;font-size:14px;margin:0 0 8px;font-family:Arial,Helvetica,sans-serif',
+          `Предмет-якорь: ${story.anchor.title}`
+        ))
+        box.appendChild(add('p',
+          'color:#555;font-size:13px;line-height:1.6;margin:0;font-family:Arial,Helvetica,sans-serif',
+          story.anchor.description
+        ))
+        container.appendChild(box)
+      }
 
       const html2canvas = (await import('html2canvas')).default
       const { jsPDF } = await import('jspdf')
 
-      const canvas = await html2canvas(storyRef.current, {
+      const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: false,
         allowTaint: false,
         logging: false,
         backgroundColor: '#ffffff',
+        width: 794,
+        windowWidth: 794,
       })
-
-      restoreImgs()
 
       const imgData = canvas.toDataURL('image/jpeg', 0.85)
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
@@ -360,10 +420,11 @@ export default function Home() {
         pdf.save(`${story.title}.pdf`)
       }
     } catch (err) {
-      restoreImgs()
       console.error('PDF error:', err)
-      setPdfError('Не удалось создать PDF. Дождитесь загрузки иллюстраций и попробуйте снова.')
+      const msg = err instanceof Error ? err.message : String(err)
+      setPdfError(`Не удалось создать PDF: ${msg.slice(0, 100)}`)
     } finally {
+      document.body.removeChild(container)
       setPdfLoading(false)
     }
   }
