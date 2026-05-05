@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
 Требования:
 - Язык: красивый литературный русский язык
-- Длина: 800–900 слов (5 минут чтения), каждая из трёх частей — 270–300 слов
+- Длина: 700–800 слов (5 минут чтения), каждая из двух частей — 350–400 слов
 - Стиль: волшебный, образный, тёплый — как лучшие русские детские сказки
 - Герой преодолевает страх и побеждает благодаря смелости и доброте
 - Богатые описания природы, эмоций, деталей окружающего мира
@@ -40,15 +40,11 @@ export async function POST(req: NextRequest) {
   "title": "Красивое название сказки",
   "scenes": [
     {
-      "text": "Завязка 270–300 слов: знакомство с героем, его миром и проблемой...",
-      "imagePrompt": "cute ${hero} in enchanted forest, soft morning light, watercolor style"
+      "text": "Начало и кульминация 350–400 слов: знакомство с героем, его миром, проблемой — и встреча с главным испытанием...",
+      "imagePrompt": "cute ${hero} in enchanted forest facing magical challenge, soft warm light, watercolor style"
     },
     {
-      "text": "Кульминация 270–300 слов: герой встречает испытание, связанное со страхом...",
-      "imagePrompt": "brave ${hero} facing magical challenge with glowing fairy, watercolor style"
-    },
-    {
-      "text": "Развязка 270–300 слов: герой преодолевает страх, счастливый финал...",
+      "text": "Развязка 350–400 слов: герой преодолевает страх, урок, счастливый финал...",
       "imagePrompt": "happy ${hero} celebrating victory with friends, golden warm sunset, watercolor style"
     }
   ],

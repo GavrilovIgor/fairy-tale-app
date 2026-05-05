@@ -63,7 +63,7 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
 
   useEffect(() => {
     if (index > 0) {
-      const t = setTimeout(() => setActive(true), index * 4000)
+      const t = setTimeout(() => setActive(true), 5000)
       return () => clearTimeout(t)
     }
   }, [index])
@@ -384,7 +384,7 @@ export default function Home() {
             <div className="space-y-3">
               {([
                 ['📖', 'Уникальная сказка по вашему запросу'],
-                ['🎨', '3 акварельные иллюстрации от ИИ'],
+                ['🎨', '2 акварельные иллюстрации от ИИ'],
                 ['🧠', 'Вопросы для обсуждения с ребёнком'],
                 ['🪨', 'Предмет-якорь для закрепления урока'],
                 ['📄', 'PDF для скачивания и печати'],
