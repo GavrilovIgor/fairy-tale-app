@@ -172,19 +172,19 @@ function StoryView({
         )}
       </div>
 
-      <div className="mt-12 flex gap-3 justify-center print:hidden flex-wrap">
+      <div className="mt-12 grid grid-cols-2 gap-3 print:hidden">
         <button
           onClick={onBack}
-          className="px-5 py-3 rounded-xl border border-orange-300 text-orange-600 hover:bg-orange-50 transition-colors cursor-pointer"
+          className="h-12 rounded-xl bg-orange-100 text-orange-600 hover:bg-orange-200 transition-colors cursor-pointer text-sm font-medium flex items-center justify-center gap-1.5"
         >
           ← Новая сказка
         </button>
         <button
           onClick={onSave}
           disabled={alreadySaved}
-          className={`px-5 py-3 rounded-xl transition-colors cursor-pointer ${
+          className={`h-12 rounded-xl transition-colors cursor-pointer text-sm font-medium flex items-center justify-center gap-1.5 ${
             alreadySaved
-              ? 'bg-green-100 text-green-600 border border-green-300'
+              ? 'bg-green-100 text-green-600'
               : 'bg-amber-500 text-white hover:bg-amber-600'
           }`}
         >
@@ -192,22 +192,18 @@ function StoryView({
         </button>
         <button
           onClick={onShare}
-          className={`px-5 py-3 rounded-xl transition-colors cursor-pointer ${
+          className={`h-12 rounded-xl transition-colors cursor-pointer text-sm font-medium flex items-center justify-center gap-1.5 ${
             shareStatus !== 'idle'
-              ? 'bg-green-100 text-green-600 border border-green-300'
+              ? 'bg-green-100 text-green-600'
               : 'bg-sky-500 text-white hover:bg-sky-600'
           }`}
         >
-          {shareStatus === 'copied-tg'
-            ? '✓ Скопировано — вставьте в чат'
-            : shareStatus === 'copied'
-            ? '✓ Скопировано'
-            : '↗ Поделиться'}
+          {shareStatus !== 'idle' ? '✓ Скопировано' : '↗ Поделиться'}
         </button>
         <button
           onClick={onDownloadPDF}
           disabled={pdfLoading}
-          className="px-5 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-60"
+          className="h-12 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-60 text-sm font-medium flex items-center justify-center gap-1.5"
         >
           {pdfLoading ? '⏳ Создаём...' : '📄 Скачать PDF'}
         </button>
