@@ -38,6 +38,15 @@ interface FormData {
 
 const STORAGE_KEY = 'fairy-tale-saved-stories'
 
+const R_NAMES  = ['Маша', 'Саша', 'Дима', 'Аня', 'Ваня', 'Катя', 'Петя', 'Оля', 'Коля', 'Соня', 'Миша', 'Даша', 'Лёша', 'Юля']
+const R_AGES   = ['3-4 года', '5-6 лет', '7-8 лет', '9-10 лет']
+const R_HEROES = ['котёнок Пушок', 'дракончик Огонёк', 'щенок Бобик', 'лисёнок Рыжик', 'медвежонок Топтыжка', 'зайчонок Ушастик', 'черепашка Тихоня', 'ёжик Колючка', 'совёнок Мудрик', 'бельчонок Рыжик', 'поросёнок Хрюша', 'лягушонок Прыгун']
+const R_FEARS  = ['боится темноты', 'боится собак', 'не хочет делиться', 'боится идти к врачу', 'не любит есть овощи', 'боится остаться одному', 'боится громких звуков', 'не хочет ложиться спать', 'боится сделать ошибку', 'не хочет идти в садик', 'боится потеряться', 'не хочет есть новую еду']
+const R_FAVS   = ['динозавры и космос', 'мороженое и рисование', 'машинки и конструктор', 'принцессы и единороги', 'футбол и мультики', 'кошки и пазлы', 'роботы и лего', 'рыбки и раскраски', 'музыка и танцы', 'сказки и звёзды']
+const R_LESSONS = ['смелость', 'дружба', 'доброта', 'честность', 'терпение', 'щедрость', 'забота о природе', 'уважение к старшим', 'умение просить прощения']
+
+const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
+
 function loadSaved(): SavedStory[] {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -245,35 +254,48 @@ export default function Home() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const generateStory = async (data: FormData) => {
     setStatus('loading')
     setError('')
     setAlreadySaved(false)
-
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(data),
       })
-
-      const data = await res.json()
-
+      const json = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Ошибка генерации')
+        setError(json.error || 'Ошибка генерации')
         setStatus('idle')
         return
       }
-
-      setStory(data)
-      setCurrentChildName(form.childName)
+      setStory(json)
+      setCurrentChildName(data.childName)
       setAlreadySaved(false)
       setStatus('done')
     } catch {
       setError('Не удалось подключиться к серверу.')
       setStatus('idle')
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await generateStory(form)
+  }
+
+  const handleRandom = async () => {
+    const randomForm: FormData = {
+      childName: pick(R_NAMES),
+      age: pick(R_AGES),
+      hero: pick(R_HEROES),
+      fear: pick(R_FEARS),
+      favorites: pick(R_FAVS),
+      lesson: pick(R_LESSONS),
+    }
+    setForm(randomForm)
+    await generateStory(randomForm)
   }
 
   const handleSave = () => {
@@ -646,13 +668,23 @@ export default function Home() {
                 <div className="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{error}</div>
               )}
 
-              <button
-                type="submit"
-                className="w-full text-white rounded-xl py-3.5 font-semibold text-lg hover:opacity-90 transition-opacity cursor-pointer"
-                style={{ background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
-              >
-                ✨ Создать сказку
-              </button>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="submit"
+                  className="text-white rounded-xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer"
+                  style={{ background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
+                >
+                  ✨ Создать сказку
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRandom}
+                  className="rounded-xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer text-purple-700"
+                  style={{ background: 'linear-gradient(to right, #EDE9FE, #FDE8FF)' }}
+                >
+                  🎲 Мне повезёт!
+                </button>
+              </div>
             </form>
           </div>
 
