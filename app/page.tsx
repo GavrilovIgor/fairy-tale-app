@@ -4,8 +4,38 @@ import { useState, useEffect, useRef } from 'react'
 
 declare global {
   interface Window {
-    Telegram?: { WebApp: { ready: () => void; expand: () => void; switchInlineQuery?: (query: string, chatTypes?: string[]) => void } }
+    Telegram?: {
+      WebApp: {
+        ready: () => void
+        expand: () => void
+        switchInlineQuery?: (query: string, chatTypes?: string[]) => void
+        openInvoice: (url: string, callback?: (status: string) => void) => void
+      }
+    }
   }
+}
+
+const FREE_LIMIT = 3
+const USAGE_KEY = 'fairy-tale-usage'
+const PAID_UNTIL_KEY = 'fairy-tale-paid-until'
+
+function getUsageCount(): number {
+  try { return parseInt(localStorage.getItem(USAGE_KEY) || '0', 10) } catch { return 0 }
+}
+function incrementUsage() {
+  try { localStorage.setItem(USAGE_KEY, String(getUsageCount() + 1)) } catch { /* */ }
+}
+function getPaidUntil(): number {
+  try { return parseInt(localStorage.getItem(PAID_UNTIL_KEY) || '0', 10) } catch { return 0 }
+}
+function setPaidUntil(ms: number) {
+  try { localStorage.setItem(PAID_UNTIL_KEY, String(ms)) } catch { /* */ }
+}
+function isPremium(): boolean {
+  return getPaidUntil() > Date.now()
+}
+function canGenerate(): boolean {
+  return isPremium() || getUsageCount() < FREE_LIMIT
 }
 
 interface Scene {
@@ -224,6 +254,76 @@ function StoryView({
   )
 }
 
+function Paywall({ onPaid }: { onPaid: () => void }) {
+  const [loading, setLoading] = useState<string | null>(null)
+  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp
+
+  const buy = async (plan: 'one_story' | 'unlimited_30d') => {
+    if (!isTelegram) {
+      alert('Оплата доступна только через Telegram. Откройте бота @volshebnaya_skazka_bot')
+      return
+    }
+    setLoading(plan)
+    try {
+      const res = await fetch('/api/invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      const { invoiceLink } = await res.json()
+      window.Telegram!.WebApp.openInvoice(invoiceLink, (status) => {
+        if (status === 'paid') {
+          if (plan === 'unlimited_30d') {
+            setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          } else {
+            // одна сказка — увеличиваем лимит на 1
+            localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
+          }
+          onPaid()
+        }
+        setLoading(null)
+      })
+    } catch {
+      setLoading(null)
+      alert('Ошибка создания счёта, попробуйте позже')
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+        <div className="text-5xl mb-4">⭐</div>
+        <h2 className="text-2xl font-bold text-purple-800 mb-2">Бесплатные сказки закончились</h2>
+        <p className="text-gray-500 text-sm mb-6">Вы использовали {FREE_LIMIT} бесплатные сказки. Выберите тариф для продолжения:</p>
+
+        <div className="space-y-3">
+          <button
+            onClick={() => buy('one_story')}
+            disabled={!!loading}
+            className="w-full rounded-2xl py-4 bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors disabled:opacity-60 cursor-pointer"
+          >
+            {loading === 'one_story' ? '⏳ Загрузка...' : '✨ 1 сказка — 49 Stars (~65 ₽)'}
+          </button>
+          <button
+            onClick={() => buy('unlimited_30d')}
+            disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer text-white"
+            style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
+          >
+            {loading === 'unlimited_30d' ? '⏳ Загрузка...' : '🚀 Безлимит 30 дней — 249 Stars (~325 ₽)'}
+          </button>
+        </div>
+
+        {!isTelegram && (
+          <p className="mt-4 text-xs text-gray-400">
+            Откройте <a href="https://t.me/volshebnaya_skazka_bot" className="underline">@volshebnaya_skazka_bot</a> в Telegram для оплаты
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'reading'>('idle')
   const [story, setStory] = useState<Story | null>(null)
@@ -234,6 +334,8 @@ export default function Home() {
   const [pdfLoading, setPdfLoading] = useState(false)
   const [pdfError, setPdfError] = useState('')
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'copied-tg'>('idle')
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [usageCount, setUsageCount] = useState(0)
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -248,6 +350,7 @@ export default function Home() {
     window.Telegram?.WebApp?.ready()
     window.Telegram?.WebApp?.expand()
     setSavedStories(loadSaved())
+    setUsageCount(getUsageCount())
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -255,6 +358,10 @@ export default function Home() {
   }
 
   const generateStory = async (data: FormData) => {
+    if (!canGenerate()) {
+      setShowPaywall(true)
+      return
+    }
     setStatus('loading')
     setError('')
     setAlreadySaved(false)
@@ -270,6 +377,8 @@ export default function Home() {
         setStatus('idle')
         return
       }
+      incrementUsage()
+      setUsageCount(getUsageCount())
       setStory(json)
       setCurrentChildName(data.childName)
       setAlreadySaved(false)
@@ -552,13 +661,30 @@ export default function Home() {
     }
   }
 
+  const storiesLeft = isPremium() ? '∞' : Math.max(0, FREE_LIMIT - usageCount)
+
   return (
     <div className="min-h-screen print:bg-white" style={{ background: 'linear-gradient(160deg, #FFFBF4 0%, #FFF3E3 50%, #FFE9D5 100%)' }}>
+      {showPaywall && (
+        <Paywall onPaid={() => { setShowPaywall(false); setUsageCount(getUsageCount()) }} />
+      )}
       <header className="text-center py-10 print:py-4">
         <div className="text-4xl mb-2">✨</div>
         <h1 className="text-4xl font-bold text-purple-800 print:text-black">Волшебная Сказка</h1>
         {status === 'idle' && (
-          <p className="text-orange-400 mt-2">Персональная сказка для вашего ребёнка</p>
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <p className="text-orange-400">Персональная сказка для вашего ребёнка</p>
+            {!isPremium() && (
+              <span className="text-xs text-gray-400 bg-white/70 rounded-full px-3 py-1">
+                {usageCount < FREE_LIMIT
+                  ? `Осталось бесплатных сказок: ${storiesLeft}`
+                  : '🔒 Бесплатные сказки закончились'}
+              </span>
+            )}
+            {isPremium() && (
+              <span className="text-xs text-purple-500 bg-purple-50 rounded-full px-3 py-1">⭐ Премиум активен</span>
+            )}
+          </div>
         )}
       </header>
 
