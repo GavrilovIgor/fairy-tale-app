@@ -97,17 +97,28 @@ function imageUrl(prompt: string, index: number): string {
 function StoryImage({ prompt, index }: { prompt: string; index: number }) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
-  const [retry, setRetry] = useState(0)
-  const [active, setActive] = useState(index === 0)
+  const [cacheKey, setCacheKey] = useState(() => Date.now())
+  const [mounted, setMounted] = useState(index === 0)
 
   useEffect(() => {
     if (index > 0) {
-      const t = setTimeout(() => setActive(true), 2000)
+      const t = setTimeout(() => setMounted(true), 2000)
       return () => clearTimeout(t)
     }
   }, [index])
 
-  const src = `${imageUrl(prompt, index)}&retry=${retry}`
+  const src = `${imageUrl(prompt, index)}&t=${cacheKey}`
+
+  const handleRetry = () => {
+    // Размонтируем img полностью, потом монтируем с новым timestamp — браузер не может использовать кеш
+    setMounted(false)
+    setError(false)
+    setLoaded(false)
+    setTimeout(() => {
+      setCacheKey(Date.now())
+      setMounted(true)
+    }, 50)
+  }
 
   return (
     <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden bg-orange-50 shadow-lg print:shadow-none">
@@ -121,16 +132,13 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <div className="text-3xl">🖼️</div>
           <span className="text-xs text-orange-300 mb-1">Не удалось загрузить</span>
-          <button
-            onClick={() => { setError(false); setLoaded(false); setRetry(r => r + 1) }}
-            className="text-xs text-orange-400 underline cursor-pointer"
-          >
+          <button onClick={handleRetry} className="text-xs text-orange-400 underline cursor-pointer">
             Повторить
           </button>
         </div>
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {active && (
+      {mounted && !error && (
         <img
           key={src}
           src={src}
