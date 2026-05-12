@@ -95,34 +95,42 @@ function imageUrl(prompt: string, index: number): string {
 }
 
 function StoryImage({ prompt, index }: { prompt: string; index: number }) {
-  const [loaded, setLoaded] = useState(false)
+  const [blobSrc, setBlobSrc] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  const [cacheKey, setCacheKey] = useState(() => Date.now())
-  const [mounted, setMounted] = useState(index === 0)
+
+  const load = async () => {
+    setError(false)
+    setLoading(true)
+    setBlobSrc(null)
+    try {
+      const url = `${imageUrl(prompt, index)}&t=${Date.now()}`
+      const res = await fetch(url, { cache: 'no-store' })
+      if (!res.ok) throw new Error(`${res.status}`)
+      const blob = await res.blob()
+      setBlobSrc(URL.createObjectURL(blob))
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    if (index > 0) {
-      const t = setTimeout(() => setMounted(true), 2000)
-      return () => clearTimeout(t)
-    }
-  }, [index])
+    const delay = index === 0 ? 0 : 2000
+    const t = setTimeout(load, delay)
+    return () => clearTimeout(t)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prompt, index])
 
-  const src = `${imageUrl(prompt, index)}&t=${cacheKey}`
-
-  const handleRetry = () => {
-    // Размонтируем img полностью, потом монтируем с новым timestamp — браузер не может использовать кеш
-    setMounted(false)
-    setError(false)
-    setLoaded(false)
-    setTimeout(() => {
-      setCacheKey(Date.now())
-      setMounted(true)
-    }, 50)
-  }
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => { if (blobSrc) URL.revokeObjectURL(blobSrc) }
+  }, [blobSrc])
 
   return (
     <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden bg-orange-50 shadow-lg print:shadow-none">
-      {!loaded && !error && (
+      {loading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <div className="text-3xl animate-spin">🎨</div>
           <span className="text-xs text-orange-300">Рисуем...</span>
@@ -132,20 +140,17 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <div className="text-3xl">🖼️</div>
           <span className="text-xs text-orange-300 mb-1">Не удалось загрузить</span>
-          <button onClick={handleRetry} className="text-xs text-orange-400 underline cursor-pointer">
+          <button onClick={load} className="text-xs text-orange-400 underline cursor-pointer">
             Повторить
           </button>
         </div>
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {mounted && !error && (
+      {blobSrc && (
         <img
-          key={src}
-          src={src}
+          src={blobSrc}
           alt={`Иллюстрация ${index + 1}`}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
+          className="w-full h-full object-cover transition-opacity duration-500 opacity-100"
         />
       )}
     </div>
