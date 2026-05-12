@@ -254,20 +254,39 @@ function StoryView({
   )
 }
 
-const SBP_PHONE = '89164100025'
-const SBP_BANK_HINT = 'Сбер, Т‑Банк, ВТБ или любой другой банк'
-
 function Paywall({ onPaid }: { onPaid: () => void }) {
   const [loading, setLoading] = useState<string | null>(null)
-  const [screen, setScreen] = useState<'choose' | 'sbp' | 'code'>('choose')
-  const [sbpAmount, setSbpAmount] = useState<149 | 349>(349)
+  const [screen, setScreen] = useState<'choose' | 'code'>('choose')
   const [code, setCode] = useState('')
   const [codeError, setCodeError] = useState('')
   const [codeLoading, setCodeLoading] = useState(false)
   const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp
 
+  const telegramId = typeof window !== 'undefined'
+    ? window.Telegram?.WebApp && (window as unknown as { Telegram: { WebApp: { initDataUnsafe?: { user?: { id?: number } } } } }).Telegram?.WebApp?.initDataUnsafe?.user?.id
+    : undefined
+
+  // Оплата через ЮКассу (СБП + карта + SberPay)
+  const buyYookassa = async (plan: 'one_story' | 'unlimited_30d') => {
+    setLoading(plan)
+    try {
+      const res = await fetch('/api/yookassa/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, telegramId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      // Редирект на страницу оплаты ЮКассы
+      window.location.href = data.confirmationUrl
+    } catch {
+      setLoading(null)
+      alert('Ошибка создания платежа, попробуйте позже')
+    }
+  }
+
   const buyStars = async (plan: 'one_story' | 'unlimited_30d') => {
-    if (!isTelegram) { setScreen('sbp'); return }
+    if (!isTelegram) { buyYookassa(plan); return }
     setLoading(plan)
     try {
       const res = await fetch('/api/invoice', {
@@ -305,16 +324,14 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
     finally { setCodeLoading(false) }
   }
 
-  const sbpLink = `https://qr.nspk.ru/AS1000397E04A2BEB83A3B4DCFDA97B65?type=02&bank=100000000111&sum=${sbpAmount * 100}&cur=RUB&crc=AB59`
-
-  // Экран: ввод кода
+  // Экран: ввод кода (резервный, если что-то пошло не так)
   if (screen === 'code') return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
-        <button onClick={() => setScreen('sbp')} className="text-gray-400 text-sm mb-4 cursor-pointer">← Назад</button>
+        <button onClick={() => setScreen('choose')} className="text-gray-400 text-sm mb-4 cursor-pointer">← Назад</button>
         <div className="text-4xl mb-3 text-center">🔑</div>
-        <h3 className="text-xl font-bold text-purple-800 mb-2 text-center">Введите код активации</h3>
-        <p className="text-gray-500 text-sm mb-5 text-center">Код пришёл от бота после подтверждения оплаты</p>
+        <h3 className="text-xl font-bold text-purple-800 mb-2 text-center">Код активации</h3>
+        <p className="text-gray-500 text-sm mb-5 text-center">Введите код, полученный от поддержки</p>
         <input
           value={code}
           onChange={e => { setCode(e.target.value.toUpperCase()); setCodeError('') }}
@@ -334,119 +351,77 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
     </div>
   )
 
-  // Экран: СБП инструкция
-  if (screen === 'sbp') return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 overflow-y-auto py-8">
-      <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl">
-        <button onClick={() => setScreen('choose')} className="text-gray-400 text-sm mb-4 cursor-pointer">← Назад</button>
-        <div className="text-4xl mb-2 text-center">📱</div>
-        <h3 className="text-xl font-bold text-purple-800 mb-1 text-center">Оплата через СБП</h3>
-
-        {/* Выбор тарифа */}
-        <div className="flex gap-2 my-4">
-          {([149, 349] as const).map(amt => (
-            <button
-              key={amt}
-              onClick={() => setSbpAmount(amt)}
-              className={`flex-1 rounded-xl py-2.5 text-sm font-semibold border-2 transition-colors cursor-pointer ${sbpAmount === amt ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-500'}`}
-            >
-              {amt === 149 ? '1 сказка\n149 ₽' : '30 дней\n349 ₽'}
-            </button>
-          ))}
-        </div>
-
-        {/* Шаги */}
-        <div className="space-y-3 mb-5">
-          {[
-            { n: 1, text: `Переведите <b>${sbpAmount} ₽</b> по СБП на номер <b>${SBP_PHONE}</b>`, sub: SBP_BANK_HINT },
-            { n: 2, text: 'Напишите боту слово <b>«Оплатил»</b>', sub: '@volshebnaya_skazka_bot' },
-            { n: 3, text: 'Получите код и введите ниже', sub: 'Обычно за 1–5 минут' },
-          ].map(({ n, text, sub }) => (
-            <div key={n} className="flex gap-3 items-start">
-              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 text-purple-700 text-sm font-bold flex items-center justify-center">{n}</span>
-              <div>
-                <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: text }} />
-                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="space-y-2">
-          <a
-            href={`https://t.me/volshebnaya_skazka_bot`}
-            target="_blank"
-            className="block w-full rounded-2xl py-3.5 bg-sky-500 text-white font-semibold text-center hover:bg-sky-600 transition-colors"
-          >
-            2. Написать боту →
-          </a>
-          <button
-            onClick={() => setScreen('code')}
-            className="w-full rounded-2xl py-3.5 bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors cursor-pointer"
-          >
-            3. У меня есть код →
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-
-  // Главный экран выбора способа оплаты
+  // Главный экран
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl">
         <div className="text-center mb-5">
-          <div className="text-5xl mb-3">🔒</div>
-          <h2 className="text-xl font-bold text-purple-800">Бесплатные сказки закончились</h2>
-          <p className="text-gray-500 text-sm mt-1">Выберите удобный способ оплаты</p>
+          <div className="text-5xl mb-3">✨</div>
+          <h2 className="text-xl font-bold text-purple-800">Продолжить создавать сказки</h2>
+          <p className="text-gray-500 text-sm mt-1">Выберите тариф</p>
         </div>
 
         {/* Тарифы */}
         <div className="grid grid-cols-2 gap-2 mb-5">
           <div className="border-2 border-orange-200 rounded-2xl p-3 text-center">
-            <div className="text-lg font-bold text-orange-500">1 сказка</div>
+            <div className="text-sm font-bold text-orange-500">1 сказка</div>
             <div className="text-2xl font-bold text-gray-800 my-1">149 ₽</div>
-            <div className="text-xs text-gray-400">или 49 ⭐</div>
+            <div className="text-xs text-gray-400">{isTelegram ? 'или 49 ⭐' : 'СБП / карта'}</div>
           </div>
           <div className="border-2 border-purple-300 rounded-2xl p-3 text-center bg-purple-50 relative">
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Выгоднее</div>
-            <div className="text-lg font-bold text-purple-600">30 дней</div>
+            <div className="text-sm font-bold text-purple-600">30 дней</div>
             <div className="text-2xl font-bold text-gray-800 my-1">349 ₽</div>
-            <div className="text-xs text-gray-400">или 249 ⭐</div>
+            <div className="text-xs text-gray-400">{isTelegram ? 'или 249 ⭐' : 'СБП / карта'}</div>
           </div>
         </div>
 
         {/* Кнопки оплаты */}
         <div className="space-y-2.5">
-          <button
-            onClick={() => setScreen('sbp')}
-            className="w-full rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-2 cursor-pointer"
-            style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
-          >
-            <span className="text-lg">💳</span> Оплатить через СБП
-          </button>
+          {/* Главная кнопка — ЮКасса: СБП + карта + SberPay */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => buyYookassa('one_story')}
+              disabled={!!loading}
+              className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
+            >
+              {loading === 'one_story' ? '⏳' : '💳 149 ₽'}
+            </button>
+            <button
+              onClick={() => buyYookassa('unlimited_30d')}
+              disabled={!!loading}
+              className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
+            >
+              {loading === 'unlimited_30d' ? '⏳' : '💳 349 ₽'}
+            </button>
+          </div>
+          <p className="text-center text-xs text-gray-400">СБП · Карта · SberPay · Mir Pay</p>
+
+          {/* Stars — только в Telegram */}
           {isTelegram && (
-            <>
+            <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 onClick={() => buyStars('one_story')}
                 disabled={!!loading}
-                className="w-full rounded-2xl py-3 bg-amber-400 text-white font-semibold text-sm hover:bg-amber-500 transition-colors disabled:opacity-60 cursor-pointer"
+                className="rounded-2xl py-2.5 bg-amber-400 text-white font-semibold text-xs hover:bg-amber-500 transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {loading === 'one_story' ? '⏳...' : '⭐ 49 Stars — 1 сказка'}
+                ⭐ 49 Stars
               </button>
               <button
                 onClick={() => buyStars('unlimited_30d')}
                 disabled={!!loading}
-                className="w-full rounded-2xl py-3 font-semibold text-sm disabled:opacity-60 cursor-pointer text-white"
-                style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
+                className="rounded-2xl py-2.5 bg-amber-500 text-white font-semibold text-xs hover:bg-amber-600 transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {loading === 'unlimited_30d' ? '⏳...' : '⭐ 249 Stars — 30 дней'}
+                ⭐ 249 Stars
               </button>
-            </>
+            </div>
           )}
+
           <button
             onClick={() => setScreen('code')}
-            className="w-full text-xs text-gray-400 py-2 cursor-pointer hover:text-gray-600"
+            className="w-full text-xs text-gray-400 py-1.5 cursor-pointer hover:text-gray-600"
           >
             Есть код активации →
           </button>
@@ -484,7 +459,32 @@ export default function Home() {
     setSavedStories(loadSaved())
     const count = getUsageCount()
     setUsageCount(count)
-    // Показать paywall сразу если лимит исчерпан
+
+    // Проверить возврат с ЮКассы по payment_id в URL
+    const params = new URLSearchParams(window.location.search)
+    const paymentId = params.get('payment_id')
+    const plan = params.get('plan')
+    if (paymentId && plan) {
+      // Убрать параметры из URL
+      window.history.replaceState({}, '', '/')
+      // Проверить статус платежа
+      fetch(`/api/yookassa/check?payment_id=${paymentId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.paid) {
+            if (data.plan === 'unlimited_30d') {
+              setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            } else {
+              localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
+            }
+            setUsageCount(getUsageCount())
+            setShowPaywall(false)
+          }
+        })
+        .catch(() => { /* тихо игнорируем */ })
+      return // не показываем paywall пока идёт проверка
+    }
+
     if (count >= FREE_LIMIT && !isPremium()) {
       setShowPaywall(true)
     }
