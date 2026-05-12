@@ -102,7 +102,7 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
 
   useEffect(() => {
     if (index > 0) {
-      const t = setTimeout(() => setActive(true), 5000)
+      const t = setTimeout(() => setActive(true), 2000)
       return () => clearTimeout(t)
     }
   }, [index])
