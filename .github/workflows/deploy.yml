@@ -1,0 +1,21 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: |
+          npm install -g vercel
+          DEPLOY_URL=$(vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }})
+          echo "Deployed: $DEPLOY_URL"
+          vercel alias set $DEPLOY_URL skazka-ai.vercel.app --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: team_ZxBlTC1fDErCin9o6qxuwCet
+          VERCEL_PROJECT_ID: prj_BHCdoGDYN2oEq6SKx5douTfi6JHB
