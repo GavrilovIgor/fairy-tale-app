@@ -161,8 +161,6 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
     setPhase('loading')
     setBlobSrc(null)
     try {
-      // First attempt uses browser cache (no cache-busting) — will be instant if server pre-fetched
-      // Retries add timestamp to bypass browser cache and get a fresh server request
       const base = imageUrl(prompt, index)
       const url = attempt > 0 ? `${base}&t=${Date.now()}` : base
       const res = await fetch(url)
@@ -173,9 +171,8 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
       setPhase('done')
     } catch {
       if (!mountedRef.current) return
-      if (attempt < 2) {
-        // Silent auto-retry with increasing delay
-        setTimeout(() => load(attempt + 1), 4000 * (attempt + 1))
+      if (attempt < 3) {
+        setTimeout(() => load(attempt + 1), 5000 * (attempt + 1))
       } else {
         setPhase('fallback')
       }
@@ -197,7 +194,17 @@ function StoryImage({ prompt, index }: { prompt: string; index: number }) {
   return (
     <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden bg-orange-50 shadow-lg print:shadow-none">
       {phase === 'loading' && <WatercolorShimmer />}
-      {phase === 'fallback' && <StoryFallback index={index} />}
+      {phase === 'fallback' && (
+        <>
+          <StoryFallback index={index} />
+          <button
+            onClick={() => load(0)}
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-white/80 hover:bg-white text-purple-700 text-xs font-medium px-4 py-1.5 rounded-full shadow transition-colors cursor-pointer"
+          >
+            Повторить загрузку
+          </button>
+        </>
+      )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {phase === 'done' && blobSrc && (
         <img
