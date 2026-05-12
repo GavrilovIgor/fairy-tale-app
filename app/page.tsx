@@ -254,15 +254,20 @@ function StoryView({
   )
 }
 
+const SBP_PHONE = '89164100025'
+const SBP_BANK_HINT = 'Сбер, Т‑Банк, ВТБ или любой другой банк'
+
 function Paywall({ onPaid }: { onPaid: () => void }) {
   const [loading, setLoading] = useState<string | null>(null)
+  const [screen, setScreen] = useState<'choose' | 'sbp' | 'code'>('choose')
+  const [sbpAmount, setSbpAmount] = useState<149 | 349>(349)
+  const [code, setCode] = useState('')
+  const [codeError, setCodeError] = useState('')
+  const [codeLoading, setCodeLoading] = useState(false)
   const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp
 
-  const buy = async (plan: 'one_story' | 'unlimited_30d') => {
-    if (!isTelegram) {
-      alert('Оплата доступна только через Telegram. Откройте бота @volshebnaya_skazka_bot')
-      return
-    }
+  const buyStars = async (plan: 'one_story' | 'unlimited_30d') => {
+    if (!isTelegram) { setScreen('sbp'); return }
     setLoading(plan)
     try {
       const res = await fetch('/api/invoice', {
@@ -273,52 +278,179 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
       const { invoiceLink } = await res.json()
       window.Telegram!.WebApp.openInvoice(invoiceLink, (status) => {
         if (status === 'paid') {
-          if (plan === 'unlimited_30d') {
-            setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          } else {
-            // одна сказка — увеличиваем лимит на 1
-            localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
-          }
+          if (plan === 'unlimited_30d') setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          else localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
           onPaid()
         }
         setLoading(null)
       })
-    } catch {
-      setLoading(null)
-      alert('Ошибка создания счёта, попробуйте позже')
-    }
+    } catch { setLoading(null) }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
-        <div className="text-5xl mb-4">⭐</div>
-        <h2 className="text-2xl font-bold text-purple-800 mb-2">Бесплатные сказки закончились</h2>
-        <p className="text-gray-500 text-sm mb-6">Вы использовали {FREE_LIMIT} бесплатные сказки. Выберите тариф для продолжения:</p>
+  const redeemCode = async () => {
+    if (!code.trim()) return
+    setCodeLoading(true)
+    setCodeError('')
+    try {
+      const res = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setCodeError(data.error || 'Неверный код'); return }
+      setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      onPaid()
+    } catch { setCodeError('Ошибка сети, попробуйте ещё раз') }
+    finally { setCodeLoading(false) }
+  }
 
-        <div className="space-y-3">
-          <button
-            onClick={() => buy('one_story')}
-            disabled={!!loading}
-            className="w-full rounded-2xl py-4 bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors disabled:opacity-60 cursor-pointer"
-          >
-            {loading === 'one_story' ? '⏳ Загрузка...' : '✨ 1 сказка — 49 Stars (~65 ₽)'}
-          </button>
-          <button
-            onClick={() => buy('unlimited_30d')}
-            disabled={!!loading}
-            className="w-full rounded-2xl py-4 font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer text-white"
-            style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
-          >
-            {loading === 'unlimited_30d' ? '⏳ Загрузка...' : '🚀 Безлимит 30 дней — 249 Stars (~325 ₽)'}
-          </button>
+  const sbpLink = `https://qr.nspk.ru/AS1000397E04A2BEB83A3B4DCFDA97B65?type=02&bank=100000000111&sum=${sbpAmount * 100}&cur=RUB&crc=AB59`
+
+  // Экран: ввод кода
+  if (screen === 'code') return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+        <button onClick={() => setScreen('sbp')} className="text-gray-400 text-sm mb-4 cursor-pointer">← Назад</button>
+        <div className="text-4xl mb-3 text-center">🔑</div>
+        <h3 className="text-xl font-bold text-purple-800 mb-2 text-center">Введите код активации</h3>
+        <p className="text-gray-500 text-sm mb-5 text-center">Код пришёл от бота после подтверждения оплаты</p>
+        <input
+          value={code}
+          onChange={e => { setCode(e.target.value.toUpperCase()); setCodeError('') }}
+          placeholder="XXXXXXXX"
+          className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-center text-lg font-mono tracking-widest focus:outline-none focus:border-purple-400 mb-3"
+          maxLength={8}
+        />
+        {codeError && <p className="text-red-500 text-sm text-center mb-3">{codeError}</p>}
+        <button
+          onClick={redeemCode}
+          disabled={codeLoading || code.length < 6}
+          className="w-full rounded-2xl py-3.5 bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 cursor-pointer"
+        >
+          {codeLoading ? '⏳ Проверяем...' : '✅ Активировать'}
+        </button>
+      </div>
+    </div>
+  )
+
+  // Экран: СБП инструкция
+  if (screen === 'sbp') return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 overflow-y-auto py-8">
+      <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl">
+        <button onClick={() => setScreen('choose')} className="text-gray-400 text-sm mb-4 cursor-pointer">← Назад</button>
+        <div className="text-4xl mb-2 text-center">📱</div>
+        <h3 className="text-xl font-bold text-purple-800 mb-1 text-center">Оплата через СБП</h3>
+
+        {/* Выбор тарифа */}
+        <div className="flex gap-2 my-4">
+          {([149, 349] as const).map(amt => (
+            <button
+              key={amt}
+              onClick={() => setSbpAmount(amt)}
+              className={`flex-1 rounded-xl py-2.5 text-sm font-semibold border-2 transition-colors cursor-pointer ${sbpAmount === amt ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-500'}`}
+            >
+              {amt === 149 ? '1 сказка\n149 ₽' : '30 дней\n349 ₽'}
+            </button>
+          ))}
         </div>
 
-        {!isTelegram && (
-          <p className="mt-4 text-xs text-gray-400">
-            Откройте <a href="https://t.me/volshebnaya_skazka_bot" className="underline">@volshebnaya_skazka_bot</a> в Telegram для оплаты
-          </p>
-        )}
+        {/* Шаги */}
+        <div className="space-y-3 mb-5">
+          {[
+            { n: 1, text: `Переведите <b>${sbpAmount} ₽</b> по СБП на номер <b>${SBP_PHONE}</b>`, sub: SBP_BANK_HINT },
+            { n: 2, text: 'Напишите боту слово <b>«Оплатил»</b>', sub: '@volshebnaya_skazka_bot' },
+            { n: 3, text: 'Получите код и введите ниже', sub: 'Обычно за 1–5 минут' },
+          ].map(({ n, text, sub }) => (
+            <div key={n} className="flex gap-3 items-start">
+              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-purple-100 text-purple-700 text-sm font-bold flex items-center justify-center">{n}</span>
+              <div>
+                <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: text }} />
+                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          <a
+            href={`https://t.me/volshebnaya_skazka_bot`}
+            target="_blank"
+            className="block w-full rounded-2xl py-3.5 bg-sky-500 text-white font-semibold text-center hover:bg-sky-600 transition-colors"
+          >
+            2. Написать боту →
+          </a>
+          <button
+            onClick={() => setScreen('code')}
+            className="w-full rounded-2xl py-3.5 bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors cursor-pointer"
+          >
+            3. У меня есть код →
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  // Главный экран выбора способа оплаты
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-3xl p-7 max-w-sm w-full shadow-2xl">
+        <div className="text-center mb-5">
+          <div className="text-5xl mb-3">🔒</div>
+          <h2 className="text-xl font-bold text-purple-800">Бесплатные сказки закончились</h2>
+          <p className="text-gray-500 text-sm mt-1">Выберите удобный способ оплаты</p>
+        </div>
+
+        {/* Тарифы */}
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          <div className="border-2 border-orange-200 rounded-2xl p-3 text-center">
+            <div className="text-lg font-bold text-orange-500">1 сказка</div>
+            <div className="text-2xl font-bold text-gray-800 my-1">149 ₽</div>
+            <div className="text-xs text-gray-400">или 49 ⭐</div>
+          </div>
+          <div className="border-2 border-purple-300 rounded-2xl p-3 text-center bg-purple-50 relative">
+            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Выгоднее</div>
+            <div className="text-lg font-bold text-purple-600">30 дней</div>
+            <div className="text-2xl font-bold text-gray-800 my-1">349 ₽</div>
+            <div className="text-xs text-gray-400">или 249 ⭐</div>
+          </div>
+        </div>
+
+        {/* Кнопки оплаты */}
+        <div className="space-y-2.5">
+          <button
+            onClick={() => setScreen('sbp')}
+            className="w-full rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-2 cursor-pointer"
+            style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
+          >
+            <span className="text-lg">💳</span> Оплатить через СБП
+          </button>
+          {isTelegram && (
+            <>
+              <button
+                onClick={() => buyStars('one_story')}
+                disabled={!!loading}
+                className="w-full rounded-2xl py-3 bg-amber-400 text-white font-semibold text-sm hover:bg-amber-500 transition-colors disabled:opacity-60 cursor-pointer"
+              >
+                {loading === 'one_story' ? '⏳...' : '⭐ 49 Stars — 1 сказка'}
+              </button>
+              <button
+                onClick={() => buyStars('unlimited_30d')}
+                disabled={!!loading}
+                className="w-full rounded-2xl py-3 font-semibold text-sm disabled:opacity-60 cursor-pointer text-white"
+                style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
+              >
+                {loading === 'unlimited_30d' ? '⏳...' : '⭐ 249 Stars — 30 дней'}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setScreen('code')}
+            className="w-full text-xs text-gray-400 py-2 cursor-pointer hover:text-gray-600"
+          >
+            Есть код активации →
+          </button>
+        </div>
       </div>
     </div>
   )
