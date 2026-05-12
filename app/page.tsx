@@ -852,6 +852,23 @@ export default function Home() {
           </div>
 
           <div className="bg-white rounded-3xl shadow-xl p-8">
+            {/* Кнопка быстрого старта — над формой */}
+            <button
+              type="button"
+              onClick={handleRandom}
+              className="w-full rounded-2xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer text-purple-700 mb-2"
+              style={{ background: 'linear-gradient(to right, #EDE9FE, #FDE8FF)' }}
+            >
+              🎲 Мне повезёт! — создать сказку прямо сейчас
+            </button>
+            <p className="text-center text-xs text-gray-400 mb-6">Не хочешь заполнять? Нажми — сделаем случайную сказку за тебя</p>
+
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex-1 h-px bg-gray-100" />
+              <span className="text-xs text-gray-400">или заполни сам</span>
+              <div className="flex-1 h-px bg-gray-100" />
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -938,23 +955,13 @@ export default function Home() {
                 <div className="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">{error}</div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="submit"
-                  className="text-white rounded-xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer"
-                  style={{ background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
-                >
-                  ✨ Создать сказку
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRandom}
-                  className="rounded-xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer text-purple-700"
-                  style={{ background: 'linear-gradient(to right, #EDE9FE, #FDE8FF)' }}
-                >
-                  🎲 Мне повезёт!
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full text-white rounded-xl py-3.5 font-semibold text-base hover:opacity-90 transition-opacity cursor-pointer"
+                style={{ background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
+              >
+                ✨ Создать сказку
+              </button>
             </form>
           </div>
 
