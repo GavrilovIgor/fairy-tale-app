@@ -5,7 +5,7 @@ const API = `https://api.telegram.org/bot${BOT_TOKEN}`
 
 // Тарифы в Stars (1 Star ≈ $0.013 / ~1.2 руб)
 const PLANS = {
-  one_story: { title: '1 сказка', description: 'Одна персональная сказка с иллюстрациями и PDF', amount: 49 },
+  three_stories: { title: '3 сказки', description: '3 персональные сказки с иллюстрациями и PDF', amount: 49 },
   unlimited_30d: { title: 'Безлимит на 30 дней', description: 'Неограниченное количество сказок в течение 30 дней', amount: 249 },
 }
 
