@@ -40,11 +40,34 @@ const OPEN_APP_KEYBOARD = {
   }]],
 }
 
+const NTFY_TOPIC = process.env.NTFY_TOPIC // напр. "skazka-igor-tasks-2026"
+
+async function sendAdminTask(taskText: string) {
+  if (!NTFY_TOPIC) return
+  await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+    method: 'POST',
+    headers: {
+      'Title': '🛠 Задача: Волшебная Сказка',
+      'Priority': 'high',
+      'Tags': 'fairy-tale-app',
+    },
+    body: taskText,
+  })
+}
+
 export async function POST(req: NextRequest) {
   const update = await req.json()
   const msg = update.message
   const chatId = msg?.chat?.id
   const text = msg?.text?.toLowerCase().trim()
+  const rawText = msg?.text?.trim()
+
+  // Сообщение от владельца (не команда) — передать Claude Code как задачу
+  if (chatId === parseInt(OWNER_CHAT_ID || '0') && rawText && !rawText.startsWith('/')) {
+    await sendAdminTask(rawText)
+    await sendMessage(chatId, `✅ Задача отправлена в Claude Code:\n\n<i>${rawText}</i>`)
+    return NextResponse.json({ ok: true })
+  }
 
   // /myid — узнать свой chat_id
   if (text === '/myid') {
