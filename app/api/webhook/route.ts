@@ -44,15 +44,18 @@ const NTFY_TOPIC = process.env.NTFY_TOPIC // напр. "skazka-igor-tasks-2026"
 
 async function sendAdminTask(taskText: string) {
   if (!NTFY_TOPIC) return
+  // Заголовки должны быть ASCII — кодируем кириллицу в base64
+  const titleEncoded = Buffer.from('Zadacha: Volshebnaya Skazka').toString('ascii')
   await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
     method: 'POST',
     headers: {
-      'Title': '🛠 Задача: Волшебная Сказка',
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Title': titleEncoded,
       'Priority': 'high',
-      'Tags': 'fairy-tale-app',
+      'Tags': 'wrench',
     },
     body: taskText,
-  })
+  }).catch(err => console.error('ntfy error:', err))
 }
 
 export async function POST(req: NextRequest) {
