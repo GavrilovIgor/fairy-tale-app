@@ -482,7 +482,12 @@ export default function Home() {
     window.Telegram?.WebApp?.ready()
     window.Telegram?.WebApp?.expand()
     setSavedStories(loadSaved())
-    setUsageCount(getUsageCount())
+    const count = getUsageCount()
+    setUsageCount(count)
+    // Показать paywall сразу если лимит исчерпан
+    if (count >= FREE_LIMIT && !isPremium()) {
+      setShowPaywall(true)
+    }
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -806,12 +811,18 @@ export default function Home() {
         {status === 'idle' && (
           <div className="mt-2 flex flex-col items-center gap-1">
             <p className="text-orange-400">Персональная сказка для вашего ребёнка</p>
-            {!isPremium() && (
+            {!isPremium() && usageCount < FREE_LIMIT && (
               <span className="text-xs text-gray-400 bg-white/70 rounded-full px-3 py-1">
-                {usageCount < FREE_LIMIT
-                  ? `Осталось бесплатных сказок: ${storiesLeft}`
-                  : '🔒 Бесплатные сказки закончились'}
+                Осталось бесплатных сказок: {storiesLeft}
               </span>
+            )}
+            {!isPremium() && usageCount >= FREE_LIMIT && (
+              <button
+                onClick={() => setShowPaywall(true)}
+                className="text-xs text-white bg-purple-500 hover:bg-purple-600 rounded-full px-4 py-1.5 cursor-pointer transition-colors"
+              >
+                🔒 Открыть доступ →
+              </button>
             )}
             {isPremium() && (
               <span className="text-xs text-purple-500 bg-purple-50 rounded-full px-3 py-1">⭐ Премиум активен</span>
@@ -820,7 +831,25 @@ export default function Home() {
         )}
       </header>
 
-      {status === 'idle' && (
+      {status === 'idle' && !isPremium() && usageCount >= FREE_LIMIT && (
+        <main className="max-w-2xl mx-auto px-4 pb-16">
+          <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
+            <div className="text-6xl mb-4">📖</div>
+            <h2 className="text-2xl font-bold text-purple-800 mb-3">Вы использовали все бесплатные сказки</h2>
+            <p className="text-gray-500 mb-8">Разблокируйте доступ, чтобы создавать персональные сказки для вашего ребёнка</p>
+            <button
+              onClick={() => setShowPaywall(true)}
+              className="w-full rounded-2xl py-4 text-white font-bold text-lg cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(to right, #F97316, #F59E0B)' }}
+            >
+              ✨ Разблокировать сказки
+            </button>
+            <p className="text-xs text-gray-400 mt-4">От 149 ₽ · СБП или Telegram Stars</p>
+          </div>
+        </main>
+      )}
+
+      {status === 'idle' && (isPremium() || usageCount < FREE_LIMIT) && (
         <main className="max-w-2xl mx-auto px-4 pb-16">
           <div className="bg-white rounded-3xl shadow-sm px-6 py-5 mb-6">
             <div className="space-y-3">

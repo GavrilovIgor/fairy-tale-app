@@ -46,6 +46,12 @@ export async function POST(req: NextRequest) {
   const chatId = msg?.chat?.id
   const text = msg?.text?.toLowerCase().trim()
 
+  // /myid — узнать свой chat_id
+  if (text === '/myid') {
+    await sendMessage(chatId, `Ваш chat_id: <code>${chatId}</code>`)
+    return NextResponse.json({ ok: true })
+  }
+
   // /start
   if (text === '/start') {
     const name = msg.from?.first_name || 'друг'
