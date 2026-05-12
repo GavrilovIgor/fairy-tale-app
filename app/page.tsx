@@ -265,17 +265,14 @@ function StoryView({
 function Paywall({ onPaid }: { onPaid: () => void }) {
   const [loading, setLoading] = useState<string | null>(null)
   const [screen, setScreen] = useState<'choose' | 'code'>('choose')
-  const [payMethod, setPayMethod] = useState<'rub' | 'stars'>('rub')
   const [code, setCode] = useState('')
   const [codeError, setCodeError] = useState('')
   const [codeLoading, setCodeLoading] = useState(false)
-  const isTelegram = typeof window !== 'undefined' && !!window.Telegram?.WebApp
 
   const telegramId = typeof window !== 'undefined'
     ? window.Telegram?.WebApp && (window as unknown as { Telegram: { WebApp: { initDataUnsafe?: { user?: { id?: number } } } } }).Telegram?.WebApp?.initDataUnsafe?.user?.id
     : undefined
 
-  // Оплата через ЮКассу (СБП + карта + SberPay)
   const buyYookassa = async (plan: 'three_stories' | 'unlimited_30d') => {
     setLoading(plan)
     try {
@@ -291,26 +288,6 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
       setLoading(null)
       alert('Ошибка создания платежа, попробуйте позже')
     }
-  }
-
-  const buyStars = async (plan: 'three_stories' | 'unlimited_30d') => {
-    setLoading(plan)
-    try {
-      const res = await fetch('/api/invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      })
-      const { invoiceLink } = await res.json()
-      window.Telegram!.WebApp.openInvoice(invoiceLink, (status) => {
-        if (status === 'paid') {
-          if (plan === 'unlimited_30d') setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          else localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 3)))
-          onPaid()
-        }
-        setLoading(null)
-      })
-    } catch { setLoading(null) }
   }
 
   const redeemCode = async () => {
@@ -383,73 +360,27 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
           </div>
         </div>
 
-        {/* Переключатель способа оплаты — только в Telegram */}
-        {isTelegram && (
-          <div className="flex bg-gray-100 rounded-2xl p-1 mb-4">
-            <button
-              onClick={() => setPayMethod('rub')}
-              className={`flex-1 rounded-xl py-2 text-sm font-semibold transition-all cursor-pointer ${payMethod === 'rub' ? 'bg-white shadow text-gray-800' : 'text-gray-400'}`}
-            >
-              💳 Рублями
-            </button>
-            <button
-              onClick={() => setPayMethod('stars')}
-              className={`flex-1 rounded-xl py-2 text-sm font-semibold transition-all cursor-pointer ${payMethod === 'stars' ? 'bg-white shadow text-amber-500' : 'text-gray-400'}`}
-            >
-              ⭐ Stars
-            </button>
-          </div>
-        )}
-
         {/* Кнопки оплаты */}
         <div className="space-y-2.5">
-          {(!isTelegram || payMethod === 'rub') && (
-            <>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => buyYookassa('three_stories')}
-                  disabled={!!loading}
-                  className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
-                  style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
-                >
-                  {loading === 'three_stories' ? '⏳' : '💳 149 ₽'}
-                </button>
-                <button
-                  onClick={() => buyYookassa('unlimited_30d')}
-                  disabled={!!loading}
-                  className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
-                  style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
-                >
-                  {loading === 'unlimited_30d' ? '⏳' : '💳 349 ₽'}
-                </button>
-              </div>
-              <p className="text-center text-xs text-gray-400">СБП · Карта · SberPay · Mir Pay</p>
-            </>
-          )}
-
-          {isTelegram && payMethod === 'stars' && (
-            <>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => buyStars('three_stories')}
-                  disabled={!!loading}
-                  className="rounded-2xl py-3.5 font-bold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
-                  style={{ background: 'linear-gradient(to right, #f59e0b, #d97706)' }}
-                >
-                  {loading === 'three_stories' ? '⏳' : '⭐ 49 Stars'}
-                </button>
-                <button
-                  onClick={() => buyStars('unlimited_30d')}
-                  disabled={!!loading}
-                  className="rounded-2xl py-3.5 font-bold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
-                  style={{ background: 'linear-gradient(to right, #f59e0b, #b45309)' }}
-                >
-                  {loading === 'unlimited_30d' ? '⏳' : '⭐ 249 Stars'}
-                </button>
-              </div>
-              <p className="text-center text-xs text-gray-400">3 сказки · 30 дней безлимита</p>
-            </>
-          )}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => buyYookassa('three_stories')}
+              disabled={!!loading}
+              className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
+            >
+              {loading === 'three_stories' ? '⏳' : '💳 149 ₽'}
+            </button>
+            <button
+              onClick={() => buyYookassa('unlimited_30d')}
+              disabled={!!loading}
+              className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+              style={{ background: 'linear-gradient(to right, #7c3aed, #a855f7)' }}
+            >
+              {loading === 'unlimited_30d' ? '⏳' : '💳 349 ₽'}
+            </button>
+          </div>
+          <p className="text-center text-xs text-gray-400">СБП · Карта · SberPay · Mir Pay</p>
 
           <button
             onClick={() => setScreen('code')}
