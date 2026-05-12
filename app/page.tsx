@@ -443,6 +443,7 @@ export default function Home() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'copied-tg'>('idle')
   const [showPaywall, setShowPaywall] = useState(false)
   const [usageCount, setUsageCount] = useState(0)
+  const [checkingPayment, setCheckingPayment] = useState(false)
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
     childName: '',
@@ -465,24 +466,40 @@ export default function Home() {
     const paymentId = params.get('payment_id')
     const plan = params.get('plan')
     if (paymentId && plan) {
-      // Убрать параметры из URL
       window.history.replaceState({}, '', '/')
-      // Проверить статус платежа
-      fetch(`/api/yookassa/check?payment_id=${paymentId}`)
-        .then(r => r.json())
-        .then(data => {
+      setCheckingPayment(true)
+
+      // Поллинг: проверяем каждые 3 сек до 20 попыток (60 сек)
+      let attempts = 0
+      const poll = async () => {
+        attempts++
+        try {
+          const r = await fetch(`/api/yookassa/check?payment_id=${paymentId}`)
+          const data = await r.json()
           if (data.paid) {
             if (data.plan === 'unlimited_30d') {
               setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
             } else {
-              localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
+              // одна сказка — сбросить счётчик на 1 ниже лимита
+              localStorage.setItem(USAGE_KEY, String(FREE_LIMIT - 1))
             }
             setUsageCount(getUsageCount())
+            setCheckingPayment(false)
             setShowPaywall(false)
+            return
           }
-        })
-        .catch(() => { /* тихо игнорируем */ })
-      return // не показываем paywall пока идёт проверка
+        } catch { /* продолжаем попытки */ }
+
+        if (attempts < 20) {
+          setTimeout(poll, 3000)
+        } else {
+          // Таймаут — показываем инструкцию с кодом активации
+          setCheckingPayment(false)
+          setShowPaywall(true)
+        }
+      }
+      poll()
+      return
     }
 
     if (count >= FREE_LIMIT && !isPremium()) {
@@ -802,7 +819,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen print:bg-white" style={{ background: 'linear-gradient(160deg, #FFFBF4 0%, #FFF3E3 50%, #FFE9D5 100%)' }}>
-      {showPaywall && (
+      {checkingPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-3xl p-10 max-w-sm w-full shadow-2xl text-center">
+            <div className="text-5xl mb-4 animate-spin">⏳</div>
+            <h2 className="text-xl font-bold text-purple-800 mb-2">Проверяем оплату...</h2>
+            <p className="text-gray-500 text-sm">СБП-платёж подтверждается банком, обычно до 30 секунд</p>
+          </div>
+        </div>
+      )}
+      {!checkingPayment && showPaywall && (
         <Paywall onPaid={() => { setShowPaywall(false); setUsageCount(getUsageCount()) }} />
       )}
       <header className="text-center py-10 print:py-4">
