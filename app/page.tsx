@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 declare global {
   interface Window {
@@ -94,63 +94,117 @@ function imageUrl(prompt: string, index: number): string {
   return `/api/image?prompt=${encodeURIComponent(base)}&seed=${index * 137 + 42}`
 }
 
-function StoryImage({ prompt, index }: { prompt: string; index: number }) {
-  const [blobSrc, setBlobSrc] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+// Beautiful watercolor-style fallback illustrations (shown only if all retries fail)
+const FALLBACK_SCENES = [
+  {
+    bg: ['#FEF9C3', '#FDE68A', '#FCA5A5'],
+    emoji: '🌅',
+    stars: false,
+  },
+  {
+    bg: ['#EDE9FE', '#C4B5FD', '#818CF8'],
+    emoji: '✨',
+    stars: true,
+  },
+  {
+    bg: ['#D1FAE5', '#6EE7B7', '#34D399'],
+    emoji: '🌿',
+    stars: false,
+  },
+]
 
-  const load = async () => {
-    setError(false)
-    setLoading(true)
-    setBlobSrc(null)
-    try {
-      const url = `${imageUrl(prompt, index)}&t=${Date.now()}`
-      const res = await fetch(url, { cache: 'no-store' })
-      if (!res.ok) throw new Error(`${res.status}`)
-      const blob = await res.blob()
-      setBlobSrc(URL.createObjectURL(blob))
-    } catch {
-      setError(true)
-    } finally {
-      setLoading(false)
-    }
-  }
+function StoryFallback({ index }: { index: number }) {
+  const scene = FALLBACK_SCENES[index % FALLBACK_SCENES.length]
+  const [c1, c2, c3] = scene.bg
+  return (
+    <div
+      className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+      style={{ background: `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)` }}
+    >
+      {scene.stars && (
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 267" aria-hidden>
+          {[
+            [60, 40], [120, 80], [200, 25], [280, 60], [340, 35],
+            [80, 130], [160, 160], [240, 110], [320, 150], [370, 100],
+            [50, 200], [150, 220], [220, 190], [300, 230], [360, 200],
+          ].map(([cx, cy], i) => (
+            <circle key={i} cx={cx} cy={cy} r={i % 3 === 0 ? 3 : 2} fill="white" opacity={0.5 + (i % 3) * 0.2} />
+          ))}
+        </svg>
+      )}
+      <div className="text-5xl float-anim relative z-10">{scene.emoji}</div>
+    </div>
+  )
+}
+
+function WatercolorShimmer() {
+  return (
+    <div className="absolute inset-0 watercolor-shimmer flex flex-col items-center justify-center gap-3">
+      <div className="text-4xl float-anim">🎨</div>
+      <span className="text-xs text-purple-300 font-medium tracking-wide">Иллюстрация создаётся...</span>
+    </div>
+  )
+}
+
+function StoryImage({ prompt, index }: { prompt: string; index: number }) {
+  const [phase, setPhase] = useState<'loading' | 'done' | 'fallback'>('loading')
+  const [blobSrc, setBlobSrc] = useState<string | null>(null)
+  const mountedRef = useRef(true)
 
   useEffect(() => {
-    const delay = index === 0 ? 0 : 2000
-    const t = setTimeout(load, delay)
-    return () => clearTimeout(t)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
+  const load = useCallback(async (attempt = 0) => {
+    if (!mountedRef.current) return
+    setPhase('loading')
+    setBlobSrc(null)
+    try {
+      // First attempt uses browser cache (no cache-busting) — will be instant if server pre-fetched
+      // Retries add timestamp to bypass browser cache and get a fresh server request
+      const base = imageUrl(prompt, index)
+      const url = attempt > 0 ? `${base}&t=${Date.now()}` : base
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`${res.status}`)
+      const blob = await res.blob()
+      if (!mountedRef.current) return
+      setBlobSrc(URL.createObjectURL(blob))
+      setPhase('done')
+    } catch {
+      if (!mountedRef.current) return
+      if (attempt < 2) {
+        // Silent auto-retry with increasing delay
+        setTimeout(() => load(attempt + 1), 4000 * (attempt + 1))
+      } else {
+        setPhase('fallback')
+      }
+    }
   }, [prompt, index])
 
-  // Cleanup blob URL on unmount
+  useEffect(() => {
+    // Stagger: first image immediately, next ones with small delay
+    // Delay is short because server has likely already pre-fetched
+    const delay = index * 600
+    const t = setTimeout(() => load(0), delay)
+    return () => clearTimeout(t)
+  }, [prompt, index, load])
+
   useEffect(() => {
     return () => { if (blobSrc) URL.revokeObjectURL(blobSrc) }
   }, [blobSrc])
 
   return (
     <div className="relative w-full aspect-[3/2] rounded-2xl overflow-hidden bg-orange-50 shadow-lg print:shadow-none">
-      {loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <div className="text-3xl animate-spin">🎨</div>
-          <span className="text-xs text-orange-300">Рисуем...</span>
-        </div>
-      )}
-      {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <div className="text-3xl">🖼️</div>
-          <span className="text-xs text-orange-300 mb-1">Не удалось загрузить</span>
-          <button onClick={load} className="text-xs text-orange-400 underline cursor-pointer">
-            Повторить
-          </button>
-        </div>
-      )}
+      {phase === 'loading' && <WatercolorShimmer />}
+      {phase === 'fallback' && <StoryFallback index={index} />}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {blobSrc && (
+      {phase === 'done' && blobSrc && (
         <img
           src={blobSrc}
           alt={`Иллюстрация ${index + 1}`}
-          className="w-full h-full object-cover transition-opacity duration-500 opacity-100"
+          className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+          onLoad={e => { (e.target as HTMLImageElement).style.opacity = '1' }}
         />
       )}
     </div>

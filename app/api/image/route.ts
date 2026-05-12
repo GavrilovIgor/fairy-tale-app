@@ -1,38 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cleanPrompt, seedForIndex, fetchAndCache } from '@/lib/imageCache'
 
 export const maxDuration = 60
 
 export async function GET(req: NextRequest) {
   const prompt = req.nextUrl.searchParams.get('prompt') ?? 'watercolor children illustration'
-  const seed = req.nextUrl.searchParams.get('seed') ?? '42'
+  const seedParam = req.nextUrl.searchParams.get('seed')
+  const indexParam = req.nextUrl.searchParams.get('index')
 
-  const cleanPrompt = prompt.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, ' ').trim().slice(0, 120)
-  const finalPrompt = `${cleanPrompt}, children's book watercolor illustration, soft pastel colors, no text, no words`
+  const cp = cleanPrompt(prompt)
+  const seed = seedParam ?? (indexParam != null ? seedForIndex(Number(indexParam)) : '42')
 
-  // Два варианта URL — основной и с другим сидом как запасной
-  const urls = [
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=768&height=512&nologo=true&seed=${seed}`,
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=640&height=427&nologo=true&seed=${Number(seed) + 1}`,
-  ]
+  const entry = await fetchAndCache(cp, seed)
+  if (!entry) return new NextResponse(null, { status: 502 })
 
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (attempt > 0) await new Promise(r => setTimeout(r, 2000))
-    try {
-      const res = await fetch(urls[attempt], { signal: AbortSignal.timeout(25000) })
-      if (!res.ok) throw new Error(`Status ${res.status}`)
-
-      const buffer = await res.arrayBuffer()
-      return new NextResponse(buffer, {
-        headers: {
-          'Content-Type': res.headers.get('Content-Type') ?? 'image/jpeg',
-          'Cache-Control': 'public, max-age=86400',
-          'Access-Control-Allow-Origin': '*',
-        },
-      })
-    } catch (err) {
-      console.error(`Image attempt ${attempt + 1} failed:`, err)
-    }
-  }
-
-  return new NextResponse(null, { status: 502 })
+  return new NextResponse(entry.buffer, {
+    headers: {
+      'Content-Type': entry.contentType,
+      'Cache-Control': 'public, max-age=86400',
+    },
+  })
 }

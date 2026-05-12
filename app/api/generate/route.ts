@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { prefetchImages } from '@/lib/imageCache'
 
 export const maxDuration = 120
 
@@ -76,6 +77,8 @@ export async function POST(req: NextRequest) {
           ...scene,
           imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
         }))
+        // Start fetching images in background — they'll be cached by the time user sees the story
+        prefetchImages(story.scenes)
       }
 
       return NextResponse.json(story)

@@ -5,6 +5,27 @@ body {
   color: #171717;
 }
 
+@keyframes watercolor {
+  0%   { background-position: 0% 50% }
+  50%  { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) }
+  50%       { transform: translateY(-8px) }
+}
+
+.watercolor-shimmer {
+  background: linear-gradient(-45deg, #FFF3E3, #EDE9FE, #FDE8FF, #FEF3C7, #E0F2FE, #FCE7F3);
+  background-size: 400% 400%;
+  animation: watercolor 5s ease infinite;
+}
+
+.float-anim {
+  animation: float 2.5s ease-in-out infinite;
+}
+
 @media print {
   body {
     background: white !important;
