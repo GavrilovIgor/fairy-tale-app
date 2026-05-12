@@ -6,7 +6,7 @@ const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
 const BASE_URL = 'https://skazka-ai.vercel.app'
 
 const PLANS = {
-  one_story: { amount: '149.00', description: 'Волшебная Сказка — 1 сказка' },
+  three_stories: { amount: '149.00', description: 'Волшебная Сказка — 3 сказки' },
   unlimited_30d: { amount: '349.00', description: 'Волшебная Сказка — безлимит 30 дней' },
 }
 

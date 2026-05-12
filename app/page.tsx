@@ -267,7 +267,7 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
     : undefined
 
   // Оплата через ЮКассу (СБП + карта + SberPay)
-  const buyYookassa = async (plan: 'one_story' | 'unlimited_30d') => {
+  const buyYookassa = async (plan: 'three_stories' | 'unlimited_30d') => {
     setLoading(plan)
     try {
       const res = await fetch('/api/yookassa/create', {
@@ -277,33 +277,11 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      // Редирект на страницу оплаты ЮКассы
       window.location.href = data.confirmationUrl
     } catch {
       setLoading(null)
       alert('Ошибка создания платежа, попробуйте позже')
     }
-  }
-
-  const buyStars = async (plan: 'one_story' | 'unlimited_30d') => {
-    if (!isTelegram) { buyYookassa(plan); return }
-    setLoading(plan)
-    try {
-      const res = await fetch('/api/invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      })
-      const { invoiceLink } = await res.json()
-      window.Telegram!.WebApp.openInvoice(invoiceLink, (status) => {
-        if (status === 'paid') {
-          if (plan === 'unlimited_30d') setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
-          else localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 1)))
-          onPaid()
-        }
-        setLoading(null)
-      })
-    } catch { setLoading(null) }
   }
 
   const redeemCode = async () => {
@@ -364,29 +342,28 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
         {/* Тарифы */}
         <div className="grid grid-cols-2 gap-2 mb-5">
           <div className="border-2 border-orange-200 rounded-2xl p-3 text-center">
-            <div className="text-sm font-bold text-orange-500">1 сказка</div>
+            <div className="text-sm font-bold text-orange-500">3 сказки</div>
             <div className="text-2xl font-bold text-gray-800 my-1">149 ₽</div>
-            <div className="text-xs text-gray-400">{isTelegram ? 'или 49 ⭐' : 'СБП / карта'}</div>
+            <div className="text-xs text-gray-400">СБП · Карта · SberPay</div>
           </div>
           <div className="border-2 border-purple-300 rounded-2xl p-3 text-center bg-purple-50 relative">
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Выгоднее</div>
             <div className="text-sm font-bold text-purple-600">30 дней</div>
             <div className="text-2xl font-bold text-gray-800 my-1">349 ₽</div>
-            <div className="text-xs text-gray-400">{isTelegram ? 'или 249 ⭐' : 'СБП / карта'}</div>
+            <div className="text-xs text-gray-400">Безлимит · СБП · Карта</div>
           </div>
         </div>
 
         {/* Кнопки оплаты */}
         <div className="space-y-2.5">
-          {/* Главная кнопка — ЮКасса: СБП + карта + SberPay */}
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => buyYookassa('one_story')}
+              onClick={() => buyYookassa('three_stories')}
               disabled={!!loading}
               className="rounded-2xl py-3.5 font-semibold text-white text-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
               style={{ background: 'linear-gradient(to right, #2da562, #1a8a4a)' }}
             >
-              {loading === 'one_story' ? '⏳' : '💳 149 ₽'}
+              {loading === 'three_stories' ? '⏳' : '💳 149 ₽'}
             </button>
             <button
               onClick={() => buyYookassa('unlimited_30d')}
@@ -398,26 +375,6 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
             </button>
           </div>
           <p className="text-center text-xs text-gray-400">СБП · Карта · SberPay · Mir Pay</p>
-
-          {/* Stars — только в Telegram */}
-          {isTelegram && (
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                onClick={() => buyStars('one_story')}
-                disabled={!!loading}
-                className="rounded-2xl py-2.5 bg-amber-400 text-white font-semibold text-xs hover:bg-amber-500 transition-colors disabled:opacity-60 cursor-pointer"
-              >
-                ⭐ 49 Stars
-              </button>
-              <button
-                onClick={() => buyStars('unlimited_30d')}
-                disabled={!!loading}
-                className="rounded-2xl py-2.5 bg-amber-500 text-white font-semibold text-xs hover:bg-amber-600 transition-colors disabled:opacity-60 cursor-pointer"
-              >
-                ⭐ 249 Stars
-              </button>
-            </div>
-          )}
 
           <button
             onClick={() => setScreen('code')}
@@ -480,8 +437,8 @@ export default function Home() {
             if (data.plan === 'unlimited_30d') {
               setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
             } else {
-              // одна сказка — сбросить счётчик на 1 ниже лимита
-              localStorage.setItem(USAGE_KEY, String(FREE_LIMIT - 1))
+              // 3 сказки — сбросить счётчик так чтобы осталось 3 попытки
+              localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 3)))
             }
             setUsageCount(getUsageCount())
             setCheckingPayment(false)

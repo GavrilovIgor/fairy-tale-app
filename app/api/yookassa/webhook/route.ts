@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   const plan = payment.metadata?.plan
   const telegramId = payment.metadata?.telegramId
   const amount = payment.amount?.value
-  const planLabel = plan === 'unlimited_30d' ? 'Безлимит на 30 дней' : '1 сказка'
+  const planLabel = plan === 'unlimited_30d' ? 'Безлимит на 30 дней' : '3 сказки'
 
   // Уведомление пользователю в Telegram (если пришёл из бота)
   if (telegramId) {
