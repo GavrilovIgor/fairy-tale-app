@@ -48,8 +48,10 @@ export default function RootLayout({
       lang="ru"
       className={`${jakarta.variable} ${playfair.variable} h-full antialiased`}
     >
-      <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
+      </body>
     </html>
   );
 }
