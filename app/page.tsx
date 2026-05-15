@@ -310,7 +310,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
       <div className="rounded-2xl p-5 mb-6 text-center" style={{background:'var(--primary-light)',border:'1.5px dashed var(--primary)'}}>
         <p className="text-sm font-semibold mb-3" style={{color:'var(--primary)'}}>Хочешь попробовать прямо сейчас?</p>
         <button type="button" onClick={handleRandom} disabled={isLoading}
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold text-white cursor-pointer disabled:opacity-60 hover:opacity-90 transition-opacity"
+          className="clay-btn inline-flex items-center gap-2 px-8 py-4 font-bold cursor-pointer disabled:opacity-60"
           style={{background:'var(--primary)'}}>
           {isLoading?'⏳ Создаём...':'🎲 Мне повезёт! — создать сказку'}
         </button>
@@ -385,7 +385,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
           </div>
 
           <button type="submit" disabled={isLoading}
-            className="w-full rounded-2xl py-4 font-bold text-base text-white disabled:opacity-60 cursor-pointer hover:opacity-90 transition-opacity"
+            className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 cursor-pointer"
             style={{background:'var(--primary)',boxShadow:'0 8px 24px rgba(107,56,212,0.3)'}}>
             {isLoading?'⏳ Создаём...': `✨ Создать сказку ${form.childName?`для ${form.childName}`:''}`}
           </button>
@@ -598,14 +598,14 @@ async function generatePDF(story:Story) {
   if(story.anchor){tCtx.font='13px sans-serif';totalH+=wrap(tCtx,story.anchor.description,CW-24).length*20+70}
   totalH+=M
   const canvas=document.createElement('canvas');canvas.width=W*SCALE;canvas.height=totalH*SCALE;const ctx=canvas.getContext('2d')!;ctx.scale(SCALE,SCALE)
-  ctx.fillStyle='#f5f0ff';ctx.fillRect(0,0,W,totalH)
-  let y=M;ctx.fillStyle='#6b38d4';ctx.font='bold 28px serif';ctx.textAlign='center';ctx.fillText(story.title,W/2,y+36);y+=64;ctx.textAlign='left'
+  ctx.fillStyle='#f9f5ec';ctx.fillRect(0,0,W,totalH)
+  let y=M;ctx.fillStyle='#2d4a1e';ctx.font='bold 28px serif';ctx.textAlign='center';ctx.fillText(story.title,W/2,y+36);y+=64;ctx.textAlign='left'
   for(let i=0;i<story.scenes.length;i++){
-    if(images[i]){ctx.save();rrect(ctx,M,y,CW,IMG_H,12);ctx.clip();ctx.drawImage(images[i]!,M,y,CW,IMG_H);ctx.restore()}else{ctx.fillStyle='#ede8ff';ctx.fillRect(M,y,CW,IMG_H)}
-    y+=IMG_H+16;ctx.fillStyle='#1a1a2e';ctx.font='500 16px serif'
+    if(images[i]){ctx.save();rrect(ctx,M,y,CW,IMG_H,12);ctx.clip();ctx.drawImage(images[i]!,M,y,CW,IMG_H);ctx.restore()}else{ctx.fillStyle='#e8f0e3';ctx.fillRect(M,y,CW,IMG_H)}
+    y+=IMG_H+16;ctx.fillStyle='#1c1c1a';ctx.font='500 16px serif'
     for(const line of wrap(ctx,story.scenes[i].text,CW)){ctx.fillText(line,M,y+15);y+=LH};y+=36
   }
-  if(story.discussion?.length){ctx.fillStyle='#6b38d4';rrect(ctx,M,y,CW,44,10);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('Поговорите с ребёнком',W/2,y+29);y+=58;ctx.textAlign='left';for(let i=0;i<story.discussion.length;i++){ctx.fillStyle='#6b38d4';ctx.beginPath();ctx.arc(M+14,y+14,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),M+14,y+19);ctx.textAlign='left';ctx.fillStyle='#1a1a2e';ctx.font='14px sans-serif';const qLines=wrap(ctx,story.discussion[i],CW-44);let qy=y+2;for(const line of qLines){ctx.fillText(line,M+36,qy+14);qy+=20};y+=Math.max(36,qLines.length*20)+14}}
+  if(story.discussion?.length){ctx.fillStyle='#2d4a1e';rrect(ctx,M,y,CW,44,10);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText('Поговорите с ребёнком',W/2,y+29);y+=58;ctx.textAlign='left';for(let i=0;i<story.discussion.length;i++){ctx.fillStyle='#2d4a1e';ctx.beginPath();ctx.arc(M+14,y+14,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText(String(i+1),M+14,y+19);ctx.textAlign='left';ctx.fillStyle='#1c1c1a';ctx.font='14px sans-serif';const qLines=wrap(ctx,story.discussion[i],CW-44);let qy=y+2;for(const line of qLines){ctx.fillText(line,M+36,qy+14);qy+=20};y+=Math.max(36,qLines.length*20)+14}}
   if(story.anchor){y+=14;ctx.font='13px sans-serif';const aLines=wrap(ctx,story.anchor.description,CW-24);const boxH=20+24+aLines.length*20+16;ctx.strokeStyle='#fcd34d';ctx.lineWidth=2;rrect(ctx,M,y,CW,boxH,10);ctx.fillStyle='#fffbeb';ctx.fill();ctx.stroke();y+=16;ctx.fillStyle='#92400e';ctx.font='bold 13px sans-serif';ctx.fillText(`🪄 ${story.anchor.title}`,M+12,y+13);y+=26;ctx.fillStyle='#555';ctx.font='13px sans-serif';for(const line of aLines){ctx.fillText(line,M+12,y+13);y+=20}}
   const {jsPDF}=await import('jspdf');const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'})
   const pW=pdf.internal.pageSize.getWidth(),pH=pdf.internal.pageSize.getHeight(),pM=10,iW=pW-pM*2,iH=(canvas.height*iW)/canvas.width,uH=pH-pM*2

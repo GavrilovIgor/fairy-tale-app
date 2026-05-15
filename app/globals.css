@@ -5,21 +5,26 @@
   --font-sans: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-serif: var(--font-playfair), 'Playfair Display', Georgia, serif;
 
-  /* Desktop palette (lavender) */
-  --bg: #f5f0ff;
-  --bg-card: #ffffff;
-  --primary: #6b38d4;
-  --primary-light: #ede8ff;
-  --primary-hover: #5929b8;
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --border: #e5e0f5;
-  --chip-bg: #ede8ff;
-  --chip-selected-bg: #6b38d4;
+  /* Stitch clay design: warm cream + sage green (extracted from Stitch HTML) */
+  --bg: #fdf9f3;
+  --bg-card: #fdf9f3;
+  --primary: #466252;
+  --primary-hover: #364d3e;
+  --primary-light: #caead5;
+  --primary-bg: #e8f0e3;
+  --secondary-bg: #e6e2dc;
+  --text: #1c1c18;
+  --text-muted: #6b7064;
+  --border: #e6e2dc;
+  --chip-bg: #e6e2dc;
+  --chip-selected-bg: #466252;
   --chip-selected-text: #ffffff;
-  --nav-bg: #ffffff;
-  --btn-login-bg: #6b38d4;
-  --btn-login-text: #ffffff;
+  --nav-bg: #fdf9f3;
+
+  /* Clay shadows (from Stitch) */
+  --clay-card-shadow: inset 4px 4px 10px rgba(255,255,255,0.7), inset -4px -4px 10px rgba(0,0,0,0.05), 8px 8px 20px rgba(0,0,0,0.05);
+  --clay-btn-shadow: inset 4px 4px 10px rgba(255,255,255,0.2), inset -4px -4px 10px rgba(0,0,0,0.2), 4px 4px 15px rgba(70,98,82,0.3);
+  --clay-btn-secondary-shadow: inset 4px 4px 10px rgba(255,255,255,0.8), inset -4px -4px 10px rgba(0,0,0,0.05), 4px 4px 15px rgba(0,0,0,0.05);
 }
 
 body {
@@ -30,21 +35,6 @@ body {
 }
 
 .font-serif { font-family: var(--font-serif) !important; }
-
-/* Mobile overrides */
-@media (max-width: 767px) {
-  :root {
-    --bg: #f5ede2;
-    --bg-card: #ffffff;
-    --primary: #2d5a1f;
-    --primary-light: #e8f0e3;
-    --primary-hover: #1f4015;
-    --text: #1a1a1a;
-    --chip-bg: #e8f0e3;
-    --chip-selected-bg: #2d5a1f;
-    --border: #e5ddd0;
-  }
-}
 
 /* ── Animations ─────────────────────────────────────── */
 @keyframes fadeUp {
@@ -96,12 +86,34 @@ body {
   color: var(--primary);
 }
 
+/* ── Clay morphism (Stitch style) ───────────────────── */
+.clay-card {
+  box-shadow: var(--clay-card-shadow);
+  border-radius: 32px;
+  background: var(--bg-card);
+}
+.clay-btn {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--clay-btn-shadow);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+.clay-btn:active { transform: scale(0.98) }
+.clay-btn-secondary {
+  background: var(--secondary-bg);
+  color: var(--primary);
+  box-shadow: var(--clay-btn-secondary-shadow);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
 /* ── Story card shadow ──────────────────────────────── */
 .card-shadow {
-  box-shadow: 0 4px 24px rgba(107,56,212,0.08), 0 1px 4px rgba(107,56,212,0.04);
+  box-shadow: var(--clay-card-shadow);
 }
 .card-shadow-warm {
-  box-shadow: 0 4px 20px rgba(45,90,31,0.1), 0 1px 4px rgba(45,90,31,0.05);
+  box-shadow: var(--clay-card-shadow);
 }
 
 /* ── Print ──────────────────────────────────────────── */
