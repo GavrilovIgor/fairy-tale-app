@@ -120,21 +120,20 @@ function StoryImage({prompt,index}:{prompt:string;index:number}) {
 // ── Desktop Navigation ────────────────────────────────────────────────────────
 function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:string)=>void}) {
   return (
-    <nav className="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b print:hidden" style={{borderColor:'var(--border)'}}>
-      <div className="font-serif text-xl font-bold" style={{color:'var(--primary)'}}>Magic Fairy Tales</div>
-      <div className="flex items-center gap-6">
-        {[['create','Создать сказку'],['library','Библиотека'],['benefits','Преимущества'],['support','Поддержка']].map(([id,label])=>(
+    <nav className="hidden md:flex items-center justify-between px-16 py-4 bg-white border-b print:hidden" style={{borderColor:'var(--border-light)'}}>
+      <div className="font-serif text-xl font-bold italic" style={{color:'var(--primary)'}}>Magic Fairy Tales</div>
+      <div className="flex items-center gap-8">
+        {[['library','Библиотека'],['create','Создать сказку'],['benefits','Преимущества'],['support','Поддержка']].map(([id,label])=>(
           <button key={id} onClick={()=>onTabChange(id)}
-            className="text-sm font-semibold transition-colors cursor-pointer"
-            style={activeTab===id ? {color:'var(--primary)',borderBottom:'2px solid var(--primary)',paddingBottom:'2px'} : {color:'var(--text-muted)'}}>
+            className="text-sm font-medium transition-colors cursor-pointer"
+            style={activeTab===id
+              ? {color:'var(--accent)',borderBottom:'2px solid var(--accent)',paddingBottom:'2px'}
+              : {color:'var(--text-muted)'}}>
             {label}
           </button>
         ))}
       </div>
-      <button className="px-5 py-2 rounded-full text-sm font-bold cursor-pointer transition-opacity hover:opacity-90"
-        style={{background:'var(--primary)',color:'#fff'}}>
-        Войти
-      </button>
+      <button className="paper-btn-outline text-sm">Войти</button>
     </nav>
   )
 }
@@ -142,13 +141,13 @@ function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:str
 // ── Mobile Top Bar ────────────────────────────────────────────────────────────
 function MobileTopBar({title}:{title:string}) {
   return (
-    <div className="md:hidden flex items-center justify-between px-5 py-4 print:hidden">
-      <div className="font-serif text-lg font-bold" style={{color:'var(--primary)'}}>{title}</div>
-      <button className="w-8 h-8 rounded-full flex items-center justify-center" style={{background:'var(--bg-card)'}}>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="2" fill="currentColor" opacity=".5"/>
-          <path d="M9 2v2M9 14v2M2 9h2M14 9h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity=".5"/>
-        </svg>
+    <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white border-b print:hidden" style={{borderColor:'var(--border-light)'}}>
+      <div className="flex items-center gap-2">
+        <span className="material-symbols-outlined" style={{color:'var(--primary)',fontSize:22}}>auto_stories</span>
+        <div className="font-serif text-lg font-bold italic" style={{color:'var(--primary)'}}>{title}</div>
+      </div>
+      <button className="cursor-pointer hover:opacity-70 transition-opacity">
+        <span className="material-symbols-outlined" style={{color:'var(--text-muted)',fontSize:22}}>settings</span>
       </button>
     </div>
   )
@@ -156,19 +155,19 @@ function MobileTopBar({title}:{title:string}) {
 
 // ── Mobile Tab Bar ────────────────────────────────────────────────────────────
 function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)=>void}) {
-  const tabs: [MobileTab, string, React.ReactElement][] = [
-    ['create','Создать',<svg key="c" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>],
-    ['library','Библиотека',<svg key="l" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.8"/><rect x="14" y="4" width="6" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.8"/></svg>],
-    ['profile','Профиль',<svg key="p" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>],
+  const tabs:[MobileTab,string,string][] = [
+    ['create',  'Создать',    'auto_fix_high'],
+    ['library', 'Библиотека', 'menu_book'],
+    ['profile', 'Профиль',   'person'],
   ]
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around py-3 px-4 print:hidden"
-      style={{background:'#fff',borderTop:'1px solid var(--border)',boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
+      style={{background:'#fff',borderTop:'1px solid var(--border-light)',boxShadow:'0 -2px 12px rgba(26,58,42,0.06)'}}>
       {tabs.map(([id,label,icon])=>(
         <button key={id} onClick={()=>onChange(id)}
-          className="flex flex-col items-center gap-1 cursor-pointer transition-all"
-          style={{color:active===id?'var(--primary)':'var(--text-muted)'}}>
-          <div style={{transform:active===id?'scale(1.1)':'scale(1)',transition:'transform 0.2s'}}>{icon}</div>
+          className="flex flex-col items-center gap-0.5 cursor-pointer transition-all"
+          style={{color:active===id?'var(--accent)':'var(--text-muted)'}}>
+          <span className="material-symbols-outlined" style={{fontSize:22}}>{icon}</span>
           <span className="text-xs font-semibold">{label}</span>
         </button>
       ))}
@@ -271,188 +270,175 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
   const handleRandom = async()=>{
     const r=pick(R_SITS)
-    const rf:FormData={childName:pick(R_NAMES),age:pick(R_AGES),hero:pick(R_HEROES),situation:r.situation,situationType:r.situationType,favorites:pick(R_FAVS),lesson:''}
+    const rf:FormData={childName:pick(R_NAMES),age:pick(R_AGES),hero:pick(R_HEROES),
+      situation:r.situation,situationType:r.situationType,favorites:pick(R_FAVS),lesson:''}
     setForm(rf); await onGenerate(rf)
   }
 
-  const lbl = "block text-label-caps mb-2"
-  const lblStyle = {color:'var(--text-muted)'}
+  // Form fields — shared between desktop and mobile
+  const FormFields = ({compact=false}:{compact?:boolean}) => (
+    <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className={compact?'space-y-6':'space-y-8'}>
 
-  // Shared form fields
-  const FormFields = () => (
-    <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={lbl} style={lblStyle}>Имя ребёнка <span className="text-red-400">*</span></label>
-          <input value={form.childName} required placeholder="напр. Лёша"
+      {/* Name + Age */}
+      <div className="flex gap-6">
+        <div className="flex-1">
+          <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Имя ребёнка</label>
+          <input value={form.childName} required placeholder="Введите имя"
             onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
-            className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+            className="editorial-input" />
         </div>
-        <div>
-          <label className={lbl} style={lblStyle}>Возраст</label>
+        <div className="w-28">
+          <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Возраст</label>
           <select value={form.age} onChange={e=>setForm(f=>({...f,age:e.target.value}))}
-            className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}}>
+            className="editorial-input" style={{cursor:'pointer'}}>
             {['1-2 года','3-4 года','5-6 лет','7-8 лет','9-10 лет'].map(a=><option key={a}>{a}</option>)}
           </select>
         </div>
       </div>
 
+      {/* Hero */}
       <div>
-        <label className={lbl} style={lblStyle}>Главный герой <span className="text-red-400">*</span></label>
+        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Главный герой</label>
         <div className="relative">
-          <span className="absolute left-4 top-4 text-xl">🧸</span>
-          <input value={form.hero} required placeholder="напр. храбрый лисёнок, добрый медвежонок..."
+          <input value={form.hero} required placeholder="Например, смелый котёнок"
             onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-            className="clay-input w-full pl-14 pr-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+            className="editorial-input pr-8" />
+          <span className="material-symbols-outlined absolute right-0 bottom-2 opacity-30" style={{color:'var(--primary)'}}>book_2</span>
         </div>
       </div>
 
+      {/* Theme chips */}
       <div>
-        <label className={lbl} style={lblStyle}>Тема сказки <span className="text-red-400">*</span></label>
-        {/* Desktop: horizontal wrap / Mobile: vertical */}
-        <div className="hidden md:flex flex-wrap gap-2 mb-3">
+        <label className="text-label-caps block mb-4" style={{color:'var(--text-muted)'}}>Тема сказки</label>
+        <div className="flex flex-wrap gap-2 mb-4">
           {SIT_TYPES.map(t=>(
             <button key={t.id} type="button"
               onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-              className={`clay-chip px-4 py-2 text-sm font-semibold active:scale-95 ${form.situationType===t.id?'clay-chip-selected':''}`}>
-              {t.emoji} {t.label}
-            </button>
-          ))}
-        </div>
-        <div className="md:hidden flex flex-col gap-2 mb-3">
-          {SIT_TYPES.map(t=>(
-            <button key={t.id} type="button"
-              onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-              className={`clay-chip px-4 py-3 text-sm font-semibold text-left active:scale-95 ${form.situationType===t.id?'clay-chip-selected':''}`}>
-              {t.emoji} {t.label}
+              className={`paper-chip ${form.situationType===t.id?'paper-chip-selected':''}`}>
+              {t.label}
             </button>
           ))}
         </div>
         <input value={form.situation} required placeholder={sitType.hint}
           onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+          className="editorial-input" />
       </div>
 
+      {/* Favorites */}
       <div>
-        <label className={lbl} style={lblStyle}>Любимые вещи</label>
-        <input value={form.favorites} placeholder="напр. космос, динозавры, рисование..."
+        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Любимые вещи и интересы</label>
+        <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
           onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+          className="editorial-input" />
       </div>
 
+      {/* Lesson */}
       <div>
-        <label className={lbl} style={lblStyle}>Чему учит сказка</label>
-        <input value={form.lesson} placeholder="напр. не бояться темноты, делиться..."
+        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Чему должна научить сказка?</label>
+        <input value={form.lesson} placeholder="Доброте, дружбе, честности..."
           onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+          className="editorial-input" />
       </div>
 
-      <button type="submit" disabled={isLoading}
-        className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 flex items-center justify-center gap-2">
-        <span>✨</span>
-        <span>{isLoading?'Создаём...': `СОЗДАТЬ СКАЗКУ${form.childName?` ДЛЯ ${form.childName.toUpperCase()}`:''}`}</span>
+      {/* Submit */}
+      <button type="submit" disabled={isLoading} className="paper-btn">
+        {isLoading
+          ? 'Создаём сказку...'
+          : form.childName
+            ? `✦ Создать сказку для ${form.childName}`
+            : '✦ Создать сказку'}
       </button>
     </form>
   )
 
   return (
     <>
-      {/* ── DESKTOP: 2-column layout (from Stitch) ── */}
-      <div className="hidden md:flex gap-12 items-start max-w-6xl mx-auto px-8 py-12 pb-16">
+      {/* Botanical background decoration */}
+      <div className="botanical-bg" aria-hidden />
 
-        {/* Left: Hero 40% */}
-        <section className="w-[40%] flex-shrink-0 flex flex-col gap-8 sticky top-24">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full w-fit text-sm font-semibold"
-            style={{background:'var(--primary-light)',color:'var(--primary)'}}>
-            ✨ Помогло 500+ детям
-          </div>
+      {/* ── DESKTOP (md+) — 2-column full-width ── */}
+      <div className="hidden md:flex min-h-[calc(100vh-65px)] relative z-10">
 
-          {/* Heading */}
-          <div>
-            <h1 className="font-serif font-bold leading-tight mb-4" style={{fontSize:'clamp(28px,3vw,42px)',color:'var(--primary)'}}>
-              Создайте волшебную сказку для вашего ребёнка
+        {/* Left 45%: hero */}
+        <section className="w-[45%] flex-shrink-0 px-16 pt-16 pb-16 flex flex-col border-r relative overflow-hidden" style={{borderColor:'var(--border-light)'}}>
+          {/* Drop cap decorative */}
+          <div className="mb-6">
+            <span className="drop-cap-letter" aria-hidden>С</span>
+            <h1 className="font-serif font-bold pt-3 leading-tight" style={{fontSize:'clamp(28px,2.8vw,40px)',color:'var(--primary)'}}>
+              оздайте волшебную сказку для вашего ребёнка
             </h1>
-            <p className="text-base leading-relaxed" style={{color:'var(--text-muted)'}}>
-              Персонализированные терапевтические истории — помогают детям преодолевать страхи и расти.
-            </p>
           </div>
 
-          {/* Feature bullets */}
-          <ul className="flex flex-col gap-3">
+          <p className="text-base leading-relaxed mb-10" style={{color:'var(--text-muted)'}}>
+            Индивидуальные терапевтические истории для эмоционального роста. Каждая сказка создаётся специально для вашей ситуации — помогает ребёнку мягко справляться со страхами и сложными чувствами.
+          </p>
+
+          {/* Feature list */}
+          <div className="flex-1">
             {[
-              ['✨','Уникальная история за 1 минуту','Генерируется специально для вашего ребёнка'],
-              ['🎨','AI-иллюстрации к каждой сцене','Акварельные картинки в детском стиле'],
-              ['💬','Вопросы для разговора','Помогут обсудить историю с ребёнком'],
-              ['📄','PDF для скачивания','Распечатайте и храните навсегда'],
+              ['menu_book',   'Персонализация',       'Ребёнок становится главным героем своей истории'],
+              ['palette',     'Иллюстрации',          'AI создаёт акварельные картинки к каждой сцене'],
+              ['chat_bubble', 'Разговор с ребёнком',  'Вопросы для обсуждения сказки после прочтения'],
+              ['print',       'PDF для печати',       'Скачайте и храните сказку как книгу'],
             ].map(([icon,title,desc])=>(
-              <li key={title} className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-base"
-                  style={{background:'var(--primary-light)',color:'var(--primary)'}}>
-                  {icon}
-                </span>
+              <div key={title} className="feature-row">
+                <span className="material-symbols-outlined flex-shrink-0 mt-0.5" style={{color:'var(--primary)',opacity:0.6}}>{icon}</span>
                 <div>
-                  <div className="text-sm font-bold" style={{color:'var(--text)'}}>{title}</div>
-                  <div className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>{desc}</div>
+                  <div className="text-label-caps mb-0.5" style={{color:'var(--primary)'}}>{title}</div>
+                  <div className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>{desc}</div>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
-
-          {/* Quick start */}
-          <div>
-            <button type="button" onClick={handleRandom} disabled={isLoading}
-              className="clay-btn w-full py-3.5 font-semibold flex items-center justify-center gap-2 disabled:opacity-60">
-              🎲 Попробовать случайную сказку
-            </button>
-            <p className="text-xs text-center mt-2" style={{color:'var(--text-muted)'}}>Заполним всё сами — нажми и попробуй</p>
           </div>
+
+          {/* Random link */}
+          <button type="button" onClick={handleRandom} disabled={isLoading}
+            className="mt-8 text-sm font-semibold flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity self-start disabled:opacity-40"
+            style={{color:'var(--accent)'}}>
+            Попробовать случайную сказку
+            <span className="material-symbols-outlined" style={{fontSize:16}}>arrow_forward</span>
+          </button>
         </section>
 
-        {/* Right: Form 60% */}
-        <section className="flex-1 sticky top-24">
-          <div className="clay-card p-8">
-            <h2 className="font-serif text-xl font-bold mb-6" style={{color:'var(--text)'}}>
-              Создать сказку
-            </h2>
-            <FormFields />
-          </div>
+        {/* Right 55%: form */}
+        <section className="flex-1 px-16 pt-16 pb-16 overflow-y-auto">
+          <h2 className="font-serif text-2xl font-bold mb-8" style={{color:'var(--primary)'}}>
+            Создать сказку
+          </h2>
+          <FormFields />
         </section>
       </div>
 
-      {/* ── MOBILE: single column ── */}
-      <div className="md:hidden px-4 pb-28">
-        {/* Mobile header section */}
-        <div className="pt-4 pb-6">
-          <h1 className="font-serif font-bold mb-2" style={{fontSize:24,color:'var(--primary)'}}>
-            Создайте сказку для вашего ребёнка
-          </h1>
-          <p className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>
-            Персональная терапевтическая история — за 1 минуту
-          </p>
-        </div>
+      {/* ── MOBILE — single column ── */}
+      <div className="md:hidden px-5 pt-6 pb-32 max-w-md mx-auto relative z-10">
 
-        {/* Quick start mobile */}
+        <section className="mb-6">
+          <h2 className="font-serif text-2xl font-bold mb-2" style={{color:'var(--primary)'}}>Создать сказку</h2>
+          <p className="text-sm" style={{color:'var(--text-muted)'}}>Заполните детали, чтобы соткать волшебство.</p>
+        </section>
+
+        <FormFields compact />
+
+        {/* Random link mobile */}
         <button type="button" onClick={handleRandom} disabled={isLoading}
-          className="clay-btn w-full py-4 font-bold mb-6 flex items-center justify-center gap-2 disabled:opacity-60">
-          🎲 Мне повезёт! — создать сказку
+          className="mt-5 w-full text-sm font-semibold flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 transition-opacity disabled:opacity-40"
+          style={{color:'var(--accent)'}}>
+          <span className="material-symbols-outlined" style={{fontSize:16}}>shuffle</span>
+          Попробовать случайную сказку
         </button>
 
-        {/* Form card */}
-        <div className="clay-card p-5">
-          <FormFields />
-        </div>
-
-        {/* Inspirational quote — from Stitch mobile */}
-        <div className="mt-5 clay-card p-5 text-center">
-          <p className="text-sm italic leading-relaxed" style={{color:'var(--text-muted)'}}>
-            &ldquo;Каждая сказка — это зерно для счастливого будущего.&rdquo;
+        {/* Quote */}
+        <div className="mt-8 text-center py-6 border-t" style={{borderColor:'var(--border-light)'}}>
+          <p className="font-serif italic text-base leading-relaxed" style={{color:'var(--accent)'}}>
+            &ldquo;Каждая сказка — это мостик к сердцу ребёнка.&rdquo;
           </p>
         </div>
       </div>
     </>
   )
 }
+
+
 // ── Story Reading view (Stitch magazine layout) ───────────────────────────────
 function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean

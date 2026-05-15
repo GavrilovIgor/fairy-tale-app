@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Lora } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -10,10 +10,10 @@ const jakarta = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "600", "700"],
   display: "swap",
 });
 
@@ -46,8 +46,11 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${jakarta.variable} ${playfair.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${lora.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
