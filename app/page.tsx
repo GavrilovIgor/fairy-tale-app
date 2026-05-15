@@ -62,6 +62,20 @@ const R_SITS:{situation:string;situationType:SituationType}[] = [
 ]
 const R_FAVS = ['динозавры и космос','мороженое и рисование','машинки и конструктор','принцессы и единороги']
 const pick = <T,>(a:T[]):T => a[Math.floor(Math.random()*a.length)]
+
+// ── Guided input suggestion data ──────────────────────────────────────────────
+const AGE_OPTIONS = ['3 года','4 года','5 лет','6 лет','7 лет','8 лет','9 лет','10+ лет']
+const HERO_SUGGESTIONS = ['котёнок','щенок','лисёнок','дракончик','зайчонок','медвежонок','принцесса','маленький рыцарь','волшебник','фея']
+const SITUATION_SUGGESTIONS: Record<SituationType,string[]> = {
+  fear:        ['боится темноты','боится собак','боится врача и уколов','боится грозы','боится страшных снов','боится остаться одному'],
+  emotion:     ['злится и кричит','ревнует к братику или сестричке','обижается и замыкается','не хочет делиться','расстраивается из-за мелочей','завидует другу'],
+  adaptation:  ['идёт в новый садик','переехали в новый дом','идёт в первый класс','появился братик или сестричка','новая школа','родители расстались'],
+  behavior:    ['дерётся с другими детьми','говорит неправду','не убирает игрушки','не хочет ложиться спать','капризничает за едой','не слушается'],
+  preparation: ['завтра к стоматологу','завтра к врачу на укол','первый день в садике','первый полёт на самолёте','операция или обследование','переход в новый класс'],
+  fun:         ['хочет стать волшебником','мечтает найти клад','хочет подружиться со всеми животными','хочет стать супергероем'],
+}
+const FAVORITES_OPTIONS = ['динозавры','принцессы','супергерои','машинки','животные','космос','единороги','рыцари','феи','море','рисование','спорт']
+const LESSON_SUGGESTIONS = ['быть смелым','делиться с другими','говорить правду','быть добрым','не бояться нового','справляться со злостью','дружить','слушаться родителей']
 const imgUrl = (p:string,i:number) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${i*137+42}`
 
 // ── Image component ───────────────────────────────────────────────────────────
@@ -294,6 +308,50 @@ function Paywall({onPaid}:{onPaid:()=>void}) {
   )
 }
 
+// ── Chip suggestion helpers ───────────────────────────────────────────────────
+const cBase = 'px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer'
+const cOn   = 'bg-[#1a3a2a] text-white border-[#1a3a2a]'
+const cOff  = 'bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:border-[#1a3a2a]/50'
+const hintLabel = 'text-[11px] font-medium uppercase tracking-wider mt-1'
+
+function AgeChips({value,onChange}:{value:string;onChange:(v:string)=>void}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {AGE_OPTIONS.map(a=>(
+        <button key={a} type="button" onClick={()=>onChange(a===value?'':a)}
+          className={`${cBase} ${value===a?cOn:cOff}`}>{a}</button>
+      ))}
+    </div>
+  )
+}
+
+function SuggestionChips({options,value,onChange}:{options:string[];value:string;onChange:(v:string)=>void}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map(opt=>(
+        <button key={opt} type="button" onClick={()=>onChange(opt===value?'':opt)}
+          className={`${cBase} ${value===opt?cOn:cOff}`}>{opt}</button>
+      ))}
+    </div>
+  )
+}
+
+function MultiSuggestionChips({options,value,onChange}:{options:string[];value:string;onChange:(v:string)=>void}) {
+  const sel = value ? value.split(',').map(s=>s.trim()).filter(Boolean) : []
+  const toggle = (opt:string)=>{
+    const s=new Set(sel); if(s.has(opt)) s.delete(opt); else s.add(opt)
+    onChange([...s].join(', '))
+  }
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map(opt=>(
+        <button key={opt} type="button" onClick={()=>toggle(opt)}
+          className={`${cBase} ${sel.includes(opt)?cOn:cOff}`}>{opt}</button>
+      ))}
+    </div>
+  )
+}
+
 // ── Create Story Form ─────────────────────────────────────────────────────────
 function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
@@ -379,22 +437,23 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
                     </div>
                     <div className="flex flex-col gap-2">
                       <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
-                      <input value={form.age} placeholder="Напр. 5 лет" type="text"
-                        onChange={e=>setForm(f=>({...f,age:e.target.value}))} className={inp} />
+                      <AgeChips value={form.age} onChange={age=>setForm(f=>({...f,age}))} />
                     </div>
                   </div>
 
                   {/* Row 2: Hero */}
                   <div className="flex flex-col gap-2">
                     <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
+                    <SuggestionChips options={HERO_SUGGESTIONS} value={form.hero} onChange={hero=>setForm(f=>({...f,hero}))} />
+                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
                     <div className="relative">
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
-                      <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..." type="text"
+                      <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..."
                         onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-8`} />
                     </div>
                   </div>
 
-                  {/* Row 3: Theme chips — exact code.html */}
+                  {/* Row 3: Theme chips */}
                   <div className="flex flex-col gap-3">
                     <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Тема сказки</label>
                     <div className="flex flex-wrap gap-2">
@@ -410,22 +469,28 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
                         </button>
                       ))}
                     </div>
+                    <SuggestionChips options={SITUATION_SUGGESTIONS[form.situationType]} value={form.situation} onChange={situation=>setForm(f=>({...f,situation}))} />
+                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или опишите точнее</span>
                     <input value={form.situation} required placeholder={sitType.hint}
                       onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
                   </div>
 
-                  {/* Row 4: Favorites — textarea */}
+                  {/* Row 4: Favorites */}
                   <div className="flex flex-col gap-2">
                     <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи и интересы</label>
-                    <textarea value={form.favorites} placeholder="Космос, динозавры, рисование..." rows={2}
+                    <MultiSuggestionChips options={FAVORITES_OPTIONS} value={form.favorites} onChange={favorites=>setForm(f=>({...f,favorites}))} />
+                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
+                    <textarea value={form.favorites} placeholder="Космос, динозавры, рисование..." rows={1}
                       onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
                       className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
                   </div>
 
-                  {/* Row 5: Lesson — textarea */}
+                  {/* Row 5: Lesson */}
                   <div className="flex flex-col gap-2">
                     <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
-                    <textarea value={form.lesson} placeholder="Доброте, дружбе, честности..." rows={2}
+                    <SuggestionChips options={LESSON_SUGGESTIONS} value={form.lesson} onChange={lesson=>setForm(f=>({...f,lesson}))} />
+                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
+                    <textarea value={form.lesson} placeholder="Доброте, дружбе, честности..." rows={1}
                       onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
                       className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
                   </div>
@@ -476,13 +541,14 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
               </div>
               <div className="flex flex-col gap-2">
                 <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
-                <input value={form.age} placeholder="Лет"
-                  onChange={e=>setForm(f=>({...f,age:e.target.value}))} className={inp} />
+                <AgeChips value={form.age} onChange={age=>setForm(f=>({...f,age}))} />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
+              <SuggestionChips options={HERO_SUGGESTIONS} value={form.hero} onChange={hero=>setForm(f=>({...f,hero}))} />
+              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
               <div className="relative">
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
                 <input value={form.hero} required placeholder="Например, смелый котёнок"
@@ -505,18 +571,24 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
                   </button>
                 ))}
               </div>
+              <SuggestionChips options={SITUATION_SUGGESTIONS[form.situationType]} value={form.situation} onChange={situation=>setForm(f=>({...f,situation}))} />
+              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или опишите точнее</span>
               <input value={form.situation} required placeholder={sitType.hint}
                 onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи</label>
+              <MultiSuggestionChips options={FAVORITES_OPTIONS} value={form.favorites} onChange={favorites=>setForm(f=>({...f,favorites}))} />
+              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
               <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
                 onChange={e=>setForm(f=>({...f,favorites:e.target.value}))} className={inp} />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
+              <SuggestionChips options={LESSON_SUGGESTIONS} value={form.lesson} onChange={lesson=>setForm(f=>({...f,lesson}))} />
+              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
               <input value={form.lesson} placeholder="Доброте, дружбе..."
                 onChange={e=>setForm(f=>({...f,lesson:e.target.value}))} className={inp} />
             </div>
