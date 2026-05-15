@@ -328,11 +328,8 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     <>
       {/* ── DESKTOP — exact code.html structure ── */}
       <div className="hidden md:block relative">
-        {/* Botanical overlay */}
-        <div className="absolute inset-0 botanical-bg z-0" aria-hidden />
-
-        <div className="max-w-container-max mx-auto px-edge-margin-desktop py-stack-xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-stack-xl items-start overflow-hidden">
+        <div className="px-edge-margin-desktop py-stack-xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-stack-xl items-start">
 
             {/* LEFT COLUMN — exact code.html */}
             <div className="flex flex-col">
@@ -368,7 +365,11 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
             {/* RIGHT COLUMN — exact code.html */}
             <div className="lg:pl-stack-xl">
-              <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
+              {/* Paper stack effect: second sheet behind, offset by 10px */}
+              <div className="relative">
+              <div className="absolute pointer-events-none bg-[#e2e5e0] border border-outline-variant/30"
+                style={{top:10,left:10,right:-10,bottom:-10,zIndex:0}}/>
+              <div className="relative bg-surface-container-lowest border border-primary-container/10 p-stack-lg" style={{zIndex:1,boxShadow:'0 2px 16px rgba(26,58,42,0.06),0 1px 4px rgba(26,58,42,0.04)'}}>
                 <h2 className="font-headline-lg text-headline-lg text-primary mb-stack-lg">Создать сказку</h2>
                 <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
 
@@ -439,6 +440,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
                   </button>
                 </form>
               </div>
+              </div>{/* /paper-stack */}
             </div>
 
           </div>
