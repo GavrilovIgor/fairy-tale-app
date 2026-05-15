@@ -122,7 +122,7 @@ function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:str
   // Exact Stitch HTML from screen 4371a933
   return (
     <header className="hidden md:block bg-background border-b border-outline-variant/20 sticky top-0 z-50 print:hidden">
-      <div className="max-w-container-max mx-auto px-edge-margin-desktop flex justify-between items-center h-20">
+      <div className="px-edge-margin-desktop flex justify-between items-center h-20">
         <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
         <nav className="flex gap-stack-lg items-center">
           {[
@@ -190,7 +190,7 @@ function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)
 function SiteFooter() {
   return (
     <footer className="bg-surface-container-low border-t border-outline-variant/10 pt-stack-xl pb-stack-lg print:hidden">
-      <div className="max-w-container-max mx-auto px-edge-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
+      <div className="px-edge-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
         <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
         <div className="flex gap-stack-lg">
           {['Политика конфиденциальности','Условия использования','Контакты','Поддержка'].map(t=>(
@@ -336,12 +336,12 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
               <div className="mb-stack-lg">
                 {/* Drop cap: block, text-[120px], then heading with -mt-16 — exact Stitch */}
                 <span className="font-lora text-[120px] leading-none text-primary/10 select-none block" aria-hidden>С</span>
-                <h1 className="font-lora font-bold text-[56px] leading-[1.1] text-[#1a3a2a] -mt-16">
+                <h1 className="font-lora font-bold text-[56px] leading-[1.1] text-[#1a3a2a] -mt-16" style={{textWrap:'balance'}}>
                   Создайте волшебную сказку для вашего ребёнка
                 </h1>
               </div>
 
-              <p className="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-[540px]">
+              <p className="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-[540px]" style={{textWrap:'pretty'}}>
                 Мы верим, что каждая история — это мост к сердцу ребёнка. Наши терапевтические сказки создаются индивидуально, помогая малышам мягко проживать эмоции и находить ответы на важные жизненные вопросы в уютной атмосфере магии и тепла.
               </p>
 
