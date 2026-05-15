@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
 7. Тёплый конкретный финал — имя "${childName}" упоминается органично
 
 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:
+- Текст сказки — обычный текст БЕЗ какой-либо markdown-разметки. Никаких **звёздочек**, _подчёркиваний_, #заголовков или других символов форматирования
 - Сенсорные детали в каждой сцене: запахи, звуки, тактильные ощущения
 - Эмоция названа явно хотя бы раз: "это называлось [эмоция]" или "это был [страх/злость/...]"
 - Минимум один живой диалог в каждой сцене
@@ -123,6 +124,7 @@ ${scenarioHint}
       if (story.scenes) {
         story.scenes = story.scenes.map((scene: { text: string; imagePrompt: string }) => ({
           ...scene,
+          text: scene.text?.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/_{1,2}(.+?)_{1,2}/g, '$1') ?? '',
           imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
         }))
         prefetchImages(story.scenes)
