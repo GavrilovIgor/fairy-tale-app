@@ -134,29 +134,29 @@ function StoryImage({prompt,index}:{prompt:string;index:number}) {
 
 // ── Desktop Navigation ────────────────────────────────────────────────────────
 function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:string)=>void}) {
-  // Exact Stitch HTML from screen 4371a933
+  // Transparent floating nav — Stitch hero screen
   return (
-    <header className="hidden md:block bg-background border-b border-outline-variant/20 sticky top-0 z-50 print:hidden">
-      <div className="px-edge-margin-desktop flex justify-between items-center h-20">
-        <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
-        <nav className="flex gap-stack-lg items-center">
+    <header className="fixed top-0 w-full z-50 bg-transparent print:hidden">
+      <div className="max-w-[1200px] mx-auto px-[48px] py-[24px] flex justify-between items-center">
+        <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
+        <nav className="hidden md:flex gap-[24px] items-center">
           {[
-            ['library',  'Библиотека'],
-            ['create',   'Создать сказку'],
-            ['benefits', 'Преимущества'],
-            ['support',  'Поддержка'],
+            ['library',  'Сказки'],
+            ['create',   'Магия'],
+            ['benefits', 'Библиотека'],
+            ['support',  'О нас'],
           ].map(([id,label])=>(
             <button key={id} onClick={()=>onTabChange(id)}
-              className={`font-body-md text-body-md transition-colors cursor-pointer ${
+              className={`text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab===id
-                  ? 'text-primary font-bold border-b-2 border-secondary'
-                  : 'text-on-surface-variant hover:text-primary'
+                  ? 'text-white border-b-2 border-white/50 pb-0.5'
+                  : 'text-white/80 hover:text-white'
               }`}>
               {label}
             </button>
           ))}
         </nav>
-        <button className="font-body-md text-body-md text-primary font-medium hover:text-secondary transition-all cursor-pointer">
+        <button className="text-white text-sm font-semibold bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:opacity-80 transition-all cursor-pointer">
           Войти
         </button>
       </div>
@@ -352,7 +352,10 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
   )
 }
 
-// ── Create Story Form ─────────────────────────────────────────────────────────
+// ── Create Story Form — Stitch "Ночная сказка" design ────────────────────────
+// Hero: screen a7285ac6  Form: screen e6fa9ca5
+const FOX_IMG = 'https://lh3.googleusercontent.com/aida/ADBb0ugI_CouOKyv7x8OTjGPJlbaGaDFqca9dOESYuULRTtwpnSuUKZumHorf9yvlL37yRxQkuHKibBcNyWe6mutnlRsg6WFC0PN43rZU-xdnRdg8j3v5VLmvfVGjAetb0Bv2LAfQgE95Or7QCLayMwxXMI92PJEoULK554dla8YfnsYH7WsP0ROKHH4H6eMS0R4bSnqZY2ZDfUkD0sV-abnk7guO8CD8q0zofJE9KOahglxWnqpEvI1T-B56BU'
+
 function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
@@ -364,248 +367,190 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     setForm(rf); await onGenerate(rf)
   }
 
-  // Exact Stitch input class from code.html
-  const inp = "bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 w-full focus:outline-none"
-
-  const FEATURES = [
-    ['book_2',      'Уникальные сюжеты'],
-    ['brush',       'Художественный стиль'],
-    ['chat_bubble', 'Эмоциональный интеллект'],
-    ['description', 'Печатное качество текста'],
-  ]
-
   const CHIP_TYPES = [
-    {id:'fear'       as SituationType, label:'Страх'},
-    {id:'emotion'    as SituationType, label:'Эмоции'},
-    {id:'adaptation' as SituationType, label:'Новое'},
-    {id:'preparation'as SituationType, label:'Событие'},
-    {id:'behavior'   as SituationType, label:'Поведение'},
-    {id:'fun'        as SituationType, label:'Просто сказка'},
+    {id:'fear'        as SituationType, label:'Страх'},
+    {id:'emotion'     as SituationType, label:'Эмоции'},
+    {id:'adaptation'  as SituationType, label:'Новое'},
+    {id:'preparation' as SituationType, label:'Событие'},
+    {id:'behavior'    as SituationType, label:'Поведение'},
+    {id:'fun'         as SituationType, label:'Просто сказка'},
   ]
+
+  const chip = (active:boolean) => `form-chip${active?' form-chip-active':''}`
+  const sub  = (active:boolean) => `form-subchip${active?' form-subchip-active':''}`
 
   return (
     <>
-      {/* ── DESKTOP — exact code.html structure ── */}
-      <div className="hidden md:block relative">
-        <div className="px-edge-margin-desktop py-stack-xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-stack-xl items-start">
+      {/* ══════════════════════════════════════════════════════
+          SECTION 1 — HERO (Stitch: screen a7285ac6)
+          Dark forest, fox image, text at bottom 30%
+      ══════════════════════════════════════════════════════ */}
+      <section className="relative h-screen w-full flex flex-col justify-start overflow-hidden" style={{background:'#0d2b1e'}}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={FOX_IMG} alt="Волшебный лес с лисёнком"
+          className="absolute inset-0 w-full h-full object-cover object-center" />
+        {/* Gradient for text readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-b from-transparent to-[rgba(10,31,20,0.97)] pointer-events-none"/>
+        {/* Text block — bottom 30% */}
+        <div className="relative z-10 absolute bottom-0 left-0 right-0 w-full max-w-[1200px] mx-auto px-6 md:px-12 pb-10 pt-[72vh] flex flex-col items-center text-center">
+          <p className="text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
+          <h1 className="text-[36px] md:text-[52px] leading-tight font-bold text-white mb-2 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
+            Создайте волшебную сказку
+          </h1>
+          <h2 className="text-[22px] md:text-[32px] italic text-white/85 mb-4" style={{fontFamily:'Literata,Georgia,serif'}}>
+            для вашего ребёнка
+          </h2>
+          <p className="text-white/70 text-[14px] md:text-[16px] max-w-xl mb-6 leading-relaxed">
+            Мягкая персональная история, которая поможет малышу справиться со страхом, новой ситуацией или сложным переживанием
+          </p>
+          <button type="button" onClick={handleRandom} disabled={isLoading}
+            className="px-8 py-4 rounded-full font-bold text-[16px] tracking-wide uppercase shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-4 disabled:opacity-50 cursor-pointer"
+            style={{background:'#a46713',color:'#fff'}}>
+            Попробовать случайную
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </button>
+          <p className="text-white/40 text-xs animate-bounce">прокрутите вниз <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
+        </div>
+      </section>
 
-            {/* LEFT COLUMN — exact code.html */}
-            <div className="flex flex-col">
-              <div className="mb-stack-lg">
-                {/* Drop cap: block, text-[120px], then heading with -mt-16 — exact Stitch */}
-                <span className="font-lora text-[120px] leading-none text-primary/10 select-none block" aria-hidden>С</span>
-                <h1 className="font-lora font-bold text-[56px] leading-[1.1] text-[#1a3a2a] -mt-16" style={{textWrap:'balance'}}>
-                  Создайте волшебную сказку для вашего ребёнка
-                </h1>
-              </div>
+      {/* ══════════════════════════════════════════════════════
+          SECTION 2 — FORM (Stitch: screen e6fa9ca5)
+          Dark forest bg, fireflies, centered card max-w-740
+      ══════════════════════════════════════════════════════ */}
+      <section className="relative min-h-screen w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
+        {/* Bokeh + Fireflies */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="bokeh w-96 h-96 top-[-100px] left-[-100px]" style={{background:'#1a4a34'}}/>
+          <div className="bokeh w-80 h-80 bottom-[20%] right-[-50px]" style={{background:'#143d2b'}}/>
+          <div className="firefly top-[20%] left-[15%]" style={{animationDelay:'0s'}}/>
+          <div className="firefly top-[40%] right-[20%]" style={{animationDelay:'2s'}}/>
+          <div className="firefly top-[60%] left-[25%]" style={{animationDelay:'4s'}}/>
+          <div className="firefly top-[80%] right-[10%]" style={{animationDelay:'1s'}}/>
+          <div className="firefly top-[10%] right-[30%]" style={{animationDelay:'3s'}}/>
+        </div>
 
-              <p className="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-[540px]" style={{textWrap:'pretty'}}>
-                Мы верим, что каждая история — это мост к сердцу ребёнка. Наши терапевтические сказки создаются индивидуально, помогая малышам мягко проживать эмоции и находить ответы на важные жизненные вопросы в уютной атмосфере магии и тепла.
-              </p>
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-[740px] mx-auto px-4 flex flex-col items-center">
+          {/* Heading */}
+          <div className="text-center mb-10">
+            <h2 className="font-bold text-[32px] md:text-[44px] leading-tight mb-4" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+              Давай создавать волшебство
+            </h2>
+            <p className="text-[15px] max-w-[520px] mx-auto leading-relaxed" style={{color:'rgba(254,249,243,0.65)'}}>
+              Выбери элементы, которые нравятся вашему малышу, и наша магия сплетёт из них неповторимую историю, полную доброты и чудес.
+            </p>
+            <div className="text-yellow-300 text-xl mt-3">✦</div>
+          </div>
 
-              {/* Feature list — exact code.html: icon + single label, no description */}
-              <div className="space-y-stack-md mb-stack-xl">
-                {FEATURES.map(([icon,label])=>(
-                  <div key={label} className="flex items-center gap-stack-md text-primary">
-                    <span className="material-symbols-outlined">{icon}</span>
-                    <span className="font-label-md text-label-md">{label}</span>
+          {/* Form Card */}
+          <div className="w-full rounded-[24px] p-6 md:p-10" style={{background:'#fffdf8',boxShadow:'0 20px 40px rgba(0,0,0,0.3)'}}>
+            <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="flex flex-col gap-8">
+
+              {/* ── Имя + Возраст ── */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Имя ребёнка</label>
+                  <input value={form.childName} required placeholder="Введите имя"
+                    onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
+                    className="form-input-night" />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Возраст</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['3 года','4 года','5 лет','6 лет','7 лет','8 лет','9 лет','10+ лет'].map(a=>(
+                      <button key={a} type="button" onClick={()=>setForm(f=>({...f,age:a}))}
+                        className={chip(form.age===a)}>{a}</button>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
 
-              {/* Terracotta link — text-secondary */}
-              <button type="button" onClick={handleRandom} disabled={isLoading}
-                className="inline-flex items-center gap-2 text-secondary font-bold font-body-md group hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40">
-                Попробовать случайную сказку
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              {/* ── Главный герой ── */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Главный герой</label>
+                <div className="flex flex-wrap gap-2">
+                  {HERO_SUGGESTIONS.map(h=>(
+                    <button key={h} type="button" onClick={()=>setForm(f=>({...f,hero:h}))}
+                      className={chip(form.hero===h)}>{h}</button>
+                  ))}
+                </div>
+                <label className="text-[10px] font-semibold uppercase tracking-widest mt-2" style={{color:'#727973'}}>или напишите своё</label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#727973]/50" style={{fontSize:20}}>auto_stories</span>
+                  <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..."
+                    onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
+                    className="form-input-night pl-12" />
+                </div>
+              </div>
+
+              {/* ── Тема сказки ── */}
+              <div className="flex flex-col gap-3">
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Тема сказки</label>
+                <div className="flex flex-wrap gap-2">
+                  {CHIP_TYPES.map(t=>(
+                    <button key={t.id} type="button" onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+                      className={chip(form.situationType===t.id)}>{t.label}{form.situationType===t.id?' ★':''}</button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2 mt-1 p-4 rounded-xl" style={{background:'#f7f3ed'}}>
+                  {SITUATION_SUGGESTIONS[form.situationType].map(s=>(
+                    <button key={s} type="button" onClick={()=>setForm(f=>({...f,situation:s}))}
+                      className={sub(form.situation===s)}>{s}</button>
+                  ))}
+                </div>
+                <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или опишите точнее</label>
+                <input value={form.situation} required placeholder={sitType.hint}
+                  onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
+                  className="form-input-night" />
+              </div>
+
+              {/* ── Любимые вещи ── */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Любимые вещи и интересы</label>
+                <div className="flex flex-wrap gap-2">
+                  {FAVORITES_OPTIONS.map(f2=>(
+                    <button key={f2} type="button"
+                      onClick={()=>setForm(f=>{
+                        const arr=f.favorites?f.favorites.split(',').map(s=>s.trim()).filter(Boolean):[]
+                        return {...f, favorites: arr.includes(f2) ? arr.filter(s=>s!==f2).join(', ') : [...arr,f2].join(', ')}
+                      })}
+                      className={chip(form.favorites.includes(f2))}>{f2}</button>
+                  ))}
+                </div>
+                <label className="text-[10px] font-semibold uppercase tracking-widest mt-1" style={{color:'#727973'}}>или напишите своё</label>
+                <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
+                  onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
+                  className="form-input-night" />
+              </div>
+
+              {/* ── Чему учит ── */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Чему учит сказка?</label>
+                <div className="flex flex-wrap gap-2">
+                  {LESSON_SUGGESTIONS.map(l=>(
+                    <button key={l} type="button" onClick={()=>setForm(f=>({...f,lesson:l}))}
+                      className={chip(form.lesson===l)}>{l}</button>
+                  ))}
+                </div>
+                <label className="text-[10px] font-semibold uppercase tracking-widest mt-1" style={{color:'#727973'}}>или напишите своё</label>
+                <input value={form.lesson} placeholder="Доброте, дружбе, честности..."
+                  onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
+                  className="form-input-night" />
+              </div>
+
+              {/* ── CTA ── */}
+              <button type="submit" disabled={isLoading}
+                className="w-full h-14 rounded-xl text-white font-bold text-sm uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+                style={{background:'#0d2b1e'}}>
+                {isLoading ? 'Создаём сказку...' : '✨ Создать сказку'}
               </button>
-            </div>
-
-            {/* RIGHT COLUMN — exact code.html */}
-            <div className="lg:pl-stack-xl">
-              <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
-                <h2 className="font-headline-lg text-headline-lg text-primary mb-stack-lg">Создать сказку</h2>
-                <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
-
-                  {/* Row 1: Name + Age */}
-                  <div className="grid grid-cols-2 gap-stack-md">
-                    <div className="flex flex-col gap-2">
-                      <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Имя ребёнка</label>
-                      <input value={form.childName} required placeholder="Введите имя" type="text"
-                        onChange={e=>setForm(f=>({...f,childName:e.target.value}))} className={inp} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
-                      <AgeChips value={form.age} onChange={age=>setForm(f=>({...f,age}))} />
-                    </div>
-                  </div>
-
-                  {/* Row 2: Hero */}
-                  <div className="flex flex-col gap-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
-                    <SuggestionChips options={HERO_SUGGESTIONS} value={form.hero} onChange={hero=>setForm(f=>({...f,hero}))} />
-                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-                    <div className="relative">
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
-                      <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..."
-                        onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-8`} />
-                    </div>
-                  </div>
-
-                  {/* Row 3: Theme chips */}
-                  <div className="flex flex-col gap-3">
-                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Тема сказки</label>
-                    <div className="flex flex-wrap gap-2">
-                      {CHIP_TYPES.map(t=>(
-                        <button key={t.id} type="button"
-                          onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                          className={`px-3 py-1 text-caption font-medium rounded-sm transition-colors cursor-pointer ${
-                            form.situationType===t.id
-                              ? 'bg-primary-container text-on-primary border border-primary-container'
-                              : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30 hover:border-primary'
-                          }`}>
-                          {t.label}
-                        </button>
-                      ))}
-                    </div>
-                    <SuggestionChips options={SITUATION_SUGGESTIONS[form.situationType]} value={form.situation} onChange={situation=>setForm(f=>({...f,situation}))} />
-                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или опишите точнее</span>
-                    <input value={form.situation} required placeholder={sitType.hint}
-                      onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
-                  </div>
-
-                  {/* Row 4: Favorites */}
-                  <div className="flex flex-col gap-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи и интересы</label>
-                    <MultiSuggestionChips options={FAVORITES_OPTIONS} value={form.favorites} onChange={favorites=>setForm(f=>({...f,favorites}))} />
-                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-                    <textarea value={form.favorites} placeholder="Космос, динозавры, рисование..." rows={1}
-                      onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-                      className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
-                  </div>
-
-                  {/* Row 5: Lesson */}
-                  <div className="flex flex-col gap-2">
-                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
-                    <SuggestionChips options={LESSON_SUGGESTIONS} value={form.lesson} onChange={lesson=>setForm(f=>({...f,lesson}))} />
-                    <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-                    <textarea value={form.lesson} placeholder="Доброте, дружбе, честности..." rows={1}
-                      onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-                      className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
-                  </div>
-
-                  {/* CTA — exact code.html: bg-[#1a3a2a] dark green */}
-                  <button type="submit" disabled={isLoading}
-                    className="w-full bg-[#1a3a2a] text-white py-4 font-label-md text-label-md uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50">
-                    {isLoading ? 'Создаём сказку...' : 'Создать сказку'}
-                  </button>
-                </form>
-              </div>
-            </div>
-
+            </form>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── MOBILE — single column ── */}
-      <div className="md:hidden px-edge-margin-mobile pt-stack-lg pb-32">
-        <div className="mb-stack-lg">
-          <span className="font-lora text-[72px] leading-none text-primary/10 select-none block" aria-hidden>С</span>
-          <h1 className="font-lora font-bold text-[32px] leading-[1.2] text-[#1a3a2a] -mt-8">
-            Создайте сказку для вашего ребёнка
-          </h1>
-        </div>
-
-        {/* Случайная сказка — первый CTA, сразу под заголовком */}
-        <button type="button" onClick={handleRandom} disabled={isLoading}
-          className="w-full mb-stack-md flex items-center justify-between px-5 py-4 rounded-lg border border-secondary/40 bg-secondary/5 hover:bg-secondary/10 transition-colors cursor-pointer disabled:opacity-40">
-          <span className="font-bold font-body-md text-secondary">Попробовать случайную сказку</span>
-          <span className="material-symbols-outlined text-secondary">arrow_forward</span>
-        </button>
-
-        {/* Разделитель */}
-        <div className="flex items-center gap-3 mb-stack-lg">
-          <div className="flex-1 h-px" style={{background:'var(--border-light)'}}/>
-          <span className="text-xs text-on-surface-variant font-medium whitespace-nowrap">или заполните детали для персональной сказки</span>
-          <div className="flex-1 h-px" style={{background:'var(--border-light)'}}/>
-        </div>
-
-        <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
-          <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
-            <div className="grid grid-cols-2 gap-stack-md">
-              <div className="flex flex-col gap-2">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Имя</label>
-                <input value={form.childName} required placeholder="Введите имя"
-                  onChange={e=>setForm(f=>({...f,childName:e.target.value}))} className={inp} />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
-                <AgeChips value={form.age} onChange={age=>setForm(f=>({...f,age}))} />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
-              <SuggestionChips options={HERO_SUGGESTIONS} value={form.hero} onChange={hero=>setForm(f=>({...f,hero}))} />
-              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-              <div className="relative">
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
-                <input value={form.hero} required placeholder="Например, смелый котёнок"
-                  onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-8`} />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Тема сказки</label>
-              <div className="flex flex-col gap-2">
-                {CHIP_TYPES.map(t=>(
-                  <button key={t.id} type="button"
-                    onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                    className={`px-3 py-2 text-caption font-medium rounded-sm text-left transition-colors cursor-pointer ${
-                      form.situationType===t.id
-                        ? 'bg-primary-container text-on-primary border border-primary-container'
-                        : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
-                    }`}>
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-              <SuggestionChips options={SITUATION_SUGGESTIONS[form.situationType]} value={form.situation} onChange={situation=>setForm(f=>({...f,situation}))} />
-              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или опишите точнее</span>
-              <input value={form.situation} required placeholder={sitType.hint}
-                onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи</label>
-              <MultiSuggestionChips options={FAVORITES_OPTIONS} value={form.favorites} onChange={favorites=>setForm(f=>({...f,favorites}))} />
-              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-              <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
-                onChange={e=>setForm(f=>({...f,favorites:e.target.value}))} className={inp} />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
-              <SuggestionChips options={LESSON_SUGGESTIONS} value={form.lesson} onChange={lesson=>setForm(f=>({...f,lesson}))} />
-              <span className={hintLabel} style={{color:'var(--text-muted)'}}>или напишите своё</span>
-              <input value={form.lesson} placeholder="Доброте, дружбе..."
-                onChange={e=>setForm(f=>({...f,lesson:e.target.value}))} className={inp} />
-            </div>
-
-            <button type="submit" disabled={isLoading}
-              className="w-full bg-[#1a3a2a] text-white py-4 font-label-md text-label-md uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] cursor-pointer disabled:opacity-50">
-              {isLoading ? 'Создаём...' : 'Создать сказку'}
-            </button>
-          </form>
-        </div>
-
-        <div className="mt-stack-xl text-center">
-          <p className="font-lora italic text-[22px] leading-snug text-secondary">
-            &ldquo;Правильная сказка — это ключ к тому, что ребёнок ещё не умеет выразить словами.&rdquo;
-          </p>
-        </div>
-      </div>
+      {/* ── Footer ── */}
+      <SiteFooter/>
     </>
   )
 }
