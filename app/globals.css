@@ -57,15 +57,16 @@
   --radius-xl:      0.5rem;
   --radius-full:    0.75rem;
 
-  /* Font families — from Stitch */
-  --font-family-headline-lg: 'Literata', serif;
-  --font-family-headline-md: 'Literata', serif;
-  --font-family-display-lg:  'Literata', serif;
-  --font-family-display-lg-mobile: 'Literata', serif;
-  --font-family-body-lg:     'Plus Jakarta Sans', sans-serif;
-  --font-family-body-md:     'Plus Jakarta Sans', sans-serif;
-  --font-family-label-md:    'Plus Jakarta Sans', sans-serif;
-  --font-family-caption:     'Plus Jakarta Sans', sans-serif;
+  /* Font families — Tailwind v4 format (--font-* generates font-* utility) */
+  --font-lora:              'Lora', serif;
+  --font-headline-lg:       'Literata', serif;
+  --font-headline-md:       'Literata', serif;
+  --font-display-lg:        'Literata', serif;
+  --font-display-lg-mobile: 'Literata', serif;
+  --font-body-lg:           'Plus Jakarta Sans', sans-serif;
+  --font-body-md:           'Plus Jakarta Sans', sans-serif;
+  --font-label-md:          'Plus Jakarta Sans', sans-serif;
+  --font-caption:           'Plus Jakarta Sans', sans-serif;
 
   /* Font sizes — from Stitch */
   --font-size-headline-lg: 32px;
@@ -110,8 +111,18 @@ body {
   vertical-align: middle;
 }
 
+/* ── Font family utilities (explicit, Tailwind v4 safe) ─ */
+.font-lora           { font-family: 'Lora', Georgia, serif !important; }
+.font-headline-lg    { font-family: 'Literata', 'Georgia', serif !important; }
+.font-headline-md    { font-family: 'Literata', 'Georgia', serif !important; }
+.font-display-lg     { font-family: 'Literata', 'Georgia', serif !important; }
+.font-body-lg        { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
+.font-body-md        { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
+.font-label-md       { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
+.font-caption        { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
+.font-serif          { font-family: 'Lora', Georgia, serif !important; }
+
 /* ── Typography tokens (from Stitch DESIGN.md) ─────── */
-.font-serif { font-family: var(--font-serif) !important; }
 
 .text-headline-xl      { font-size: 40px;  font-weight: 700; line-height: 48px; letter-spacing: -0.02em; }
 .text-headline-lg      { font-size: 32px;  font-weight: 700; line-height: 40px; }

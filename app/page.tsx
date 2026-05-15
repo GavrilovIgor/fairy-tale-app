@@ -119,22 +119,33 @@ function StoryImage({prompt,index}:{prompt:string;index:number}) {
 
 // ── Desktop Navigation ────────────────────────────────────────────────────────
 function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:string)=>void}) {
+  // Exact Stitch HTML from screen 4371a933
   return (
-    <nav className="hidden md:flex items-center justify-between px-16 py-4 bg-white border-b print:hidden" style={{borderColor:'var(--border-light)'}}>
-      <div className="font-serif text-xl font-bold italic" style={{color:'var(--primary)'}}>Magic Fairy Tales</div>
-      <div className="flex items-center gap-8">
-        {[['library','Библиотека'],['create','Создать сказку'],['benefits','Преимущества'],['support','Поддержка']].map(([id,label])=>(
-          <button key={id} onClick={()=>onTabChange(id)}
-            className="text-sm font-medium transition-colors cursor-pointer"
-            style={activeTab===id
-              ? {color:'var(--accent)',borderBottom:'2px solid var(--accent)',paddingBottom:'2px'}
-              : {color:'var(--text-muted)'}}>
-            {label}
-          </button>
-        ))}
+    <header className="hidden md:block bg-background border-b border-outline-variant/20 sticky top-0 z-50 print:hidden">
+      <div className="max-w-container-max mx-auto px-edge-margin-desktop flex justify-between items-center h-20">
+        <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
+        <nav className="flex gap-stack-lg items-center">
+          {[
+            ['library',  'Библиотека'],
+            ['create',   'Создать сказку'],
+            ['benefits', 'Преимущества'],
+            ['support',  'Поддержка'],
+          ].map(([id,label])=>(
+            <button key={id} onClick={()=>onTabChange(id)}
+              className={`font-body-md text-body-md transition-colors cursor-pointer ${
+                activeTab===id
+                  ? 'text-primary font-bold border-b-2 border-secondary'
+                  : 'text-on-surface-variant hover:text-primary'
+              }`}>
+              {label}
+            </button>
+          ))}
+        </nav>
+        <button className="font-body-md text-body-md text-primary font-medium hover:text-secondary transition-all cursor-pointer">
+          Войти
+        </button>
       </div>
-      <button className="paper-btn-outline text-sm">Войти</button>
-    </nav>
+    </header>
   )
 }
 
@@ -172,6 +183,25 @@ function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)
         </button>
       ))}
     </div>
+  )
+}
+
+// ── Site Footer (from Stitch screen 4371a933) ────────────────────────────────
+function SiteFooter() {
+  return (
+    <footer className="bg-surface-container-low border-t border-outline-variant/10 pt-stack-xl pb-stack-lg print:hidden">
+      <div className="max-w-container-max mx-auto px-edge-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
+        <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
+        <div className="flex gap-stack-lg">
+          {['Политика конфиденциальности','Условия использования','Контакты','Поддержка'].map(t=>(
+            <a key={t} href="#" className="font-caption text-caption text-on-surface-variant hover:text-secondary transition-colors">{t}</a>
+          ))}
+        </div>
+        <p className="font-caption text-caption text-on-surface-variant text-center md:text-right">
+          © 2024 Magic Fairy Tales. All rights reserved. Crafted with care for little dreamers.
+        </p>
+      </div>
+    </footer>
   )
 }
 
@@ -302,7 +332,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         <div className="absolute inset-0 botanical-bg z-0" aria-hidden />
 
         <div className="max-w-container-max mx-auto px-edge-margin-desktop py-stack-xl relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-stack-xl items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[45fr_55fr] gap-stack-xl items-start overflow-hidden">
 
             {/* LEFT COLUMN — exact code.html */}
             <div className="flex flex-col">
@@ -891,9 +921,10 @@ export default function Home() {
             <MobileTabBar active={mobileTab} onChange={setMobileTab}/>
           </div>
 
-          {/* Desktop: full form */}
+          {/* Desktop: full form + footer */}
           <div className="hidden md:block">
             <CreateForm onGenerate={generate} isLoading={false}/>
+            <SiteFooter/>
           </div>
         </>
       )}
