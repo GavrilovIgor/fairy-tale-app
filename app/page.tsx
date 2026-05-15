@@ -275,8 +275,6 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     setForm(rf); await onGenerate(rf)
   }
 
-  const inputClass = "w-full rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-shadow"
-  const inputStyle = {border:'1.5px solid var(--border)',background:'#fafafa',color:'var(--text)'}
   const labelClass = "block text-label-caps mb-2"
   const labelStyle = {color:'var(--text-muted)'}
 
@@ -326,21 +324,21 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         <div className="flex-1 h-px" style={{background:'var(--border)'}}/>
       </div>
 
-      {/* Form */}
-      <div className="bg-white rounded-3xl p-6 md:p-8 card-shadow">
+      {/* Form — clay style from Stitch */}
+      <div className="clay-card p-6 md:p-8">
         <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-5">
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelClass} style={labelStyle}>Имя ребёнка <span className="text-red-400">*</span></label>
-              <input value={form.childName} required placeholder="Маша"
+              <input value={form.childName} required placeholder="напр. Лёша"
                 onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
-                className={inputClass} style={inputStyle} />
+                className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
             </div>
             <div>
               <label className={labelClass} style={labelStyle}>Возраст</label>
               <select value={form.age} onChange={e=>setForm(f=>({...f,age:e.target.value}))}
-                className={inputClass} style={inputStyle}>
+                className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}}>
                 {['1-2 года','3-4 года','5-6 лет','7-8 лет','9-10 лет'].map(a=><option key={a}>{a}</option>)}
               </select>
             </div>
@@ -348,49 +346,51 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
           <div>
             <label className={labelClass} style={labelStyle}>Главный герой <span className="text-red-400">*</span></label>
-            <input value={form.hero} required placeholder="котёнок Пушок, дракончик Огонёк..."
-              onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-              className={inputClass} style={inputStyle} />
+            <div className="relative">
+              <span className="absolute left-3 top-3 text-base">📖</span>
+              <input value={form.hero} required placeholder="напр. храбрый лисёнок, нежный робот..."
+                onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
+                className="clay-input w-full pl-9 pr-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
+            </div>
           </div>
 
           <div>
             <label className={labelClass} style={labelStyle}>Тема сказки <span className="text-red-400">*</span></label>
-            <div className="grid grid-cols-3 gap-2 mb-3">
+            {/* Pill chips — Stitch style */}
+            <div className="flex flex-wrap gap-2 mb-3">
               {SIT_TYPES.map(t=>(
                 <button key={t.id} type="button"
                   onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                  className="rounded-xl py-2.5 px-2 text-center text-xs font-bold transition-all cursor-pointer"
-                  style={form.situationType===t.id
-                    ?{background:'var(--chip-selected-bg)',color:'var(--chip-selected-text)',boxShadow:'0 4px 12px rgba(107,56,212,0.25)'}
-                    :{background:'var(--chip-bg)',color:'var(--primary)',border:'1.5px solid transparent'}}>
-                  <div className="text-lg mb-1">{t.emoji}</div>
-                  {t.label}
+                  className={`clay-chip px-4 py-2 text-xs font-semibold ${form.situationType===t.id?'clay-chip-selected':''}`}
+                  style={form.situationType!==t.id?{color:'var(--text)'}:{}}>
+                  {t.emoji} {t.label}
                 </button>
               ))}
             </div>
             <input value={form.situation} required placeholder={sitType.hint}
               onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-              className={inputClass} style={inputStyle} />
+              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
           </div>
 
           <div>
             <label className={labelClass} style={labelStyle}>Любимые вещи / интересы</label>
-            <input value={form.favorites} placeholder="динозавры, мороженое, рисование..."
+            <input value={form.favorites} placeholder="напр. космос, динозавры, рисование, мягкие одеяла..."
               onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-              className={inputClass} style={inputStyle} />
+              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
           </div>
 
           <div>
             <label className={labelClass} style={labelStyle}>Чему учит сказка</label>
-            <input value={form.lesson} placeholder="смелость, дружба, доброта..."
+            <input value={form.lesson} placeholder="напр. не бояться темноты, делиться, дружить..."
               onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-              className={inputClass} style={inputStyle} />
+              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
           </div>
 
+          {/* GENERATE STORY button — Stitch style */}
           <button type="submit" disabled={isLoading}
-            className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 cursor-pointer"
-            style={{background:'var(--primary)',boxShadow:'0 8px 24px rgba(107,56,212,0.3)'}}>
-            {isLoading?'⏳ Создаём...': `✨ Создать сказку ${form.childName?`для ${form.childName}`:''}`}
+            className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 flex items-center justify-center gap-2">
+            <span>✨</span>
+            <span>{isLoading?'Создаём...': `СОЗДАТЬ СКАЗКУ${form.childName?` ДЛЯ ${form.childName.toUpperCase()}`:''}`}</span>
           </button>
         </form>
       </div>
@@ -398,113 +398,123 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
   )
 }
 
-// ── Story Reading view ────────────────────────────────────────────────────────
+// ── Story Reading view (Stitch magazine layout) ───────────────────────────────
 function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
   storyRef:React.RefObject<HTMLDivElement|null>
 }) {
   return (
-    <div className="min-h-screen pb-28 md:pb-16 print:pb-0">
-      {/* Story content */}
-      <div ref={storyRef} className="max-w-4xl mx-auto px-4 pt-8">
-        {/* Title */}
-        <div className="text-center mb-10">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{color:'var(--text-muted)'}}>✦ Глава 1</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight print:text-black" style={{color:'var(--text)'}}>{story.title}</h2>
-        </div>
+    <div className="min-h-screen pb-28 md:pb-16 print:pb-0" style={{background:'var(--bg)'}}>
+      <div ref={storyRef}>
 
-        {/* Scenes — desktop: image left + text right; mobile: stacked */}
-        <div className="space-y-14">
-          {story.scenes.map((scene,i)=>(
-            <div key={i} className={`flex gap-8 ${i%2===1?'md:flex-row-reverse':''} flex-col md:flex-row`}>
-              <div className="md:w-2/5 flex-shrink-0">
-                <StoryImage prompt={scene.imagePrompt} index={i} />
+        {/* ── Reading scenes — Stitch magazine layout ── */}
+        {story.scenes.map((scene,i)=>(
+          <section key={i} className="max-w-5xl mx-auto px-4 py-10 md:py-14">
+            {i===0&&(
+              <div className="text-center mb-10">
+                <p className="text-label-caps mb-4 flex items-center justify-center gap-2" style={{color:'var(--text-muted)'}}>
+                  <span>📖</span> Глава {i+1}
+                </p>
+                <h2 className="font-serif font-bold leading-tight" style={{fontSize:'clamp(28px,4vw,40px)',color:'var(--text)'}}>
+                  {story.title}
+                </h2>
               </div>
-              <div className="md:w-3/5 flex items-center">
-                <p className={`text-body-reading print:text-base ${i===0?'drop-cap':''}`}
+            )}
+            <div className={`flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch ${i%2===1?'lg:flex-row-reverse':''}`}>
+              <div className="w-full lg:w-1/2 flex-shrink-0">
+                <div className="relative w-full rounded-3xl overflow-hidden clay-shadow" style={{aspectRatio:'1/1'}}>
+                  <StoryImage prompt={scene.imagePrompt} index={i} />
+                </div>
+                <div className="flex justify-center mt-3 gap-2 opacity-40" style={{color:'var(--primary)'}}>
+                  <span className="text-xs">✦</span><span className="text-base">✨</span><span className="text-xs">✦</span>
+                </div>
+              </div>
+              <div className="w-full lg:w-1/2 flex flex-col justify-center">
+                <p className={`text-body-reading leading-relaxed print:text-base ${i===0?'drop-cap':''}`}
                   style={{color:'var(--text)',fontFamily:'var(--font-serif)'}}>
                   {scene.text}
                 </p>
               </div>
             </div>
-          ))}
-        </div>
+          </section>
+        ))}
 
-        {/* Discussion */}
-        {story.discussion&&story.discussion.length>0&&(
-          <div className="mt-14 bg-white rounded-3xl p-6 md:p-8 card-shadow print:mt-10">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-2xl">💬</span>
-              <h3 className="font-serif text-xl font-bold" style={{color:'var(--text)'}}>Поговорите с ребёнком</h3>
-            </div>
-            <div className="space-y-4">
-              {story.discussion.map((q,i)=>(
-                <div key={i} className="flex gap-4 items-start rounded-2xl p-4" style={{background:'var(--primary-light)'}}>
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-black text-white" style={{background:'var(--primary)'}}>{i+1}</div>
-                  <p className="text-sm leading-relaxed font-medium pt-0.5" style={{color:'var(--text)'}}>{q}</p>
+        {/* ── THE END — Stitch bento 7/5 layout ── */}
+        <section className="max-w-5xl mx-auto px-4 py-12 print:hidden">
+          <div className="text-center mb-10">
+            <h3 className="font-serif font-bold mb-2" style={{fontSize:52,color:'var(--primary)'}}>The End</h3>
+            <p className="text-sm max-w-lg mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
+              Конец этой истории — начало следующей
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-6">
+            {/* Discussion col-span-7 */}
+            {story.discussion&&story.discussion.length>0&&(
+              <div className="md:col-span-7 clay-card p-6 flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">💬</span>
+                  <h4 className="font-serif text-xl font-bold" style={{color:'var(--text)'}}>Let&apos;s Talk About It</h4>
                 </div>
-              ))}
+                <p className="text-sm mb-5" style={{color:'var(--text-muted)'}}>Эти вопросы помогут вашему ребёнку исследовать темы истории.</p>
+                <ul className="space-y-3 flex-1">
+                  {story.discussion.map((q,qi)=>(
+                    <li key={qi} className="rounded-xl p-4 flex gap-3 items-start" style={{background:'#fff'}}>
+                      <span className="text-base mt-0.5 flex-shrink-0" style={{color:'var(--primary)'}}>
+                        {['🌟','❤️','💡'][qi%3]}
+                      </span>
+                      <p className="text-sm leading-relaxed font-medium" style={{color:'var(--text)'}}>{q}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Actions + Tip col-span-5 */}
+            <div className="md:col-span-5 flex flex-col gap-4">
+              <div className="clay-card p-5 flex flex-col gap-3">
+                <button onClick={onSave} disabled={alreadySaved}
+                  className="clay-btn w-full py-3.5 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+                  {alreadySaved?<><span>✓</span><span>Сохранено</span></>:<><span>💾</span><span>Сохранить в библиотеку</span></>}
+                </button>
+                <button onClick={onDownloadPDF} disabled={pdfLoading}
+                  className="clay-btn-outline w-full py-3 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+                  <span>↓</span><span>{pdfLoading?'Создаём PDF...':'Скачать PDF'}</span>
+                </button>
+                <button onClick={onBack}
+                  className="clay-btn-amber w-full py-3 font-semibold text-sm flex items-center justify-center gap-2">
+                  <span>✨</span><span>Создать новую сказку</span>
+                </button>
+                <button onClick={onShare}
+                  className="clay-btn-outline w-full py-3 font-semibold text-sm flex items-center justify-center gap-2">
+                  <span>{shareStatus!=='idle'?'✓':'↗'}</span>
+                  <span>{shareStatus!=='idle'?'Скопировано':'Поделиться'}</span>
+                </button>
+              </div>
+              {story.anchor&&(
+                <div className="tip-card p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">💡</span>
+                    <h5 className="font-bold text-sm" style={{color:'#1a3a1a'}}>Совет для родителей</h5>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{color:'#2d4a2d'}}>
+                    {story.anchor.description}
+                  </p>
+                </div>
+              )}
+              <div className="clay-card p-4 text-center">
+                <p className="text-xs font-semibold mb-3" style={{color:'var(--text-muted)'}}>Как вам эта история?</p>
+                <div className="flex justify-center gap-4">
+                  {['😔','😐','🙂','😍'].map(e=>(
+                    <button key={e} className="text-2xl hover:scale-125 transition-transform cursor-pointer">{e}</button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Anchor */}
-        {story.anchor&&(
-          <div className="mt-5 rounded-2xl p-5 print:break-inside-avoid" style={{background:'#fffbeb',border:'2px solid #fcd34d'}}>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🪄</span>
-              <h4 className="font-bold text-sm" style={{color:'#92400e'}}>{story.anchor.title}</h4>
-            </div>
-            <p className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>{story.anchor.description}</p>
-          </div>
-        )}
-      </div>
-
-      {/* "The End" + actions */}
-      <div className="max-w-4xl mx-auto px-4 mt-16 print:hidden">
-        <div className="text-center mb-10">
-          <h3 className="font-serif text-5xl font-bold mb-4" style={{color:'var(--primary)'}}>The End</h3>
-          <p className="text-sm" style={{color:'var(--text-muted)'}}>Конец этой истории — начало следующей</p>
-        </div>
-
-        {/* Desktop: 2-column */}
-        <div className="md:grid md:grid-cols-2 md:gap-8 space-y-4 md:space-y-0">
-          {/* Left: reactions */}
-          <div className="bg-white rounded-3xl p-6 card-shadow">
-            <p className="text-sm font-semibold mb-4" style={{color:'var(--text-muted)'}}>Как вам понравилась история?</p>
-            <div className="flex gap-4 justify-center">
-              {['😔','😐','🙂','😍'].map(e=>(
-                <button key={e} className="text-3xl hover:scale-125 transition-transform cursor-pointer">{e}</button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right: actions */}
-          <div className="bg-white rounded-3xl p-6 card-shadow space-y-3">
-            <button onClick={onSave} disabled={alreadySaved}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 font-bold text-sm transition-all cursor-pointer disabled:opacity-60"
-              style={alreadySaved?{background:'#d1fae5',color:'#065f46'}:{background:'var(--primary)',color:'#fff'}}>
-              {alreadySaved?'✓ Сохранено в библиотеке':'💾 Сохранить в библиотеку'}
-            </button>
-            <button onClick={onDownloadPDF} disabled={pdfLoading}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-60"
-              style={{background:'var(--primary-light)',color:'var(--primary)'}}>
-              {pdfLoading?'⏳ Создаём PDF...':'↓ Скачать PDF'}
-            </button>
-            <button onClick={onBack}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity"
-              style={{background:'#f5f5f5',color:'var(--text)'}}>
-              ✨ Создать новую сказку
-            </button>
-            <button onClick={onShare}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl py-3 font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity"
-              style={{background:'#f5f5f5',color:'var(--text)'}}>
-              {shareStatus!=='idle'?'✓ Скопировано':'↗ Поделиться'}
-            </button>
-          </div>
-        </div>
-        {pdfError&&<p className="mt-4 text-center text-sm text-red-500">{pdfError}</p>}
+          {pdfError&&<p className="text-center text-sm text-red-500">{pdfError}</p>}
+        </section>
       </div>
     </div>
   )

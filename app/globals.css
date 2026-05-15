@@ -107,26 +107,79 @@ body {
   color: var(--primary);
 }
 
-/* ── Clay morphism (Stitch style) ───────────────────── */
+/* ── Clay morphism (exact from Stitch HTML) ─────────── */
 .clay-card {
-  box-shadow: var(--clay-card-shadow);
-  border-radius: 32px;
-  background: var(--bg-card);
+  background: #fdf9f3;
+  box-shadow: inset 4px 4px 10px rgba(255,255,255,0.8),
+              inset -4px -4px 10px rgba(0,0,0,0.05),
+              8px 8px 20px rgba(0,0,0,0.05);
+  border-radius: 16px;
+}
+.clay-input {
+  background: #f1ede7;
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05),
+              inset -4px -4px 8px rgba(255,255,255,0.8);
+  border: none !important;
+  border-radius: 12px;
+  outline: none;
+}
+.clay-input:focus {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.08),
+              inset -4px -4px 8px rgba(255,255,255,0.8),
+              0 0 0 2px rgba(70,98,82,0.25);
 }
 .clay-btn {
-  background: var(--primary);
+  background: #466252;
   color: #fff;
-  box-shadow: var(--clay-btn-shadow);
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2),
+              inset -2px -2px 5px rgba(0,0,0,0.2),
+              4px 4px 10px rgba(0,0,0,0.1);
   border-radius: 9999px;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
-.clay-btn:active { transform: scale(0.98) }
-.clay-btn-secondary {
-  background: var(--secondary-bg);
-  color: var(--primary);
-  box-shadow: var(--clay-btn-secondary-shadow);
+.clay-btn:active { transform: scale(0.98); }
+.clay-btn-outline {
+  background: #fff;
+  color: #466252;
+  border: 1.5px solid #c8d5c5;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.06);
   border-radius: 9999px;
   transition: all 0.2s ease;
+  cursor: pointer;
+}
+.clay-btn-amber {
+  background: #d97706;
+  color: #fff;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2),
+              inset -2px -2px 5px rgba(0,0,0,0.2),
+              4px 4px 10px rgba(217,119,6,0.25);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.clay-chip {
+  background: #e6e2dc;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.05),
+              -2px -2px 5px rgba(255,255,255,0.8);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.clay-chip-selected {
+  background: #466252;
+  color: #fff;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15),
+              inset -1px -1px 3px rgba(255,255,255,0.1);
+}
+.clay-shadow {
+  box-shadow: inset 4px 4px 10px rgba(255,255,255,0.8),
+              inset -4px -4px 10px rgba(0,0,0,0.05),
+              8px 8px 20px rgba(0,0,0,0.05);
+}
+.tip-card {
+  background: #caead5;
+  border-radius: 16px;
 }
 
 /* ── Story card shadow ──────────────────────────────── */
