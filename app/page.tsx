@@ -274,7 +274,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
   const inputClass = "w-full rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 transition-shadow"
   const inputStyle = {border:'1.5px solid var(--border)',background:'#fafafa',color:'var(--text)'}
-  const labelClass = "block text-xs font-bold mb-2 uppercase tracking-widest"
+  const labelClass = "block text-label-caps mb-2"
   const labelStyle = {color:'var(--text-muted)'}
 
   return (
@@ -283,13 +283,13 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
       {/* Desktop hero */}
       <div className="hidden md:block text-center pt-10 pb-8">
         <div className="text-4xl mb-4">✨</div>
-        <h1 className="font-serif text-4xl font-bold mb-3" style={{color:'var(--primary)'}}>Волшебная Сказка</h1>
+        <h1 className="font-serif text-headline-xl mb-3" style={{color:'var(--primary)'}}>Волшебная Сказка</h1>
         <p className="text-base" style={{color:'var(--text-muted)'}}>Персональная сказка для вашего ребёнка — за минуту</p>
       </div>
 
       {/* Mobile hero */}
       <div className="md:hidden text-center pt-4 pb-6">
-        <h1 className="font-serif text-3xl font-bold mb-2" style={{color:'var(--primary)'}}>Создайте сказку для вашего ребёнка</h1>
+        <h1 className="font-serif text-headline-lg-mobile mb-2" style={{color:'var(--primary)'}}>Создайте сказку для вашего ребёнка</h1>
         <p className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>Заполните данные ниже — ИИ создаст персональную терапевтическую историю</p>
       </div>
 
@@ -419,7 +419,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
                 <StoryImage prompt={scene.imagePrompt} index={i} />
               </div>
               <div className="md:w-3/5 flex items-center">
-                <p className={`leading-loose text-lg font-medium print:text-base ${i===0?'drop-cap':''}`}
+                <p className={`text-body-reading print:text-base ${i===0?'drop-cap':''}`}
                   style={{color:'var(--text)',fontFamily:'var(--font-serif)'}}>
                   {scene.text}
                 </p>
