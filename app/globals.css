@@ -122,14 +122,21 @@ body {
 .font-caption        { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
 .font-serif          { font-family: 'Lora', Georgia, serif !important; }
 
-/* ── Typography tokens (from Stitch DESIGN.md) ─────── */
-
-.text-headline-xl      { font-size: 40px;  font-weight: 700; line-height: 48px; letter-spacing: -0.02em; }
-.text-headline-lg      { font-size: 32px;  font-weight: 700; line-height: 40px; }
-.text-headline-lg-mob  { font-size: 24px;  font-weight: 700; line-height: 32px; }
-.text-body-reading     { font-size: 20px;  font-weight: 400; line-height: 32px; }
-.text-body-ui          { font-size: 16px;  font-weight: 500; line-height: 24px; }
-.text-label-caps       { font-size: 12px;  font-weight: 700; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
+/* ── Typography utilities (exact Stitch Tailwind config values) ── */
+.text-display-lg        { font-size: 48px; line-height: 56px; letter-spacing: -0.02em; font-weight: 700; }
+.text-display-lg-mobile { font-size: 36px; line-height: 44px; letter-spacing: -0.02em; font-weight: 700; }
+.text-headline-lg       { font-size: 32px; line-height: 40px; font-weight: 600; }
+.text-headline-md       { font-size: 24px; line-height: 32px; font-weight: 600; }
+.text-body-lg           { font-size: 18px; line-height: 30px; font-weight: 400; }
+.text-body-md           { font-size: 16px; line-height: 26px; font-weight: 400; }
+.text-label-md          { font-size: 14px; line-height: 20px; letter-spacing: 0.05em; font-weight: 600; }
+.text-caption           { font-size: 12px; line-height: 18px; font-weight: 500; }
+/* Legacy tokens */
+.text-headline-xl       { font-size: 40px; font-weight: 700; line-height: 48px; letter-spacing: -0.02em; }
+.text-headline-lg-mob   { font-size: 24px; font-weight: 700; line-height: 32px; }
+.text-body-reading      { font-size: 20px; font-weight: 400; line-height: 32px; }
+.text-body-ui           { font-size: 16px; font-weight: 500; line-height: 24px; }
+.text-label-caps        { font-size: 12px; font-weight: 700; line-height: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
 
 /* ── Paper Magic: Drop Cap (from Stitch) ──────────── */
 .drop-cap-letter {

@@ -338,9 +338,9 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
             <div className="flex flex-col">
               <div className="mb-stack-lg">
                 {/* Drop cap: block, text-[120px], then heading with -mt-16 — exact Stitch */}
-                <span className="font-lora text-[120px] leading-none text-primary/10 select-none block">С</span>
+                <span className="font-lora text-[120px] leading-none text-primary/10 select-none block" aria-hidden>С</span>
                 <h1 className="font-lora font-bold text-[56px] leading-[1.1] text-[#1a3a2a] -mt-16">
-                  оздайте волшебную сказку для вашего ребёнка
+                  Создайте волшебную сказку для вашего ребёнка
                 </h1>
               </div>
 
@@ -450,9 +450,9 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         <div className="absolute inset-0 botanical-bg z-0" aria-hidden />
         <div className="relative z-10">
           <div className="mb-stack-lg">
-            <span className="font-lora text-[72px] leading-none text-primary/10 select-none block">С</span>
+            <span className="font-lora text-[72px] leading-none text-primary/10 select-none block" aria-hidden>С</span>
             <h1 className="font-lora font-bold text-[32px] leading-[1.2] text-[#1a3a2a] -mt-8">
-              оздайте сказку для вашего ребёнка
+              Создайте сказку для вашего ребёнка
             </h1>
           </div>
 
