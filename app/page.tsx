@@ -529,7 +529,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
         <div className="mt-stack-xl text-center">
           <p className="font-lora italic text-[22px] leading-snug text-secondary">
-            &ldquo;Каждая сказка — это мостик к сердцу ребёнка.&rdquo;
+            &ldquo;Правильная сказка — это ключ к тому, что ребёнок ещё не умеет выразить словами.&rdquo;
           </p>
         </div>
       </div>
