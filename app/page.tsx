@@ -275,225 +275,234 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     setForm(rf); await onGenerate(rf)
   }
 
-  // Exact Stitch input class
-  const inp = "bg-transparent border-t-0 border-x-0 border-b border-outline text-on-surface font-body-md py-2 px-0 placeholder:text-surface-dim transition-colors w-full focus:outline-none focus:border-primary"
+  // Exact Stitch input class from code.html
+  const inp = "bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 w-full focus:outline-none"
+
+  const FEATURES = [
+    ['book_2',      'Уникальные сюжеты'],
+    ['brush',       'Художественный стиль'],
+    ['chat_bubble', 'Эмоциональный интеллект'],
+    ['description', 'Печатное качество текста'],
+  ]
+
+  const CHIP_TYPES = [
+    {id:'fear'       as SituationType, label:'Страх'},
+    {id:'emotion'    as SituationType, label:'Эмоции'},
+    {id:'adaptation' as SituationType, label:'Новое'},
+    {id:'preparation'as SituationType, label:'Событие'},
+    {id:'behavior'   as SituationType, label:'Поведение'},
+    {id:'fun'        as SituationType, label:'Просто сказка'},
+  ]
 
   return (
     <>
-      {/* ── DESKTOP — exact Stitch HTML structure ── */}
-      <main className="hidden md:flex flex-col md:flex-row min-h-screen relative overflow-hidden bg-background">
+      {/* ── DESKTOP — exact code.html structure ── */}
+      <div className="hidden md:block relative">
+        {/* Botanical overlay */}
+        <div className="absolute inset-0 botanical-bg z-0" aria-hidden />
 
-        {/* LEFT COLUMN — exact Stitch */}
-        <section className="w-full md:w-[45%] px-edge-margin-mobile md:pl-edge-margin-desktop md:pr-12 pt-stack-xl pb-stack-xl flex flex-col justify-start z-10">
-          <div className="max-w-xl">
+        <div className="max-w-container-max mx-auto px-edge-margin-desktop py-stack-xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] gap-stack-xl items-start">
 
-            {/* Drop cap + heading — exact Stitch split */}
-            <div className="mb-stack-lg" style={{overflow:'hidden'}}>
-              <span style={{
-                float:'left',fontFamily:'Literata, serif',fontSize:120,
-                lineHeight:'100px',paddingRight:24,paddingTop:8,
-                color:'#032416',fontWeight:700,opacity:0.09,
-                userSelect:'none',pointerEvents:'none'
-              }} aria-hidden>С</span>
-              <h1 className="font-headline-lg text-headline-lg text-primary pt-4">
-                оздайте волшебную сказку для вашего ребёнка
-              </h1>
-            </div>
+            {/* LEFT COLUMN — exact code.html */}
+            <div className="flex flex-col">
+              <div className="mb-stack-lg">
+                {/* Drop cap: block, text-[120px], then heading with -mt-16 — exact Stitch */}
+                <span className="font-lora text-[120px] leading-none text-primary/10 select-none block">С</span>
+                <h1 className="font-lora font-bold text-[56px] leading-[1.1] text-[#1a3a2a] -mt-16">
+                  оздайте волшебную сказку для вашего ребёнка
+                </h1>
+              </div>
 
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-stack-xl">
-              Индивидуальные терапевтические истории, созданные для поддержки эмоционального роста и мягкого исцеления. Каждая глава пишется специально для вашей ситуации, помогая ребёнку находить ответы на важные вопросы.
-            </p>
+              <p className="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-[540px]">
+                Мы верим, что каждая история — это мост к сердцу ребёнка. Наши терапевтические сказки создаются индивидуально, помогая малышам мягко проживать эмоции и находить ответы на важные жизненные вопросы в уютной атмосфере магии и тепла.
+              </p>
 
-            {/* Feature list — exact Stitch */}
-            <div className="space-y-6">
-              {[
-                ['menu_book',   'Персонализация',        'Ребёнок становится главным героем своей собственной истории.'],
-                ['palette',     'Терапевтический эффект','Мягко прорабатываем страхи и обучаем новым моделям поведения.'],
-                ['chat_bubble', 'Глубокие смыслы',       'Обсуждайте важные темы через метафоры и приключения.'],
-                ['description', 'Печатное качество',     'Текст, оформленный по всем канонам классической верстки.'],
-              ].map(([icon,title,desc],i,arr)=>(
-                <div key={title} className={`flex items-start gap-4 py-4 ${i<arr.length-1?'border-b border-outline-variant':''}`}>
-                  <span className="material-symbols-outlined text-primary-container">{icon}</span>
-                  <div>
-                    <h3 className="font-label-md text-label-md text-primary uppercase tracking-wider">{title}</h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant">{desc}</p>
+              {/* Feature list — exact code.html: icon + single label, no description */}
+              <div className="space-y-stack-md mb-stack-xl">
+                {FEATURES.map(([icon,label])=>(
+                  <div key={label} className="flex items-center gap-stack-md text-primary">
+                    <span className="material-symbols-outlined">{icon}</span>
+                    <span className="font-label-md text-label-md">{label}</span>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Random link — exact Stitch (secondary = terracotta) */}
-            <div className="mt-stack-lg">
+              {/* Terracotta link — text-secondary */}
               <button type="button" onClick={handleRandom} disabled={isLoading}
-                className="inline-flex items-center gap-2 font-label-md text-label-md text-secondary hover:underline transition-all group cursor-pointer disabled:opacity-40">
+                className="inline-flex items-center gap-2 text-secondary font-bold font-body-md group hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40">
                 Попробовать случайную сказку
-                <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </button>
             </div>
+
+            {/* RIGHT COLUMN — exact code.html */}
+            <div className="lg:pl-stack-xl">
+              <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
+                <h2 className="font-headline-lg text-headline-lg text-primary mb-stack-lg">Создать сказку</h2>
+                <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
+
+                  {/* Row 1: Name + Age */}
+                  <div className="grid grid-cols-2 gap-stack-md">
+                    <div className="flex flex-col gap-2">
+                      <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Имя ребёнка</label>
+                      <input value={form.childName} required placeholder="Введите имя" type="text"
+                        onChange={e=>setForm(f=>({...f,childName:e.target.value}))} className={inp} />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
+                      <input value={form.age} placeholder="Напр. 5 лет" type="text"
+                        onChange={e=>setForm(f=>({...f,age:e.target.value}))} className={inp} />
+                    </div>
+                  </div>
+
+                  {/* Row 2: Hero */}
+                  <div className="flex flex-col gap-2">
+                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
+                    <div className="relative">
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
+                      <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..." type="text"
+                        onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-8`} />
+                    </div>
+                  </div>
+
+                  {/* Row 3: Theme chips — exact code.html */}
+                  <div className="flex flex-col gap-3">
+                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Тема сказки</label>
+                    <div className="flex flex-wrap gap-2">
+                      {CHIP_TYPES.map(t=>(
+                        <button key={t.id} type="button"
+                          onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+                          className={`px-3 py-1 text-caption font-medium rounded-sm transition-colors cursor-pointer ${
+                            form.situationType===t.id
+                              ? 'bg-primary-container text-on-primary border border-primary-container'
+                              : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30 hover:border-primary'
+                          }`}>
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                    <input value={form.situation} required placeholder={sitType.hint}
+                      onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
+                  </div>
+
+                  {/* Row 4: Favorites — textarea */}
+                  <div className="flex flex-col gap-2">
+                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи и интересы</label>
+                    <textarea value={form.favorites} placeholder="Космос, динозавры, рисование..." rows={2}
+                      onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
+                      className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
+                  </div>
+
+                  {/* Row 5: Lesson — textarea */}
+                  <div className="flex flex-col gap-2">
+                    <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
+                    <textarea value={form.lesson} placeholder="Доброте, дружбе, честности..." rows={2}
+                      onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
+                      className="bg-transparent border-0 border-b border-[#6b7064] focus:ring-0 focus:border-[#1a3a2a] transition-colors py-2 px-0 resize-none w-full focus:outline-none" />
+                  </div>
+
+                  {/* CTA — exact code.html: bg-[#1a3a2a] dark green */}
+                  <button type="submit" disabled={isLoading}
+                    className="w-full bg-[#1a3a2a] text-white py-4 font-label-md text-label-md uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50">
+                    {isLoading ? 'Создаём сказку...' : 'Создать сказку'}
+                  </button>
+                </form>
+              </div>
+            </div>
+
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* RIGHT COLUMN — exact Stitch */}
-        <section className="w-full md:w-[55%] px-edge-margin-mobile md:pr-edge-margin-desktop py-stack-xl flex items-center justify-center relative">
-          <div className="bg-surface-container-lowest border border-primary/10 shadow-sm p-stack-lg md:p-10 w-full max-w-2xl relative z-20">
-            <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg border-b border-primary/5 pb-4">
-              Создать сказку
-            </h2>
-            <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-md">
+      {/* ── MOBILE — single column ── */}
+      <div className="md:hidden px-edge-margin-mobile pt-stack-lg pb-32 relative">
+        <div className="absolute inset-0 botanical-bg z-0" aria-hidden />
+        <div className="relative z-10">
+          <div className="mb-stack-lg">
+            <span className="font-lora text-[72px] leading-none text-primary/10 select-none block">С</span>
+            <h1 className="font-lora font-bold text-[32px] leading-[1.2] text-[#1a3a2a] -mt-8">
+              оздайте сказку для вашего ребёнка
+            </h1>
+          </div>
 
-              {/* Name + Age */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+          <p className="font-body-md text-body-md text-on-surface-variant mb-stack-lg">
+            Заполните детали, чтобы соткать волшебство.
+          </p>
+
+          <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
+            <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
+              <div className="grid grid-cols-2 gap-stack-md">
                 <div className="flex flex-col gap-2">
-                  <label className="font-label-md text-label-md text-on-surface-variant uppercase">Имя ребёнка</label>
-                  <input value={form.childName} required placeholder="Введите имя" type="text"
-                    onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
-                    className={inp} />
+                  <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Имя</label>
+                  <input value={form.childName} required placeholder="Введите имя"
+                    onChange={e=>setForm(f=>({...f,childName:e.target.value}))} className={inp} />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="font-label-md text-label-md text-on-surface-variant uppercase">Возраст</label>
-                  <input value={form.age} placeholder="Напр. 5 лет" type="text"
-                    onChange={e=>setForm(f=>({...f,age:e.target.value}))}
-                    className={inp} />
+                  <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Возраст</label>
+                  <input value={form.age} placeholder="Лет"
+                    onChange={e=>setForm(f=>({...f,age:e.target.value}))} className={inp} />
                 </div>
               </div>
 
-              {/* Hero */}
               <div className="flex flex-col gap-2">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase">Главный герой</label>
+                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Главный герой</label>
                 <div className="relative">
-                  <span className="absolute left-0 top-2 material-symbols-outlined text-primary-container" style={{fontSize:20}}>auto_stories</span>
-                  <input value={form.hero} required placeholder="Храбрый лисёнок, добрый робот..." type="text"
-                    onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-                    className={`${inp} pl-8`} />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#6b7064]">auto_stories</span>
+                  <input value={form.hero} required placeholder="Например, смелый котёнок"
+                    onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-8`} />
                 </div>
               </div>
 
-              {/* Theme chips */}
-              <div className="flex flex-col gap-4">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase">Тема сказки</label>
-                <div className="flex flex-wrap gap-2">
-                  {SIT_TYPES.map(t=>(
+              <div className="flex flex-col gap-3">
+                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Тема сказки</label>
+                <div className="flex flex-col gap-2">
+                  {CHIP_TYPES.map(t=>(
                     <button key={t.id} type="button"
                       onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                      className={`px-4 py-2 border border-outline font-label-md text-caption transition-colors cursor-pointer ${
+                      className={`px-3 py-2 text-caption font-medium rounded-sm text-left transition-colors cursor-pointer ${
                         form.situationType===t.id
-                          ? 'bg-primary-container text-on-primary-container'
-                          : 'text-on-surface-variant hover:border-primary hover:text-primary'
+                          ? 'bg-primary-container text-on-primary border border-primary-container'
+                          : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/30'
                       }`}>
                       {t.label}
                     </button>
                   ))}
                 </div>
                 <input value={form.situation} required placeholder={sitType.hint}
-                  onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-                  className={inp} />
+                  onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
               </div>
 
-              {/* Favorites — textarea like Stitch */}
               <div className="flex flex-col gap-2">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase">Любимые вещи и интересы</label>
-                <textarea value={form.favorites} placeholder="Что нравится вашему ребёнку?" rows={2}
-                  onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-                  className="bg-transparent border-t-0 border-x-0 border-b border-outline text-on-surface font-body-md py-2 px-0 placeholder:text-surface-dim transition-colors resize-none w-full focus:outline-none focus:border-primary" />
+                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Любимые вещи</label>
+                <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
+                  onChange={e=>setForm(f=>({...f,favorites:e.target.value}))} className={inp} />
               </div>
 
-              {/* Lesson — textarea like Stitch */}
               <div className="flex flex-col gap-2">
-                <label className="font-label-md text-label-md text-on-surface-variant uppercase">Чему учит сказка?</label>
-                <textarea value={form.lesson} placeholder="Основной урок или мораль..." rows={2}
-                  onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-                  className="bg-transparent border-t-0 border-x-0 border-b border-outline text-on-surface font-body-md py-2 px-0 placeholder:text-surface-dim transition-colors resize-none w-full focus:outline-none focus:border-primary" />
+                <label className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Чему учит сказка?</label>
+                <input value={form.lesson} placeholder="Доброте, дружбе..."
+                  onChange={e=>setForm(f=>({...f,lesson:e.target.value}))} className={inp} />
               </div>
 
-              {/* CTA button — bg-secondary = terracotta, exact Stitch */}
               <button type="submit" disabled={isLoading}
-                className="w-full bg-secondary text-on-secondary font-label-md text-label-md py-5 tracking-widest uppercase transition-all hover:opacity-90 active:scale-[0.98] mt-4 cursor-pointer disabled:opacity-50">
-                {isLoading ? 'Создаём сказку...' : 'Создать сказку'}
+                className="w-full bg-[#1a3a2a] text-white py-4 font-label-md text-label-md uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] cursor-pointer disabled:opacity-50">
+                {isLoading ? 'Создаём...' : 'Создать сказку'}
               </button>
             </form>
           </div>
-        </section>
-      </main>
 
-      {/* ── MOBILE — single column ── */}
-      <div className="md:hidden px-edge-margin-mobile pt-stack-lg pb-32 max-w-md mx-auto relative z-10">
-        <div className="botanical-bg" aria-hidden />
-
-        <section className="mb-stack-lg">
-          <h2 className="font-headline-md text-headline-md text-primary mb-2">Создать сказку</h2>
-          <p className="font-body-md text-body-md text-on-surface-variant">Заполните детали, чтобы соткать волшебство.</p>
-        </section>
-
-        <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-md">
-          <div className="grid grid-cols-2 gap-stack-md">
-            <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase">Имя ребёнка</label>
-              <input value={form.childName} required placeholder="Введите имя"
-                onChange={e=>setForm(f=>({...f,childName:e.target.value}))} className={inp} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface-variant uppercase">Возраст</label>
-              <input value={form.age} placeholder="Лет"
-                onChange={e=>setForm(f=>({...f,age:e.target.value}))} className={inp} />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="font-label-md text-label-md text-on-surface-variant uppercase">Главный герой</label>
-            <div className="relative">
-              <span className="absolute left-0 top-2 material-symbols-outlined text-primary-container" style={{fontSize:18}}>auto_stories</span>
-              <input value={form.hero} required placeholder="Например, смелый котёнок"
-                onChange={e=>setForm(f=>({...f,hero:e.target.value}))} className={`${inp} pl-7`} />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <label className="font-label-md text-label-md text-on-surface-variant uppercase">Тема сказки</label>
-            <div className="flex flex-col gap-2">
-              {SIT_TYPES.map(t=>(
-                <button key={t.id} type="button"
-                  onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                  className={`px-4 py-2 border border-outline font-label-md text-caption transition-colors cursor-pointer text-left ${
-                    form.situationType===t.id
-                      ? 'bg-primary-container text-on-primary-container'
-                      : 'text-on-surface-variant'
-                  }`}>
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            <input value={form.situation} required placeholder={sitType.hint}
-              onChange={e=>setForm(f=>({...f,situation:e.target.value}))} className={inp} />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="font-label-md text-label-md text-on-surface-variant uppercase">Любимые вещи</label>
-            <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
-              onChange={e=>setForm(f=>({...f,favorites:e.target.value}))} className={inp} />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="font-label-md text-label-md text-on-surface-variant uppercase">Чему учит сказка?</label>
-            <input value={form.lesson} placeholder="Доброте, дружбе..."
-              onChange={e=>setForm(f=>({...f,lesson:e.target.value}))} className={inp} />
-          </div>
-
-          <button type="submit" disabled={isLoading}
-            className="w-full bg-secondary text-on-secondary font-label-md text-label-md py-5 tracking-widest uppercase transition-all hover:opacity-90 active:scale-[0.98] mt-4 cursor-pointer disabled:opacity-50">
-            {isLoading ? 'Создаём...' : 'Создать сказку'}
+          <button type="button" onClick={handleRandom} disabled={isLoading}
+            className="mt-stack-lg inline-flex items-center gap-2 text-secondary font-bold font-body-md hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40">
+            Попробовать случайную сказку
+            <span className="material-symbols-outlined">arrow_forward</span>
           </button>
-        </form>
 
-        <button type="button" onClick={handleRandom} disabled={isLoading}
-          className="mt-stack-md w-full inline-flex items-center justify-center gap-2 font-label-md text-label-md text-secondary cursor-pointer hover:underline disabled:opacity-40">
-          <span className="material-symbols-outlined text-[16px]">shuffle</span>
-          Попробовать случайную сказку
-        </button>
-
-        <div className="mt-stack-lg text-center py-stack-lg border-t border-outline-variant">
-          <p className="font-headline-md text-display-lg-mobile text-secondary italic leading-snug">
-            &ldquo;Каждая сказка — это мостик к сердцу ребёнка.&rdquo;
-          </p>
+          <div className="mt-stack-xl text-center">
+            <p className="font-lora italic text-[22px] leading-snug text-secondary">
+              &ldquo;Каждая сказка — это мостик к сердцу ребёнка.&rdquo;
+            </p>
+          </div>
         </div>
       </div>
     </>
