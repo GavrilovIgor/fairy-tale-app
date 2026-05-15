@@ -268,6 +268,35 @@ body {
   border-radius: 4px;
 }
 
+/* ── Story Reading — Stitch claymorphism (screen cc8600a3) ─── */
+.claymorphism-card {
+  background: #fdf9f3;
+  box-shadow: inset 4px 4px 10px rgba(255,255,255,0.8), inset -4px -4px 10px rgba(0,0,0,0.05), 8px 8px 24px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+.claymorphism-btn {
+  background: #fdf9f3;
+  box-shadow: 4px 4px 8px rgba(0,0,0,0.06), -4px -4px 8px rgba(255,255,255,0.8);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.claymorphism-btn:active {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.06), inset -4px -4px 8px rgba(255,255,255,0.8);
+}
+.story-drop-cap::first-letter {
+  font-family: 'Literata', Georgia, serif;
+  font-size: 3.5em;
+  font-weight: 700;
+  color: #466252;
+  float: left;
+  line-height: 0.8;
+  margin-right: 0.1em;
+  margin-top: 0.05em;
+}
+.font-story-text { font-family: 'Literata', Georgia, serif !important; }
+.text-story-text  { font-size: 22px; line-height: 1.8; font-weight: 400; }
+
 /* ── Legacy clay classes (still used in story/paywall screens) */
 .clay-card    { background:#fdf9f3; box-shadow:inset 2px 2px 5px rgba(255,255,255,0.8),inset -2px -2px 5px rgba(186,182,178,0.3),4px 4px 12px rgba(0,0,0,0.05); border-radius:20px; }
 .clay-shadow  { box-shadow:inset 2px 2px 5px rgba(255,255,255,0.8),inset -2px -2px 5px rgba(186,182,178,0.3),4px 4px 12px rgba(0,0,0,0.05); }

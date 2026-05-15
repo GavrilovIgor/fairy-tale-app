@@ -537,7 +537,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 }
 
 
-// ── Story Reading view (Stitch magazine layout) ───────────────────────────────
+// ── Story Reading (временный placeholder — ждёт согласования макета) ──────────
 function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
@@ -546,14 +546,12 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
   return (
     <div className="min-h-screen pb-28 md:pb-16 print:pb-0" style={{background:'var(--bg)'}}>
       <div ref={storyRef}>
-
-        {/* ── Reading scenes — Stitch magazine layout ── */}
         {story.scenes.map((scene,i)=>(
           <section key={i} className="max-w-5xl mx-auto px-4 py-10 md:py-14">
             {i===0&&(
               <div className="text-center mb-10">
                 <p className="text-label-caps mb-4 flex items-center justify-center gap-2" style={{color:'var(--text-muted)'}}>
-                  <span>📖</span> Глава {i+1}
+                  <span className="material-symbols-outlined" style={{fontSize:16}}>book_2</span> Глава {i+1}
                 </p>
                 <h2 className="font-serif font-bold leading-tight" style={{fontSize:'clamp(28px,4vw,40px)',color:'var(--text)'}}>
                   {story.title}
@@ -565,9 +563,6 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
                 <div className="relative w-full rounded-3xl overflow-hidden clay-shadow" style={{aspectRatio:'1/1'}}>
                   <StoryImage prompt={scene.imagePrompt} index={i} />
                 </div>
-                <div className="flex justify-center mt-3 gap-2 opacity-40" style={{color:'var(--primary)'}}>
-                  <span className="text-xs">✦</span><span className="text-base">✨</span><span className="text-xs">✦</span>
-                </div>
               </div>
               <div className="w-full lg:w-1/2 flex flex-col justify-center">
                 <p className={`text-body-reading leading-relaxed print:text-base ${i===0?'drop-cap':''}`}
@@ -578,79 +573,18 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             </div>
           </section>
         ))}
-
-        {/* ── THE END — Stitch bento 7/5 layout ── */}
         <section className="max-w-5xl mx-auto px-4 py-12 print:hidden">
-          <div className="text-center mb-10">
-            <h3 className="font-serif font-bold mb-2" style={{fontSize:52,color:'var(--primary)'}}>The End</h3>
-            <p className="text-sm max-w-lg mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
-              Конец этой истории — начало следующей
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-6">
-            {/* Discussion col-span-7 */}
-            {story.discussion&&story.discussion.length>0&&(
-              <div className="md:col-span-7 clay-card p-6 flex flex-col">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl">💬</span>
-                  <h4 className="font-serif text-xl font-bold" style={{color:'var(--text)'}}>Let&apos;s Talk About It</h4>
-                </div>
-                <p className="text-sm mb-5" style={{color:'var(--text-muted)'}}>Эти вопросы помогут вашему ребёнку исследовать темы истории.</p>
-                <ul className="space-y-3 flex-1">
-                  {story.discussion.map((q,qi)=>(
-                    <li key={qi} className="rounded-xl p-4 flex gap-3 items-start" style={{background:'#fff'}}>
-                      <span className="text-base mt-0.5 flex-shrink-0" style={{color:'var(--primary)'}}>
-                        {['🌟','❤️','💡'][qi%3]}
-                      </span>
-                      <p className="text-sm leading-relaxed font-medium" style={{color:'var(--text)'}}>{q}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Actions + Tip col-span-5 */}
-            <div className="md:col-span-5 flex flex-col gap-4">
-              <div className="clay-card p-5 flex flex-col gap-3">
-                <button onClick={onSave} disabled={alreadySaved}
-                  className="clay-btn w-full py-3.5 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
-                  {alreadySaved?<><span>✓</span><span>Сохранено</span></>:<><span>💾</span><span>Сохранить в библиотеку</span></>}
-                </button>
-                <button onClick={onDownloadPDF} disabled={pdfLoading}
-                  className="clay-btn-outline w-full py-3 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
-                  <span>↓</span><span>{pdfLoading?'Создаём PDF...':'Скачать PDF'}</span>
-                </button>
-                <button onClick={onBack}
-                  className="clay-btn-amber w-full py-3 font-semibold text-sm flex items-center justify-center gap-2">
-                  <span>✨</span><span>Создать новую сказку</span>
-                </button>
-                <button onClick={onShare}
-                  className="clay-btn-outline w-full py-3 font-semibold text-sm flex items-center justify-center gap-2">
-                  <span>{shareStatus!=='idle'?'✓':'↗'}</span>
-                  <span>{shareStatus!=='idle'?'Скопировано':'Поделиться'}</span>
-                </button>
-              </div>
-              {story.anchor&&(
-                <div className="tip-card p-5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">💡</span>
-                    <h5 className="font-bold text-sm" style={{color:'#1a3a1a'}}>Совет для родителей</h5>
-                  </div>
-                  <p className="text-xs leading-relaxed" style={{color:'#2d4a2d'}}>
-                    {story.anchor.description}
-                  </p>
-                </div>
-              )}
-              <div className="clay-card p-4 text-center">
-                <p className="text-xs font-semibold mb-3" style={{color:'var(--text-muted)'}}>Как вам эта история?</p>
-                <div className="flex justify-center gap-4">
-                  {['😔','😐','🙂','😍'].map(e=>(
-                    <button key={e} className="text-2xl hover:scale-125 transition-transform cursor-pointer">{e}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-3 justify-center mb-8">
+            <button onClick={onBack} className="clay-btn px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">← Создать новую</button>
+            <button onClick={onSave} disabled={alreadySaved} className="clay-btn px-6 py-3 rounded-full font-semibold text-sm cursor-pointer disabled:opacity-60">
+              {alreadySaved ? '✓ Сохранено' : '💾 Сохранить'}
+            </button>
+            <button onClick={onDownloadPDF} disabled={pdfLoading} className="clay-btn-outline px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">
+              {pdfLoading ? 'Создаём...' : '↓ PDF'}
+            </button>
+            <button onClick={onShare} className="clay-btn-outline px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">
+              {shareStatus!=='idle' ? '✓ Скопировано' : '↗ Поделиться'}
+            </button>
           </div>
           {pdfError&&<p className="text-center text-sm text-red-500">{pdfError}</p>}
         </section>
