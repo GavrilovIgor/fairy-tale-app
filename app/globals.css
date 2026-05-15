@@ -107,33 +107,33 @@ body {
   color: var(--primary);
 }
 
-/* ── Clay morphism (exact from Stitch HTML) ─────────── */
+/* ── Clay morphism — exact from Stitch generated HTML ── */
 .clay-card {
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8),
+              inset -2px -2px 5px rgba(186,182,178,0.3),
+              4px 4px 12px rgba(0,0,0,0.05);
+  border-radius: 20px;
   background: #fdf9f3;
-  box-shadow: inset 4px 4px 10px rgba(255,255,255,0.8),
-              inset -4px -4px 10px rgba(0,0,0,0.05),
-              8px 8px 20px rgba(0,0,0,0.05);
-  border-radius: 16px;
 }
 .clay-input {
   background: #f1ede7;
-  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05),
-              inset -4px -4px 8px rgba(255,255,255,0.8);
+  box-shadow: inset 3px 3px 6px rgba(186,182,178,0.2),
+              inset -3px -3px 6px rgba(255,255,255,0.7);
   border: none !important;
   border-radius: 12px;
   outline: none;
 }
 .clay-input:focus {
-  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.08),
-              inset -4px -4px 8px rgba(255,255,255,0.8),
-              0 0 0 2px rgba(70,98,82,0.25);
+  box-shadow: inset 3px 3px 6px rgba(186,182,178,0.2),
+              inset -3px -3px 6px rgba(255,255,255,0.7),
+              0 0 0 2px rgba(70,98,82,0.2);
 }
+/* Primary button — from Stitch clay-button-primary */
 .clay-btn {
-  background: #466252;
+  background-color: #466252;
   color: #fff;
-  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2),
-              inset -2px -2px 5px rgba(0,0,0,0.2),
-              4px 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 12px rgba(70,98,82,0.2),
+              inset 0 2px 4px rgba(255,255,255,0.2);
   border-radius: 9999px;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -151,31 +151,33 @@ body {
 .clay-btn-amber {
   background: #d97706;
   color: #fff;
-  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2),
-              inset -2px -2px 5px rgba(0,0,0,0.2),
-              4px 4px 10px rgba(217,119,6,0.25);
+  box-shadow: 0 6px 12px rgba(217,119,6,0.25),
+              inset 0 2px 4px rgba(255,255,255,0.2);
   border-radius: 9999px;
   transition: all 0.2s ease;
   cursor: pointer;
 }
+/* Chips — from Stitch clay-chip-active / clay-chip-inactive */
 .clay-chip {
-  background: #e6e2dc;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.05),
-              -2px -2px 5px rgba(255,255,255,0.8);
+  background-color: #f1ede7;
+  box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8),
+              inset -1px -1px 2px rgba(186,182,178,0.4),
+              2px 2px 4px rgba(0,0,0,0.03);
   border-radius: 9999px;
   transition: all 0.2s ease;
   cursor: pointer;
+  color: #6b7064;
 }
 .clay-chip-selected {
-  background: #466252;
+  background-color: #5e7b6a;
   color: #fff;
-  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15),
-              inset -1px -1px 3px rgba(255,255,255,0.1);
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1),
+              0 2px 4px rgba(0,0,0,0.05);
 }
 .clay-shadow {
-  box-shadow: inset 4px 4px 10px rgba(255,255,255,0.8),
-              inset -4px -4px 10px rgba(0,0,0,0.05),
-              8px 8px 20px rgba(0,0,0,0.05);
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.8),
+              inset -2px -2px 5px rgba(186,182,178,0.3),
+              4px 4px 12px rgba(0,0,0,0.05);
 }
 .tip-card {
   background: #caead5;

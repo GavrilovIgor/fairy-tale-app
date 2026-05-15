@@ -58,7 +58,38 @@ CHROMIUM="/Users/igor/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm6
 - MCP endpoint: `https://stitch.googleapis.com/mcp`
 - API Key: stored in `~/.config/secrets/google-stitch.env`
 
+## OAuth настройка (выполнено 2026-05-15)
+
+Генерация требует OAuth токен, не API ключ. Настроено:
+- ADC credentials: `/Users/igor/.config/gcloud/application_default_credentials.json`
+- Quota project: `gen-lang-client-0252922236` (Gemini Default Project)
+- Stitch API включён в `gen-lang-client-0252922236`
+
+### Получить свежий OAuth токен:
+```python
+import json, urllib.request, urllib.parse
+with open('/Users/igor/.config/gcloud/application_default_credentials.json') as f:
+    c = json.load(f)
+data = urllib.parse.urlencode({'client_id':c['client_id'],'client_secret':c['client_secret'],
+    'refresh_token':c['refresh_token'],'grant_type':'refresh_token'}).encode()
+resp = json.loads(urllib.request.urlopen(
+    urllib.request.Request('https://oauth2.googleapis.com/token',data=data)).read())
+TOKEN = resp['access_token']
+```
+
+### Генерация экрана:
+```bash
+curl -X POST "https://stitch.googleapis.com/mcp" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Goog-User-Project: gen-lang-client-0252922236" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"generate_screen_from_text",
+    "arguments":{"projectId":"10825086214956187728","deviceType":"MOBILE","prompt":"..."}}}'
+```
+
+Ответ содержит `outputComponents[0].design.screens[0]` с `screenshot.downloadUrl` и `htmlCode.downloadUrl`.
+
 ## Важно
-- После генерации НЕ повторять запрос если таймаут — poll через `get_screen` каждые 30 сек
-- Для генерации нужен OAuth (не API key) — настроить через `npx @_davideast/stitch-mcp@latest init`
-- MCP инструменты Stitch доступны только после рестарта Claude Code
+- После генерации НЕ повторять запрос — poll через `get_screen` если таймаут
+- Stitch MCP читает через API ключ, генерирует через OAuth Bearer токен
+- Chips Stitch генерирует вертикально (flex-col), не горизонтально

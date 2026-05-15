@@ -275,129 +275,184 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     setForm(rf); await onGenerate(rf)
   }
 
-  const labelClass = "block text-label-caps mb-2"
-  const labelStyle = {color:'var(--text-muted)'}
+  const lbl = "block text-label-caps mb-2"
+  const lblStyle = {color:'var(--text-muted)'}
+
+  // Shared form fields
+  const FormFields = () => (
+    <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={lbl} style={lblStyle}>Имя ребёнка <span className="text-red-400">*</span></label>
+          <input value={form.childName} required placeholder="напр. Лёша"
+            onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
+            className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+        </div>
+        <div>
+          <label className={lbl} style={lblStyle}>Возраст</label>
+          <select value={form.age} onChange={e=>setForm(f=>({...f,age:e.target.value}))}
+            className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}}>
+            {['1-2 года','3-4 года','5-6 лет','7-8 лет','9-10 лет'].map(a=><option key={a}>{a}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className={lbl} style={lblStyle}>Главный герой <span className="text-red-400">*</span></label>
+        <div className="relative">
+          <span className="absolute left-4 top-4 text-xl">🧸</span>
+          <input value={form.hero} required placeholder="напр. храбрый лисёнок, добрый медвежонок..."
+            onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
+            className="clay-input w-full pl-14 pr-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+        </div>
+      </div>
+
+      <div>
+        <label className={lbl} style={lblStyle}>Тема сказки <span className="text-red-400">*</span></label>
+        {/* Desktop: horizontal wrap / Mobile: vertical */}
+        <div className="hidden md:flex flex-wrap gap-2 mb-3">
+          {SIT_TYPES.map(t=>(
+            <button key={t.id} type="button"
+              onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+              className={`clay-chip px-4 py-2 text-sm font-semibold active:scale-95 ${form.situationType===t.id?'clay-chip-selected':''}`}>
+              {t.emoji} {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="md:hidden flex flex-col gap-2 mb-3">
+          {SIT_TYPES.map(t=>(
+            <button key={t.id} type="button"
+              onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+              className={`clay-chip px-4 py-3 text-sm font-semibold text-left active:scale-95 ${form.situationType===t.id?'clay-chip-selected':''}`}>
+              {t.emoji} {t.label}
+            </button>
+          ))}
+        </div>
+        <input value={form.situation} required placeholder={sitType.hint}
+          onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
+          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+      </div>
+
+      <div>
+        <label className={lbl} style={lblStyle}>Любимые вещи</label>
+        <input value={form.favorites} placeholder="напр. космос, динозавры, рисование..."
+          onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
+          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+      </div>
+
+      <div>
+        <label className={lbl} style={lblStyle}>Чему учит сказка</label>
+        <input value={form.lesson} placeholder="напр. не бояться темноты, делиться..."
+          onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
+          className="clay-input w-full px-4 h-14 text-sm font-medium" style={{color:'var(--text)'}} />
+      </div>
+
+      <button type="submit" disabled={isLoading}
+        className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 flex items-center justify-center gap-2">
+        <span>✨</span>
+        <span>{isLoading?'Создаём...': `СОЗДАТЬ СКАЗКУ${form.childName?` ДЛЯ ${form.childName.toUpperCase()}`:''}`}</span>
+      </button>
+    </form>
+  )
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 pb-28 md:pb-12">
+    <>
+      {/* ── DESKTOP: 2-column layout (from Stitch) ── */}
+      <div className="hidden md:flex gap-12 items-start max-w-6xl mx-auto px-8 py-12 pb-16">
 
-      {/* Desktop hero */}
-      <div className="hidden md:block text-center pt-10 pb-8">
-        <div className="text-4xl mb-4">✨</div>
-        <h1 className="font-serif text-headline-xl mb-3" style={{color:'var(--primary)'}}>Волшебная Сказка</h1>
-        <p className="text-base" style={{color:'var(--text-muted)'}}>Персональная сказка для вашего ребёнка — за минуту</p>
-      </div>
-
-      {/* Mobile hero */}
-      <div className="md:hidden text-center pt-4 pb-6">
-        <h1 className="font-serif text-headline-lg-mobile mb-2" style={{color:'var(--primary)'}}>Создайте сказку для вашего ребёнка</h1>
-        <p className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>Заполните данные ниже — ИИ создаст персональную терапевтическую историю</p>
-      </div>
-
-      {/* Features (desktop only) */}
-      <div className="hidden md:grid grid-cols-2 gap-3 mb-8 bg-white rounded-2xl p-5 card-shadow">
-        {[['📖','Уникальная сказка за минуту','Создаётся специально для вашего ребёнка'],['🎨','Иллюстрации от ИИ','Акварельные картинки к каждой сцене'],['💬','Вопросы для разговора с ребёнком','Помогут обсудить историю'],['📄','PDF для скачивания','Можно распечатать как книжку']].map(([icon,title,desc])=>(
-          <div key={title} className="flex items-start gap-3">
-            <span className="text-xl mt-0.5">{icon}</span>
-            <div>
-              <div className="text-sm font-bold" style={{color:'var(--text)'}}>{title}</div>
-              <div className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>{desc}</div>
-            </div>
+        {/* Left: Hero 40% */}
+        <section className="w-[40%] flex-shrink-0 flex flex-col gap-8 sticky top-24">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full w-fit text-sm font-semibold"
+            style={{background:'var(--primary-light)',color:'var(--primary)'}}>
+            ✨ Помогло 500+ детям
           </div>
-        ))}
+
+          {/* Heading */}
+          <div>
+            <h1 className="font-serif font-bold leading-tight mb-4" style={{fontSize:'clamp(28px,3vw,42px)',color:'var(--primary)'}}>
+              Создайте волшебную сказку для вашего ребёнка
+            </h1>
+            <p className="text-base leading-relaxed" style={{color:'var(--text-muted)'}}>
+              Персонализированные терапевтические истории — помогают детям преодолевать страхи и расти.
+            </p>
+          </div>
+
+          {/* Feature bullets */}
+          <ul className="flex flex-col gap-3">
+            {[
+              ['✨','Уникальная история за 1 минуту','Генерируется специально для вашего ребёнка'],
+              ['🎨','AI-иллюстрации к каждой сцене','Акварельные картинки в детском стиле'],
+              ['💬','Вопросы для разговора','Помогут обсудить историю с ребёнком'],
+              ['📄','PDF для скачивания','Распечатайте и храните навсегда'],
+            ].map(([icon,title,desc])=>(
+              <li key={title} className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-base"
+                  style={{background:'var(--primary-light)',color:'var(--primary)'}}>
+                  {icon}
+                </span>
+                <div>
+                  <div className="text-sm font-bold" style={{color:'var(--text)'}}>{title}</div>
+                  <div className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>{desc}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Quick start */}
+          <div>
+            <button type="button" onClick={handleRandom} disabled={isLoading}
+              className="clay-btn w-full py-3.5 font-semibold flex items-center justify-center gap-2 disabled:opacity-60">
+              🎲 Попробовать случайную сказку
+            </button>
+            <p className="text-xs text-center mt-2" style={{color:'var(--text-muted)'}}>Заполним всё сами — нажми и попробуй</p>
+          </div>
+        </section>
+
+        {/* Right: Form 60% */}
+        <section className="flex-1 sticky top-24">
+          <div className="clay-card p-8">
+            <h2 className="font-serif text-xl font-bold mb-6" style={{color:'var(--text)'}}>
+              Создать сказку
+            </h2>
+            <FormFields />
+          </div>
+        </section>
       </div>
 
-      {/* Quick start */}
-      <div className="rounded-2xl p-5 mb-6 text-center" style={{background:'var(--primary-light)',border:'1.5px dashed var(--primary)'}}>
-        <p className="text-sm font-semibold mb-3" style={{color:'var(--primary)'}}>Хочешь попробовать прямо сейчас?</p>
+      {/* ── MOBILE: single column ── */}
+      <div className="md:hidden px-4 pb-28">
+        {/* Mobile header section */}
+        <div className="pt-4 pb-6">
+          <h1 className="font-serif font-bold mb-2" style={{fontSize:24,color:'var(--primary)'}}>
+            Создайте сказку для вашего ребёнка
+          </h1>
+          <p className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>
+            Персональная терапевтическая история — за 1 минуту
+          </p>
+        </div>
+
+        {/* Quick start mobile */}
         <button type="button" onClick={handleRandom} disabled={isLoading}
-          className="clay-btn inline-flex items-center gap-2 px-8 py-4 font-bold cursor-pointer disabled:opacity-60"
-          style={{background:'var(--primary)'}}>
-          {isLoading?'⏳ Создаём...':'🎲 Мне повезёт! — создать сказку'}
+          className="clay-btn w-full py-4 font-bold mb-6 flex items-center justify-center gap-2 disabled:opacity-60">
+          🎲 Мне повезёт! — создать сказку
         </button>
-        <p className="text-xs mt-2" style={{color:'var(--primary)',opacity:0.7}}>Нажми — мы заполним всё сами</p>
+
+        {/* Form card */}
+        <div className="clay-card p-5">
+          <FormFields />
+        </div>
+
+        {/* Inspirational quote — from Stitch mobile */}
+        <div className="mt-5 clay-card p-5 text-center">
+          <p className="text-sm italic leading-relaxed" style={{color:'var(--text-muted)'}}>
+            &ldquo;Каждая сказка — это зерно для счастливого будущего.&rdquo;
+          </p>
+        </div>
       </div>
-
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px" style={{background:'var(--border)'}}/>
-        <span className="text-xs font-bold" style={{color:'var(--text-muted)'}}>или заполни сам</span>
-        <div className="flex-1 h-px" style={{background:'var(--border)'}}/>
-      </div>
-
-      {/* Form — clay style from Stitch */}
-      <div className="clay-card p-6 md:p-8">
-        <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-5">
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass} style={labelStyle}>Имя ребёнка <span className="text-red-400">*</span></label>
-              <input value={form.childName} required placeholder="напр. Лёша"
-                onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
-                className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
-            </div>
-            <div>
-              <label className={labelClass} style={labelStyle}>Возраст</label>
-              <select value={form.age} onChange={e=>setForm(f=>({...f,age:e.target.value}))}
-                className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}}>
-                {['1-2 года','3-4 года','5-6 лет','7-8 лет','9-10 лет'].map(a=><option key={a}>{a}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className={labelClass} style={labelStyle}>Главный герой <span className="text-red-400">*</span></label>
-            <div className="relative">
-              <span className="absolute left-3 top-3 text-base">📖</span>
-              <input value={form.hero} required placeholder="напр. храбрый лисёнок, нежный робот..."
-                onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-                className="clay-input w-full pl-9 pr-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
-            </div>
-          </div>
-
-          <div>
-            <label className={labelClass} style={labelStyle}>Тема сказки <span className="text-red-400">*</span></label>
-            {/* Pill chips — Stitch style */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              {SIT_TYPES.map(t=>(
-                <button key={t.id} type="button"
-                  onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                  className={`clay-chip px-4 py-2 text-xs font-semibold ${form.situationType===t.id?'clay-chip-selected':''}`}
-                  style={form.situationType!==t.id?{color:'var(--text)'}:{}}>
-                  {t.emoji} {t.label}
-                </button>
-              ))}
-            </div>
-            <input value={form.situation} required placeholder={sitType.hint}
-              onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
-          </div>
-
-          <div>
-            <label className={labelClass} style={labelStyle}>Любимые вещи / интересы</label>
-            <input value={form.favorites} placeholder="напр. космос, динозавры, рисование, мягкие одеяла..."
-              onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
-          </div>
-
-          <div>
-            <label className={labelClass} style={labelStyle}>Чему учит сказка</label>
-            <input value={form.lesson} placeholder="напр. не бояться темноты, делиться, дружить..."
-              onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-              className="clay-input w-full px-4 py-3 text-sm font-medium" style={{color:'var(--text)'}} />
-          </div>
-
-          {/* GENERATE STORY button — Stitch style */}
-          <button type="submit" disabled={isLoading}
-            className="clay-btn w-full py-4 font-bold text-base disabled:opacity-60 flex items-center justify-center gap-2">
-            <span>✨</span>
-            <span>{isLoading?'Создаём...': `СОЗДАТЬ СКАЗКУ${form.childName?` ДЛЯ ${form.childName.toUpperCase()}`:''}`}</span>
-          </button>
-        </form>
-      </div>
-    </div>
+    </>
   )
 }
-
 // ── Story Reading view (Stitch magazine layout) ───────────────────────────────
 function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
