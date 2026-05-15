@@ -15,15 +15,32 @@ declare global {
   }
 }
 
-const FREE_LIMIT = 3
-const USAGE_KEY = 'fairy-tale-usage'
+const DAILY_DATE_KEY = 'fairy-tale-daily-date'
+const DAILY_COUNT_KEY = 'fairy-tale-daily-count'
+const EXTRA_STORIES_KEY = 'fairy-tale-extra-stories'
 const PAID_UNTIL_KEY = 'fairy-tale-paid-until'
 
-function getUsageCount(): number {
-  try { return parseInt(localStorage.getItem(USAGE_KEY) || '0', 10) } catch { return 0 }
+function getTodayStr(): string {
+  return new Date().toLocaleDateString('en-CA')
 }
-function incrementUsage() {
-  try { localStorage.setItem(USAGE_KEY, String(getUsageCount() + 1)) } catch { /* */ }
+function getDailyUsage(): number {
+  try {
+    if (localStorage.getItem(DAILY_DATE_KEY) !== getTodayStr()) {
+      localStorage.setItem(DAILY_DATE_KEY, getTodayStr())
+      localStorage.setItem(DAILY_COUNT_KEY, '0')
+      return 0
+    }
+    return parseInt(localStorage.getItem(DAILY_COUNT_KEY) || '0', 10)
+  } catch { return 0 }
+}
+function incrementDailyUsage() {
+  try { localStorage.setItem(DAILY_COUNT_KEY, String(getDailyUsage() + 1)) } catch { /* */ }
+}
+function getExtraStories(): number {
+  try { return parseInt(localStorage.getItem(EXTRA_STORIES_KEY) || '0', 10) } catch { return 0 }
+}
+function setExtraStoriesCount(n: number) {
+  try { localStorage.setItem(EXTRA_STORIES_KEY, String(Math.max(0, n))) } catch { /* */ }
 }
 function getPaidUntil(): number {
   try { return parseInt(localStorage.getItem(PAID_UNTIL_KEY) || '0', 10) } catch { return 0 }
@@ -35,7 +52,7 @@ function isPremium(): boolean {
   return getPaidUntil() > Date.now()
 }
 function canGenerate(): boolean {
-  return isPremium() || getUsageCount() < FREE_LIMIT
+  return isPremium() || getDailyUsage() < 1 || getExtraStories() > 0
 }
 
 interface Scene {
@@ -422,7 +439,8 @@ function Paywall({ onPaid }: { onPaid: () => void }) {
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Выгоднее</div>
             <div className="text-sm font-bold text-purple-600">30 дней</div>
             <div className="text-2xl font-bold text-gray-800 my-1">349 ₽</div>
-            <div className="text-xs text-gray-400">Безлимит · СБП · Карта</div>
+            <div className="text-sm font-bold text-purple-500 mb-0.5">∞ Безлимит</div>
+            <div className="text-xs text-gray-400">СБП · Карта</div>
           </div>
         </div>
 
@@ -472,6 +490,7 @@ export default function Home() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'copied-tg'>('idle')
   const [showPaywall, setShowPaywall] = useState(false)
   const [usageCount, setUsageCount] = useState(0)
+  const [extraStories, setExtraStoriesState] = useState(0)
   const [checkingPayment, setCheckingPayment] = useState(false)
   const storyRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<FormData>({
@@ -487,8 +506,9 @@ export default function Home() {
     window.Telegram?.WebApp?.ready()
     window.Telegram?.WebApp?.expand()
     setSavedStories(loadSaved())
-    const count = getUsageCount()
+    const count = getDailyUsage()
     setUsageCount(count)
+    setExtraStoriesState(getExtraStories())
 
     // Проверить возврат с ЮКассы по payment_id в URL
     const params = new URLSearchParams(window.location.search)
@@ -509,10 +529,11 @@ export default function Home() {
             if (data.plan === 'unlimited_30d') {
               setPaidUntil(Date.now() + 30 * 24 * 60 * 60 * 1000)
             } else {
-              // 3 сказки — сбросить счётчик так чтобы осталось 3 попытки
-              localStorage.setItem(USAGE_KEY, String(Math.max(0, getUsageCount() - 3)))
+              // 3 сказки — добавляем 3 кредита
+              setExtraStoriesCount(getExtraStories() + 3)
             }
-            setUsageCount(getUsageCount())
+            setUsageCount(getDailyUsage())
+            setExtraStoriesState(getExtraStories())
             setCheckingPayment(false)
             setShowPaywall(false)
             return
@@ -531,9 +552,7 @@ export default function Home() {
       return
     }
 
-    if (count >= FREE_LIMIT && !isPremium()) {
-      setShowPaywall(true)
-    }
+    // paywall показывается только при попытке генерации, не при загрузке
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -560,8 +579,14 @@ export default function Home() {
         setStatus('idle')
         return
       }
-      incrementUsage()
-      setUsageCount(getUsageCount())
+      const extra = getExtraStories()
+      if (extra > 0) {
+        setExtraStoriesCount(extra - 1)
+        setExtraStoriesState(extra - 1)
+      } else {
+        incrementDailyUsage()
+        setUsageCount(getDailyUsage())
+      }
       setStory(json)
       setCurrentChildName(data.childName)
       setAlreadySaved(false)
@@ -844,7 +869,8 @@ export default function Home() {
     }
   }
 
-  const storiesLeft = isPremium() ? '∞' : Math.max(0, FREE_LIMIT - usageCount)
+  const freeTodayLeft = Math.max(0, 1 - usageCount)
+  const storiesLeft = isPremium() ? '∞' : String(freeTodayLeft + extraStories)
 
   return (
     <div className="min-h-screen print:bg-white" style={{ background: 'linear-gradient(160deg, #FFFBF4 0%, #FFF3E3 50%, #FFE9D5 100%)' }}>
@@ -858,7 +884,7 @@ export default function Home() {
         </div>
       )}
       {!checkingPayment && showPaywall && (
-        <Paywall onPaid={() => { setShowPaywall(false); setUsageCount(getUsageCount()) }} />
+        <Paywall onPaid={() => { setShowPaywall(false); setUsageCount(getDailyUsage()); setExtraStoriesState(getExtraStories()) }} />
       )}
       <header className="text-center py-10 print:py-4">
         <div className="text-4xl mb-2">✨</div>
@@ -866,12 +892,12 @@ export default function Home() {
         {status === 'idle' && (
           <div className="mt-2 flex flex-col items-center gap-1">
             <p className="text-orange-400">Персональная сказка для вашего ребёнка</p>
-            {!isPremium() && usageCount < FREE_LIMIT && (
+            {!isPremium() && (usageCount < 1 || extraStories > 0) && (
               <span className="text-xs text-gray-400 bg-white/70 rounded-full px-3 py-1">
-                Осталось бесплатных сказок: {storiesLeft}
+                {extraStories > 0 ? `Куплено сказок: ${extraStories}` : 'Осталось сегодня: 1 сказка'}
               </span>
             )}
-            {!isPremium() && usageCount >= FREE_LIMIT && (
+            {!isPremium() && usageCount >= 1 && extraStories === 0 && (
               <button
                 onClick={() => setShowPaywall(true)}
                 className="text-xs text-white bg-purple-500 hover:bg-purple-600 rounded-full px-4 py-1.5 cursor-pointer transition-colors"
@@ -886,7 +912,7 @@ export default function Home() {
         )}
       </header>
 
-      {status === 'idle' && !isPremium() && usageCount >= FREE_LIMIT && (
+      {status === 'idle' && !isPremium() && usageCount >= 1 && extraStories === 0 && (
         <main className="max-w-2xl mx-auto px-4 pb-16">
           <div className="bg-white rounded-3xl shadow-xl p-10 text-center">
             <div className="text-6xl mb-4">📖</div>
@@ -904,7 +930,7 @@ export default function Home() {
         </main>
       )}
 
-      {status === 'idle' && (isPremium() || usageCount < FREE_LIMIT) && (
+      {status === 'idle' && (isPremium() || usageCount < 1 || extraStories > 0) && (
         <main className="max-w-2xl mx-auto px-4 pb-16">
           <div className="bg-white rounded-3xl shadow-sm px-6 py-5 mb-6">
             <div className="space-y-3">
