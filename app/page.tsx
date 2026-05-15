@@ -9,7 +9,7 @@ declare global {
 }
 
 // ── Storage helpers ───────────────────────────────────────────────────────────
-const K = { date:'ft-date', count:'ft-count', extra:'ft-extra', paid:'ft-paid-until', stories:'ft-saved' }
+const K = { date:'ft-date', count:'ft-count', extra:'ft-extra', paid:'ft-paid-until', stories:'ft-saved', owner:'ft-owner' }
 const today = () => new Date().toLocaleDateString('en-CA')
 function getDailyUsage() {
   try {
@@ -25,7 +25,8 @@ function setPaidUntil(ms:number) { try { localStorage.setItem(K.paid,String(ms))
 function isDevMode() {
   try { return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' } catch { return false }
 }
-function isPremium() { return isDevMode() || getPaidUntil() > Date.now() }
+function isOwner() { try { return localStorage.getItem(K.owner)==='1' } catch { return false } }
+function isPremium() { return isDevMode() || isOwner() || getPaidUntil() > Date.now() }
 function canGenerate() { return isPremium() || getDailyUsage()<1 || getExtra()>0 }
 function loadSaved(): SavedStory[] { try { return JSON.parse(localStorage.getItem(K.stories)||'[]') } catch { return [] } }
 function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify(s)) }
@@ -726,6 +727,7 @@ export default function Home() {
     window.Telegram?.WebApp?.ready(); window.Telegram?.WebApp?.expand()
     setSaved(loadSaved()); setUsageCount(getDailyUsage()); setExtraState(getExtra())
     const params=new URLSearchParams(window.location.search)
+    if(params.get('owner')==='1'){ try{localStorage.setItem(K.owner,'1')}catch{} }
     const paymentId=params.get('payment_id'), plan=params.get('plan')
     if(paymentId&&plan){
       window.history.replaceState({},'',' /'); setCheckingPayment(true)
