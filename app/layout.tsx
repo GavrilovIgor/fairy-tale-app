@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin", "cyrillic-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "600", "700", "800", "900"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
 });
 
@@ -39,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${nunito.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${playfair.variable} h-full antialiased`}
     >
       <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
       <body className="min-h-full flex flex-col">{children}</body>
