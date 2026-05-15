@@ -385,26 +385,26 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
           SECTION 1 — HERO (Stitch: screen a7285ac6)
           Dark forest, fox image, text at bottom 30%
       ══════════════════════════════════════════════════════ */}
-      <section className="relative h-screen w-full flex flex-col justify-start overflow-hidden" style={{background:'#0d2b1e'}}>
+      <section className="relative h-screen w-full overflow-hidden" style={{background:'#0d2b1e'}}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={FOX_IMG} alt="Волшебный лес с лисёнком"
-          className="absolute inset-0 w-full h-full object-cover object-center" />
-        {/* Gradient for text readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-b from-transparent to-[rgba(10,31,20,0.97)] pointer-events-none"/>
-        {/* Text block — bottom 30% */}
-        <div className="relative z-10 absolute bottom-0 left-0 right-0 w-full max-w-[1200px] mx-auto px-6 md:px-12 pb-10 pt-[72vh] flex flex-col items-center text-center">
-          <p className="text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
-          <h1 className="text-[36px] md:text-[52px] leading-tight font-bold text-white mb-2 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
+          className="absolute inset-0 w-full h-full object-cover object-top" />
+        {/* Gradient — covers bottom 65% for text readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
+        {/* Text block — anchored to bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
+          <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
+          <h1 className="text-[28px] md:text-[48px] leading-tight font-bold text-white mb-1 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             Создайте волшебную сказку
           </h1>
-          <h2 className="text-[22px] md:text-[32px] italic text-white/85 mb-4" style={{fontFamily:'Literata,Georgia,serif'}}>
+          <h2 className="text-[18px] md:text-[28px] italic text-white/85 mb-3" style={{fontFamily:'Literata,Georgia,serif'}}>
             для вашего ребёнка
           </h2>
-          <p className="text-white/70 text-[14px] md:text-[16px] max-w-xl mb-6 leading-relaxed">
+          <p className="hidden md:block text-white/70 text-[15px] max-w-lg mb-5 leading-relaxed">
             Мягкая персональная история, которая поможет малышу справиться со страхом, новой ситуацией или сложным переживанием
           </p>
           <button type="button" onClick={handleRandom} disabled={isLoading}
-            className="px-8 py-4 rounded-full font-bold text-[16px] tracking-wide uppercase shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-4 disabled:opacity-50 cursor-pointer"
+            className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide uppercase shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
             Попробовать случайную
             <span className="material-symbols-outlined">arrow_forward</span>
