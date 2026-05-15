@@ -365,11 +365,7 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
 
             {/* RIGHT COLUMN — exact code.html */}
             <div className="lg:pl-stack-xl">
-              {/* Paper stack effect: second sheet behind, offset by 10px */}
-              <div className="relative">
-              <div className="absolute pointer-events-none bg-[#e2e5e0] border border-outline-variant/30"
-                style={{top:10,left:10,right:-10,bottom:-10,zIndex:0}}/>
-              <div className="relative bg-surface-container-lowest border border-primary-container/10 p-stack-lg" style={{zIndex:1,boxShadow:'0 2px 16px rgba(26,58,42,0.06),0 1px 4px rgba(26,58,42,0.04)'}}>
+              <div className="bg-surface-container-lowest border border-primary-container/10 p-stack-lg shadow-sm">
                 <h2 className="font-headline-lg text-headline-lg text-primary mb-stack-lg">Создать сказку</h2>
                 <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-stack-lg">
 
@@ -440,7 +436,6 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
                   </button>
                 </form>
               </div>
-              </div>{/* /paper-stack */}
             </div>
 
           </div>
