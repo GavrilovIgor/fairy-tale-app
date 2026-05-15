@@ -575,6 +575,41 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             </div>
           </section>
         ))}
+        {/* Вопросы для обсуждения */}
+        {story.discussion && story.discussion.length > 0 && (
+          <section className="max-w-3xl mx-auto px-4 pb-10 print:pb-6">
+            <div className="rounded-2xl p-6 md:p-8" style={{background:'#f0f5f0',border:'1px solid rgba(26,58,42,0.12)'}}>
+              <div className="flex items-center gap-2 mb-5">
+                <span className="material-symbols-outlined" style={{color:'var(--primary)',fontSize:20}}>forum</span>
+                <h3 className="font-serif font-bold text-lg" style={{color:'var(--primary)'}}>Поговорите с ребёнком</h3>
+              </div>
+              <div className="space-y-4">
+                {story.discussion.map((q,i)=>(
+                  <div key={i} className="flex gap-3 items-start">
+                    <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white mt-0.5" style={{background:'var(--primary)'}}>
+                      {i+1}
+                    </div>
+                    <p className="leading-relaxed" style={{color:'var(--text)',fontFamily:'var(--font-serif)',fontSize:'1.05rem'}}>{q}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Якорь */}
+        {story.anchor && (
+          <section className="max-w-3xl mx-auto px-4 pb-12 print:pb-8">
+            <div className="rounded-2xl p-6 md:p-8" style={{background:'#fffbeb',border:'1px solid #fcd34d'}}>
+              <div className="flex items-center gap-2 mb-3">
+                <span style={{fontSize:20}}>✨</span>
+                <h3 className="font-serif font-bold text-lg" style={{color:'#92400e'}}>{story.anchor.title}</h3>
+              </div>
+              <p className="leading-relaxed" style={{color:'#78350f',fontFamily:'var(--font-serif)',fontSize:'1.05rem'}}>{story.anchor.description}</p>
+            </div>
+          </section>
+        )}
+
         <section className="max-w-5xl mx-auto px-4 py-12 print:hidden">
           <div className="flex flex-wrap gap-3 justify-center mb-8">
             <button onClick={onBack} className="clay-btn px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">← Создать новую</button>
