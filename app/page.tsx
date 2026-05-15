@@ -22,7 +22,10 @@ function getExtra() { try { return parseInt(localStorage.getItem(K.extra)||'0',1
 function setExtra(n:number) { try { localStorage.setItem(K.extra,String(Math.max(0,n))) } catch{} }
 function getPaidUntil() { try { return parseInt(localStorage.getItem(K.paid)||'0',10) } catch { return 0 } }
 function setPaidUntil(ms:number) { try { localStorage.setItem(K.paid,String(ms)) } catch{} }
-function isPremium() { return getPaidUntil() > Date.now() }
+function isDevMode() {
+  try { return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' } catch { return false }
+}
+function isPremium() { return isDevMode() || getPaidUntil() > Date.now() }
 function canGenerate() { return isPremium() || getDailyUsage()<1 || getExtra()>0 }
 function loadSaved(): SavedStory[] { try { return JSON.parse(localStorage.getItem(K.stories)||'[]') } catch { return [] } }
 function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify(s)) }
