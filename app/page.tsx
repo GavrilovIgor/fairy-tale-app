@@ -265,7 +265,7 @@ function Paywall({onPaid}:{onPaid:()=>void}) {
 
 // ── Create Story Form ─────────────────────────────────────────────────────────
 function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean}) {
-  const [form,setForm] = useState<FormData>({childName:'',age:'3-4 года',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
+  const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
 
   const handleRandom = async()=>{
@@ -275,161 +275,191 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
     setForm(rf); await onGenerate(rf)
   }
 
-  // Form fields — shared between desktop and mobile
-  const FormFields = ({compact=false}:{compact?:boolean}) => (
-    <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className={compact?'space-y-6':'space-y-8'}>
+  // Exact Stitch input style
+  const inputCls = "bg-transparent border-0 border-b border-solid py-2 px-0 w-full font-medium text-sm focus:outline-none transition-colors"
+  const inputStyle = {borderColor:'rgba(26,58,42,0.25)',color:'var(--text)'}
+  const focusStyle = {borderColor:'#1a3a2a'}
 
-      {/* Name + Age */}
-      <div className="flex gap-6">
-        <div className="flex-1">
-          <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Имя ребёнка</label>
+  const FormFields = () => (
+    <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="space-y-7">
+
+      {/* Name + Age — 2 columns, both text inputs */}
+      <div className="grid grid-cols-2 gap-6">
+        <div className="flex flex-col gap-2">
+          <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Имя ребёнка</label>
           <input value={form.childName} required placeholder="Введите имя"
             onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
-            className="editorial-input" />
+            className={inputCls} style={inputStyle}
+            onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+            onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
         </div>
-        <div className="w-28">
-          <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Возраст</label>
-          <select value={form.age} onChange={e=>setForm(f=>({...f,age:e.target.value}))}
-            className="editorial-input" style={{cursor:'pointer'}}>
-            {['1-2 года','3-4 года','5-6 лет','7-8 лет','9-10 лет'].map(a=><option key={a}>{a}</option>)}
-          </select>
+        <div className="flex flex-col gap-2">
+          <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Возраст</label>
+          <input value={form.age} placeholder="Напр. 5 лет"
+            onChange={e=>setForm(f=>({...f,age:e.target.value}))}
+            className={inputCls} style={inputStyle}
+            onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+            onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
         </div>
       </div>
 
-      {/* Hero */}
-      <div>
-        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Главный герой</label>
+      {/* Hero — with auto_stories icon */}
+      <div className="flex flex-col gap-2">
+        <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Главный герой</label>
         <div className="relative">
-          <input value={form.hero} required placeholder="Например, смелый котёнок"
+          <span className="material-symbols-outlined absolute left-0 top-2" style={{color:'rgba(26,58,42,0.4)',fontSize:18}}>auto_stories</span>
+          <input value={form.hero} required placeholder="Храбрый лисёнок, добрый робот..."
             onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-            className="editorial-input pr-8" />
-          <span className="material-symbols-outlined absolute right-0 bottom-2 opacity-30" style={{color:'var(--primary)'}}>book_2</span>
+            className={`${inputCls} pl-7`} style={inputStyle}
+            onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+            onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
         </div>
       </div>
 
-      {/* Theme chips */}
-      <div>
-        <label className="text-label-caps block mb-4" style={{color:'var(--text-muted)'}}>Тема сказки</label>
-        <div className="flex flex-wrap gap-2 mb-4">
+      {/* Theme chips — horizontal flex-wrap, exact Stitch style */}
+      <div className="flex flex-col gap-3">
+        <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Тема сказки</label>
+        <div className="flex flex-wrap gap-2">
           {SIT_TYPES.map(t=>(
             <button key={t.id} type="button"
               onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-              className={`paper-chip ${form.situationType===t.id?'paper-chip-selected':''}`}>
+              className="px-4 py-2 text-xs font-semibold transition-colors cursor-pointer"
+              style={form.situationType===t.id
+                ? {background:'#1a3a2a',color:'#fff',border:'1px solid #1a3a2a'}
+                : {background:'transparent',color:'var(--text-muted)',border:'1px solid rgba(26,58,42,0.25)'}}>
               {t.label}
             </button>
           ))}
         </div>
         <input value={form.situation} required placeholder={sitType.hint}
           onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-          className="editorial-input" />
+          className={inputCls} style={inputStyle}
+          onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+          onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
       </div>
 
       {/* Favorites */}
-      <div>
-        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Любимые вещи и интересы</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Любимые вещи и интересы</label>
         <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
           onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-          className="editorial-input" />
+          className={inputCls} style={inputStyle}
+          onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+          onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
       </div>
 
       {/* Lesson */}
-      <div>
-        <label className="text-label-caps block mb-1" style={{color:'var(--text-muted)'}}>Чему должна научить сказка?</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-label-caps" style={{color:'var(--text-muted)'}}>Чему учит сказка?</label>
         <input value={form.lesson} placeholder="Доброте, дружбе, честности..."
           onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-          className="editorial-input" />
+          className={inputCls} style={inputStyle}
+          onFocus={e=>{e.target.style.borderColor=focusStyle.borderColor}}
+          onBlur={e=>{e.target.style.borderColor=inputStyle.borderColor}} />
       </div>
 
-      {/* Submit */}
-      <button type="submit" disabled={isLoading} className="paper-btn">
-        {isLoading
-          ? 'Создаём сказку...'
-          : form.childName
-            ? `✦ Создать сказку для ${form.childName}`
-            : '✦ Создать сказку'}
+      {/* CTA button — full width, dark green, uppercase */}
+      <button type="submit" disabled={isLoading}
+        className="w-full py-4 font-bold text-xs tracking-widest uppercase text-white transition-opacity cursor-pointer disabled:opacity-50"
+        style={{background:'#1a3a2a',letterSpacing:'0.1em'}}
+        onMouseEnter={e=>{(e.target as HTMLElement).style.opacity='0.85'}}
+        onMouseLeave={e=>{(e.target as HTMLElement).style.opacity='1'}}>
+        {isLoading ? 'Создаём сказку...' : '✦ Создать сказку'}
       </button>
     </form>
   )
 
+  const features = [
+    ['menu_book','Персонализация','Ребёнок становится главным героем своей истории'],
+    ['palette','Терапевтический эффект','Мягко прорабатываем страхи через волшебные истории'],
+    ['chat_bubble','Глубокие смыслы','Обсуждайте важные темы через метафоры и приключения'],
+    ['description','Печатное качество','Текст и иллюстрации, готовые для сохранения в PDF'],
+  ]
+
   return (
     <>
-      {/* Botanical background decoration */}
-      <div className="botanical-bg" aria-hidden />
+      {/* ── DESKTOP: exact Stitch layout ── */}
+      <main className="hidden md:flex min-h-[calc(100vh-57px)] relative overflow-hidden">
 
-      {/* ── DESKTOP (md+) — 2-column full-width ── */}
-      <div className="hidden md:flex min-h-[calc(100vh-65px)] relative z-10">
+        {/* LEFT 45% */}
+        <section className="w-[45%] flex-shrink-0 flex flex-col justify-start z-10 py-16 pl-16 pr-12">
+          <div className="max-w-xl">
+            {/* Drop cap + heading — exact Stitch split */}
+            <div className="mb-8">
+              <span style={{
+                float:'left',fontFamily:'var(--font-serif)',fontSize:120,lineHeight:'100px',
+                paddingRight:20,paddingTop:8,color:'#1a3a2a',fontWeight:700,opacity:0.12
+              }} aria-hidden>С</span>
+              <h1 className="font-serif font-bold leading-tight pt-4" style={{fontSize:'clamp(32px,3vw,48px)',color:'#1a3a2a'}}>
+                оздайте волшебную сказку для вашего ребёнка
+              </h1>
+            </div>
 
-        {/* Left 45%: hero */}
-        <section className="w-[45%] flex-shrink-0 px-16 pt-16 pb-16 flex flex-col border-r relative overflow-hidden" style={{borderColor:'var(--border-light)'}}>
-          {/* Drop cap decorative */}
-          <div className="mb-6">
-            <span className="drop-cap-letter" aria-hidden>С</span>
-            <h1 className="font-serif font-bold pt-3 leading-tight" style={{fontSize:'clamp(28px,2.8vw,40px)',color:'var(--primary)'}}>
-              оздайте волшебную сказку для вашего ребёнка
-            </h1>
-          </div>
+            <p className="text-base leading-relaxed mb-10" style={{color:'var(--text-muted)'}}>
+              Индивидуальные терапевтические истории для эмоционального роста. Каждая сказка создаётся специально для вашей ситуации — помогает ребёнку мягко справляться со страхами и сложными чувствами.
+            </p>
 
-          <p className="text-base leading-relaxed mb-10" style={{color:'var(--text-muted)'}}>
-            Индивидуальные терапевтические истории для эмоционального роста. Каждая сказка создаётся специально для вашей ситуации — помогает ребёнку мягко справляться со страхами и сложными чувствами.
-          </p>
-
-          {/* Feature list */}
-          <div className="flex-1">
-            {[
-              ['menu_book',   'Персонализация',       'Ребёнок становится главным героем своей истории'],
-              ['palette',     'Иллюстрации',          'AI создаёт акварельные картинки к каждой сцене'],
-              ['chat_bubble', 'Разговор с ребёнком',  'Вопросы для обсуждения сказки после прочтения'],
-              ['print',       'PDF для печати',       'Скачайте и храните сказку как книгу'],
-            ].map(([icon,title,desc])=>(
-              <div key={title} className="feature-row">
-                <span className="material-symbols-outlined flex-shrink-0 mt-0.5" style={{color:'var(--primary)',opacity:0.6}}>{icon}</span>
-                <div>
-                  <div className="text-label-caps mb-0.5" style={{color:'var(--primary)'}}>{title}</div>
-                  <div className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>{desc}</div>
+            {/* Feature list — exact Stitch: flex items-start gap-4 py-4 border-b */}
+            <div>
+              {features.map(([icon,title,desc],i)=>(
+                <div key={title} className="flex items-start gap-4 py-4"
+                  style={i<features.length-1?{borderBottom:'1px solid rgba(26,58,42,0.1)'}:{}}>
+                  <span className="material-symbols-outlined flex-shrink-0 mt-0.5" style={{color:'rgba(26,58,42,0.5)',fontSize:20}}>{icon}</span>
+                  <div>
+                    <div className="text-label-caps mb-0.5" style={{color:'#1a3a2a'}}>{title}</div>
+                    <div className="text-sm leading-relaxed" style={{color:'var(--text-muted)'}}>{desc}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Terracotta link */}
+            <button type="button" onClick={handleRandom} disabled={isLoading}
+              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold cursor-pointer hover:opacity-70 transition-opacity disabled:opacity-40"
+              style={{color:'#C4704A'}}>
+              Попробовать случайную сказку
+              <span className="material-symbols-outlined" style={{fontSize:16}}>arrow_forward</span>
+            </button>
           </div>
-
-          {/* Random link */}
-          <button type="button" onClick={handleRandom} disabled={isLoading}
-            className="mt-8 text-sm font-semibold flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity self-start disabled:opacity-40"
-            style={{color:'var(--accent)'}}>
-            Попробовать случайную сказку
-            <span className="material-symbols-outlined" style={{fontSize:16}}>arrow_forward</span>
-          </button>
         </section>
 
-        {/* Right 55%: form */}
-        <section className="flex-1 px-16 pt-16 pb-16 overflow-y-auto">
-          <h2 className="font-serif text-2xl font-bold mb-8" style={{color:'var(--primary)'}}>
-            Создать сказку
-          </h2>
-          <FormFields />
+        {/* RIGHT 55% — centers form card, exact Stitch */}
+        <section className="flex-1 flex items-center justify-center py-16 pr-16 pl-8">
+          {/* White card with border + shadow — exact Stitch */}
+          <div className="w-full max-w-2xl bg-white p-10" style={{
+            border:'1px solid rgba(26,58,42,0.1)',
+            boxShadow:'0 1px 8px rgba(26,58,42,0.06)'
+          }}>
+            <h2 className="font-serif text-2xl font-bold mb-6 pb-4" style={{
+              color:'#1a3a2a',borderBottom:'1px solid rgba(26,58,42,0.06)'
+            }}>
+              Создать сказку
+            </h2>
+            <FormFields />
+          </div>
         </section>
-      </div>
+      </main>
 
-      {/* ── MOBILE — single column ── */}
+      {/* ── MOBILE: single column ── */}
       <div className="md:hidden px-5 pt-6 pb-32 max-w-md mx-auto relative z-10">
+        <div className="botanical-bg" aria-hidden />
 
         <section className="mb-6">
-          <h2 className="font-serif text-2xl font-bold mb-2" style={{color:'var(--primary)'}}>Создать сказку</h2>
+          <h2 className="font-serif text-2xl font-bold mb-2" style={{color:'#1a3a2a'}}>Создать сказку</h2>
           <p className="text-sm" style={{color:'var(--text-muted)'}}>Заполните детали, чтобы соткать волшебство.</p>
         </section>
 
-        <FormFields compact />
+        <FormFields />
 
-        {/* Random link mobile */}
         <button type="button" onClick={handleRandom} disabled={isLoading}
           className="mt-5 w-full text-sm font-semibold flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 transition-opacity disabled:opacity-40"
-          style={{color:'var(--accent)'}}>
+          style={{color:'#C4704A'}}>
           <span className="material-symbols-outlined" style={{fontSize:16}}>shuffle</span>
           Попробовать случайную сказку
         </button>
 
-        {/* Quote */}
-        <div className="mt-8 text-center py-6 border-t" style={{borderColor:'var(--border-light)'}}>
-          <p className="font-serif italic text-base leading-relaxed" style={{color:'var(--accent)'}}>
+        <div className="mt-8 text-center py-6 border-t" style={{borderColor:'rgba(26,58,42,0.1)'}}>
+          <p className="font-serif italic text-base leading-relaxed" style={{color:'#C4704A'}}>
             &ldquo;Каждая сказка — это мостик к сердцу ребёнка.&rdquo;
           </p>
         </div>
