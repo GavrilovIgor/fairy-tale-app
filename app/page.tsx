@@ -929,24 +929,30 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
 // ── Library screen (mobile) ───────────────────────────────────────────────────
 function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];onOpen:(s:SavedStory)=>void;onDelete:(id:string)=>void;onCreateNew?:()=>void}) {
   return (
-    <div className="min-h-screen" style={{background:'#0d2b1e'}}>
-      {/* Star particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {Array.from({length:16},(_,i)=>(
-          <div key={i} style={{
-            position:'absolute',width:i%4===0?'2.5px':'1.5px',height:i%4===0?'2.5px':'1.5px',
-            borderRadius:'50%',background:'rgba(255,255,255,0.7)',
-            top:`${5+(i*6.1)%88}%`,left:`${3+(i*13.7)%94}%`,
-            animation:`twinkle ${2.5+(i%3)*0.8}s ease-in-out infinite`,animationDelay:`${(i*0.45)%3}s`
-          }}/>
-        ))}
-        <div className="firefly" style={{top:'15%',left:'8%',animationDelay:'0s'}}/>
-        <div className="firefly" style={{top:'35%',right:'10%',animationDelay:'2s'}}/>
-        <div className="firefly" style={{top:'65%',left:'5%',animationDelay:'4s'}}/>
-        <div className="firefly" style={{top:'80%',right:'8%',animationDelay:'1s'}}/>
-      </div>
+    <div className="relative min-h-screen overflow-hidden" style={{background:'#0d2b1e'}}>
+      {/* Bokeh */}
+      <div className="bokeh w-96 h-96 pointer-events-none" style={{position:'absolute',top:'-80px',left:'-80px',background:'#1a4a34'}}/>
+      <div className="bokeh w-80 h-80 pointer-events-none" style={{position:'absolute',bottom:'20%',right:'-50px',background:'#143d2b'}}/>
+      {/* Fireflies ×10 */}
+      {([
+        {t:'8%',l:'6%',d:'0s'},{t:'22%',r:'8%',d:'1.5s'},{t:'38%',l:'12%',d:'3s'},
+        {t:'55%',r:'14%',d:'0.7s'},{t:'70%',l:'5%',d:'2.2s'},{t:'85%',r:'6%',d:'4s'},
+        {t:'15%',r:'28%',d:'1s'},{t:'48%',l:'30%',d:'3.5s'},{t:'62%',r:'32%',d:'2s'},
+        {t:'30%',l:'50%',d:'0.3s'},
+      ] as {t:string;l?:string;r?:string;d:string}[]).map((p,i)=>(
+        <div key={i} className="firefly" style={{position:'absolute',top:p.t,...(p.l?{left:p.l}:{}),...(p.r?{right:p.r}:{}),animationDelay:p.d,pointerEvents:'none'}}/>
+      ))}
+      {/* Star particles ×20 */}
+      {Array.from({length:20},(_,i)=>(
+        <div key={i} style={{
+          position:'absolute',width:i%4===0?'2.5px':'1.5px',height:i%4===0?'2.5px':'1.5px',
+          borderRadius:'50%',background:'rgba(255,255,255,0.75)',pointerEvents:'none',
+          top:`${6+(i*4.8)%86}%`,left:`${3+(i*11.3)%93}%`,
+          animation:`twinkle ${2.5+(i%3)*0.8}s ease-in-out infinite`,animationDelay:`${(i*0.45)%3}s`
+        }}/>
+      ))}
 
-      <div className="relative z-10 max-w-[620px] mx-auto px-4 pt-12 pb-20">
+      <div className="relative z-10 max-w-[620px] mx-auto px-4 pt-20 pb-20">
 
         {/* Header */}
         <div className="text-center mb-8 pt-4">
@@ -957,7 +963,7 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
           </div>
           <h1 className="italic font-bold text-2xl mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fff',
             textShadow:'0 0 18px rgba(212,145,42,0.45)'}}>
-            Волшебная библиотека
+            Библиотека сказок
           </h1>
           <p className="text-sm leading-relaxed max-w-xs mx-auto" style={{color:'rgba(255,255,255,0.55)'}}>
             Здесь хранятся все истории, которые вы создали для своих малышей. Каждую можно перечитать в любой вечер.
@@ -1431,21 +1437,10 @@ export default function Home() {
 
           {/* Desktop: form or library */}
           <div className="hidden md:block">
-            {desktopTab==='library' ? (
-              <div className="max-w-2xl mx-auto px-4 pt-24 pb-16">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-serif text-2xl font-bold" style={{color:'var(--text)'}}>Мои сказки</h2>
-                  <button onClick={()=>setDesktopTab('create')}
-                    className="text-sm cursor-pointer hover:opacity-70 transition-opacity"
-                    style={{color:'var(--text-muted)'}}>
-                    ← К созданию
-                  </button>
-                </div>
-                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
-              </div>
-            ) : (
-              <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
-            )}
+            {desktopTab==='library'
+              ? <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
+              : <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
+            }
           </div>
         </>
       )}
