@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AuthModal } from '@/components/AuthModal'
+import { NameModal } from '@/components/NameModal'
+import { ProfileModal } from '@/components/ProfileModal'
+import { UserMenu } from '@/components/UserMenu'
 import type { User } from '@supabase/supabase-js'
 
 declare global {
@@ -150,29 +153,16 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index
 }
 
 // ── Desktop Navigation ────────────────────────────────────────────────────────
-function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut}:{
+function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfile}:{
   activeTab:string;onTabChange:(t:string)=>void
-  user:User|null;onShowAuth:()=>void;onSignOut:()=>void
+  user:User|null;onShowAuth:()=>void;onSignOut:()=>void;onEditProfile:()=>void
 }) {
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
         <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
         {user ? (
-          <div className="flex items-center gap-3">
-            {user.user_metadata?.avatar_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.user_metadata.avatar_url} alt="avatar"
-                style={{width:32,height:32,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.4)'}}/>
-            )}
-            <span className="text-white/80 text-sm font-medium">
-              {user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0]}
-            </span>
-            <button onClick={onSignOut}
-              className="text-white/60 text-xs hover:text-white/90 cursor-pointer transition-colors">
-              Выйти
-            </button>
-          </div>
+          <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile}/>
         ) : (
           <button onClick={onShowAuth}
             className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
@@ -1059,6 +1049,8 @@ export default function Home() {
   const [desktopTab,setDesktopTab] = useState('create')
   const [user,setUser] = useState<User|null>(null)
   const [showAuth,setShowAuth] = useState(false)
+  const [showName,setShowName] = useState(false)
+  const [showProfile,setShowProfile] = useState(false)
   const storyRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -1096,10 +1088,16 @@ export default function Home() {
 
     // Auth state
     supabase.auth.getUser().then(({data:{user}})=>{ setUser(user); if(user) loadDbStories() })
-    const {data:{subscription}} = supabase.auth.onAuthStateChange((_,session)=>{
+    const {data:{subscription}} = supabase.auth.onAuthStateChange((event,session)=>{
       const u = session?.user ?? null
       setUser(u)
-      if(u){ migrateLocalStories(u.id); loadDbStories() }
+      if(u){
+        migrateLocalStories(u.id); loadDbStories()
+        // Show name modal on first sign-in if no name set
+        if(event==='SIGNED_IN' && !u.user_metadata?.full_name && !u.user_metadata?.name){
+          setShowName(true)
+        }
+      }
     })
     return ()=>subscription.unsubscribe()
     const params=new URLSearchParams(window.location.search)
@@ -1229,11 +1227,21 @@ export default function Home() {
 
       {/* Auth modal */}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)}/>}
+      {/* Name modal — first login without name */}
+      {showName&&user&&<NameModal email={user.email||''} onDone={name=>{
+        setUser(u=>u?{...u,user_metadata:{...u.user_metadata,full_name:name}}:u)
+        setShowName(false)
+      }}/>}
+      {/* Profile modal */}
+      {showProfile&&user&&<ProfileModal user={user} onClose={()=>setShowProfile(false)} onUpdated={name=>{
+        setUser(u=>u?{...u,user_metadata:{...u.user_metadata,full_name:name}}:u)
+      }}/>}
 
       {/* Desktop nav */}
       {(status==='idle'||status==='loading')&&(
         <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}
-          user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}/>
+          user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}
+          onEditProfile={()=>setShowProfile(true)}/>
       )}
 
       {/* Content */}
@@ -1286,7 +1294,7 @@ export default function Home() {
       {(status==='done'||status==='reading')&&story&&(
         <>
           {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}/>
+          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
