@@ -1289,7 +1289,7 @@ export default function Home() {
       {(status==='idle'||status==='loading')&&(
         <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}
           user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}
-          onEditProfile={()=>setShowProfile(true)} onMyStories={()=>setMobileTab('library')}/>
+          onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library')}}/>
       )}
 
       {/* Content */}
@@ -1342,7 +1342,7 @@ export default function Home() {
       {(status==='done'||status==='reading')&&story&&(
         <>
           {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>setMobileTab('library')}/>
+          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library')}}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
