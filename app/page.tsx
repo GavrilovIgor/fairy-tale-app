@@ -353,8 +353,7 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
 }
 
 // ── Create Story Form — Stitch "Ночная сказка" design ────────────────────────
-// Hero: screen a7285ac6  Form: screen e6fa9ca5
-const FOX_IMG = 'https://lh3.googleusercontent.com/aida/ADBb0ugI_CouOKyv7x8OTjGPJlbaGaDFqca9dOESYuULRTtwpnSuUKZumHorf9yvlL37yRxQkuHKibBcNyWe6mutnlRsg6WFC0PN43rZU-xdnRdg8j3v5VLmvfVGjAetb0Bv2LAfQgE95Or7QCLayMwxXMI92PJEoULK554dla8YfnsYH7WsP0ROKHH4H6eMS0R4bSnqZY2ZDfUkD0sV-abnk7guO8CD8q0zofJE9KOahglxWnqpEvI1T-B56BU'
+// Hero desktop: Stitch screen 31f3c84c (1376×768), mobile: 9bb16ef2 (768×1376)
 
 function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
@@ -386,10 +385,16 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
           Dark forest, fox image, text at bottom 30%
       ══════════════════════════════════════════════════════ */}
       <section className="relative h-screen w-full overflow-hidden" style={{background:'#0d2b1e'}}>
+        {/* Responsive hero image: portrait on mobile, landscape on desktop */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={FOX_IMG} alt="Волшебный лес с лисёнком"
-          className="absolute inset-0 w-full h-full object-cover object-top" />
-        {/* Gradient — covers bottom 65% for text readability */}
+        <img src="/hero-mobile.jpg" alt="Волшебный лес с лисёнком"
+          className="md:hidden absolute inset-0 w-full h-full object-cover object-center" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/hero-desktop.jpg" alt="Волшебный лес с лисёнком"
+          className="hidden md:block absolute inset-0 w-full h-full object-cover object-top" />
+        {/* Top gradient — dims Stitch nav text, keeps our nav sharp */}
+        <div className="absolute top-0 left-0 right-0 h-[18%] bg-gradient-to-b from-[rgba(10,31,20,0.75)] to-transparent pointer-events-none"/>
+        {/* Bottom gradient — covers bottom 65% for text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
