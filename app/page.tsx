@@ -604,62 +604,60 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
 
       {/* ══ SECTION 1.5 — ПОЧЕМУ ЭТО РАБОТАЕТ ══ */}
       <section style={{background:'#071812'}} className="py-12 md:py-16 px-5">
-        <div className="max-w-[560px] mx-auto">
+        <div className="max-w-[480px] mx-auto">
+          {/* Heading */}
           <div className="text-center mb-8">
-            <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-3" style={{color:'rgba(212,145,42,0.65)'}}>О методе</p>
-            <h2 className="text-[22px] md:text-[28px] font-bold italic mb-4" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+            <h2 className="text-[26px] md:text-[32px] font-bold italic mb-3" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
               Почему это работает?
             </h2>
-            <div className="w-10 h-px mx-auto" style={{background:'rgba(212,145,42,0.35)'}}/>
+            <div className="w-12 h-[2px] mx-auto rounded-full" style={{background:'rgba(212,145,42,0.55)'}}/>
           </div>
-          <div className="flex flex-col gap-3">
+
+          {/* Cards — centered vertical layout (как в Stitch) */}
+          <div className="flex flex-col gap-4">
             {([
               {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
-                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                  </svg>
-                ),
+                img: '/why/icon-fox.jpg',
+                imgPos: 'center center',
                 title: 'Ребёнок видит себя в герое',
-                text: 'Персонаж переживает то же — это безопасный способ встретиться со страхом или трудной ситуацией',
+                text: 'Персонаж переживает то же, что и ваш малыш — это безопасный способ встретиться со страхом.',
               },
               {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                  </svg>
-                ),
-                title: 'История переживается изнутри',
-                text: 'В сказке ребёнок эмоционально проходит путь от тревоги к решению — в полной безопасности',
+                img: '/why/icon-book.jpg',
+                imgPos: 'center center',
+                title: 'История проживается, а не рассказывается',
+                text: 'В сказке ребёнок эмоционально проходит путь от тревоги к решению.',
               },
               {
-                icon: (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                ),
+                img: '/story-fallback-0.jpg',
+                imgPos: 'center 40%',
                 title: 'Опыт переносится в реальную жизнь',
-                text: 'После чтения вы вместе обсудите — что помогло герою и как это поможет именно вашему малышу',
+                text: 'После чтения вы вместе обсудите — что герой сделал и как это поможет малышу.',
               },
-            ] as {icon:React.ReactNode;title:string;text:string}[]).map((item,i)=>(
-              <div key={i} className="flex items-start gap-4 rounded-2xl p-5" style={{background:'#0f2818',border:'1px solid rgba(212,145,42,0.18)'}}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{background:'rgba(212,145,42,0.12)',color:'#d4912a',border:'1px solid rgba(212,145,42,0.25)'}}>
-                  {item.icon}
+            ] as {img:string;imgPos:string;title:string;text:string}[]).map((item,i)=>(
+              <div key={i} className="rounded-2xl px-6 pt-6 pb-6 text-center"
+                style={{background:'#0f2818',border:'1px solid rgba(212,145,42,0.15)'}}>
+                {/* Circular icon */}
+                <div className="w-14 h-14 rounded-full mx-auto mb-4 overflow-hidden"
+                  style={{border:'2px solid rgba(212,145,42,0.35)',boxShadow:'0 0 16px rgba(212,145,42,0.2)'}}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={item.img} alt="" aria-hidden
+                    className="w-full h-full object-cover"
+                    style={{objectPosition:item.imgPos}}/>
                 </div>
-                <div>
-                  <h3 className="font-bold text-[14px] mb-1.5" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-                    {item.title}
-                  </h3>
-                  <p className="text-[12px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
-                    {item.text}
-                  </p>
-                </div>
+                <h3 className="font-bold text-[15px] mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+                  {item.title}
+                </h3>
+                <p className="text-[13px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
+                  {item.text}
+                </p>
               </div>
             ))}
           </div>
-          <p className="text-center text-[11px] italic mt-8" style={{color:'rgba(212,145,42,0.6)'}}>
-            Метод сказкотерапии — признанная практика детских психологов
+
+          {/* Bottom quote */}
+          <p className="text-center text-[11px] italic mt-8" style={{color:'rgba(212,145,42,0.65)'}}>
+            «Метод сказкотерапии — признанная практика детских психологов»
           </p>
         </div>
       </section>
