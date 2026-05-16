@@ -136,7 +136,7 @@ function StoryImage({prompt,index}:{prompt:string;index:number}) {
 function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:string)=>void}) {
   // Transparent floating nav — Stitch hero screen
   return (
-    <header className="fixed top-0 w-full z-50 bg-transparent print:hidden">
+    <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="max-w-[1200px] mx-auto px-[48px] py-[24px] flex justify-between items-center">
         <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
         <nav className="hidden md:flex gap-[24px] items-center">
@@ -392,10 +392,10 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero-desktop.jpg" alt="Волшебный лес с лисёнком"
           className="hidden md:block absolute inset-0 w-full h-full object-cover object-top" />
-        {/* Top gradient — dims Stitch nav text, keeps our nav sharp */}
-        <div className="absolute top-0 left-0 right-0 h-[18%] bg-gradient-to-b from-[rgba(10,31,20,0.75)] to-transparent pointer-events-none"/>
-        {/* Bottom gradient — covers bottom 65% for text readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
+        {/* Top gradient — fully hides Stitch baked nav text */}
+        <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{height:'20%',background:'linear-gradient(to bottom, rgba(10,31,20,0.97) 0%, rgba(10,31,20,0.65) 50%, transparent 100%)'}}/>
+        {/* Bottom gradient — fully hides Stitch baked body text */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{height:'72%',background:'linear-gradient(to bottom, transparent 0%, rgba(10,31,20,0.25) 25%, rgba(10,31,20,0.82) 50%, rgba(10,31,20,0.98) 70%, rgba(10,31,20,1) 100%)'}}/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
           <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
@@ -899,7 +899,7 @@ export default function Home() {
         <>
           {/* Mobile: tabs */}
           <div className="md:hidden">
-            <MobileTopBar title="Волшебная Сказка"/>
+            {mobileTab!=='create'&&<MobileTopBar title="Волшебная Сказка"/>}
             {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false}/>}
             {mobileTab==='library'&&<LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>}
             {mobileTab==='profile'&&(
