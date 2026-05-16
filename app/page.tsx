@@ -226,13 +226,14 @@ function SiteFooter() {
       <div className="max-w-[900px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3">
         <div className="italic text-sm font-bold" style={{fontFamily:'Literata,Georgia,serif',color:'rgba(255,255,255,0.5)'}}>Волшебная Сказка</div>
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-1">
-          {['Политика конфиденциальности','Условия использования','Контакты'].map(t=>(
-            <a key={t} href="#" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
-              {t}
-            </a>
-          ))}
+          <a href="/privacy" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
+            Политика конфиденциальности
+          </a>
+          <a href={`mailto:gigor92@gmail.com`} className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
+            Написать нам
+          </a>
         </div>
-        <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>© 2025 Волшебная Сказка</p>
+        <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>© 2026 Волшебная Сказка</p>
       </div>
     </footer>
   )
