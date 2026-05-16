@@ -386,12 +386,11 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
             Мягкая персональная история, которая поможет малышу справиться со страхом, новой ситуацией или сложным переживанием
           </p>
           <button type="button" onClick={handleRandom} disabled={isLoading}
-            className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide uppercase shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
+            className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
-            Попробовать случайную
-            <span className="material-symbols-outlined">arrow_forward</span>
+            ✨ Попробовать волшебство
           </button>
-          <p className="text-white/40 text-xs animate-bounce">прокрутите вниз <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
+          <p className="text-white/45 text-[13px]">или заполните форму ниже для персональной сказки <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
         </div>
       </section>
 
