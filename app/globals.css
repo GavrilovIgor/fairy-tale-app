@@ -250,14 +250,15 @@ body {
 
 /* ── Story drop cap ────────────────────────────────── */
 .drop-cap::first-letter {
-  font-family: var(--font-serif);
-  font-size: 4.5rem;
-  font-weight: 700;
-  line-height: 0.8;
   float: left;
-  margin-right: 8px;
-  margin-top: 6px;
-  color: var(--primary);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 72px;
+  line-height: 60px;
+  padding-top: 4px;
+  padding-right: 8px;
+  padding-left: 3px;
+  font-weight: 700;
+  color: rgba(13, 43, 30, 0.15);
 }
 
 /* ── Story card / shadows ──────────────────────────── */
