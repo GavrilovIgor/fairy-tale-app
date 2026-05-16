@@ -160,7 +160,7 @@ function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfi
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-2.5">
+        <a href="/" className="flex items-center gap-2.5 cursor-pointer hover:opacity-85 transition-opacity">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
             style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
@@ -168,7 +168,7 @@ function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfi
             textShadow:'0 0 18px rgba(212,145,42,0.55), 0 0 36px rgba(212,145,42,0.2)'}}>
             Волшебная Сказка
           </span>
-        </div>
+        </a>
         {user ? (
           <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
         ) : (
@@ -442,7 +442,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
           className="absolute inset-0 w-full h-full object-cover object-[center_20%] md:object-center" />
         {/* Mobile transparent header — overlaid on fox image */}
         <div className="md:hidden absolute top-0 left-0 right-0 z-20 flex justify-between items-center px-6 pt-12 pb-4">
-          <div className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-85 transition-opacity">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
               style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
@@ -450,7 +450,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
               textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
               Волшебная Сказка
             </span>
-          </div>
+          </a>
           <div className="flex items-center gap-3">
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
@@ -880,48 +880,91 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
 }
 
 // ── Library screen (mobile) ───────────────────────────────────────────────────
-function LibraryScreen({saved,onOpen,onDelete}:{saved:SavedStory[];onOpen:(s:SavedStory)=>void;onDelete:(id:string)=>void}) {
+function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];onOpen:(s:SavedStory)=>void;onDelete:(id:string)=>void;onCreateNew?:()=>void}) {
   return (
-    <div className="px-5 pb-28">
-      <MobileTopBar title="Волшебная Сказка" />
-      <div className="mt-2 mb-6 rounded-3xl overflow-hidden relative" style={{background:'linear-gradient(135deg,var(--primary),#4a6741)',minHeight:160}}>
-        <div className="p-6 text-white">
-          <h2 className="font-serif text-2xl font-bold mb-1">Добро пожаловать</h2>
-          <p className="text-sm opacity-80">Готовы отправиться в новое приключение?</p>
-        </div>
-        <div className="absolute right-4 bottom-4 text-5xl opacity-20">📖</div>
+    <div className="min-h-screen" style={{background:'#0d2b1e'}}>
+      {/* Star particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {Array.from({length:16},(_,i)=>(
+          <div key={i} style={{
+            position:'absolute',width:i%4===0?'2.5px':'1.5px',height:i%4===0?'2.5px':'1.5px',
+            borderRadius:'50%',background:'rgba(255,255,255,0.7)',
+            top:`${5+(i*6.1)%88}%`,left:`${3+(i*13.7)%94}%`,
+            animation:`twinkle ${2.5+(i%3)*0.8}s ease-in-out infinite`,animationDelay:`${(i*0.45)%3}s`
+          }}/>
+        ))}
+        <div className="firefly" style={{top:'15%',left:'8%',animationDelay:'0s'}}/>
+        <div className="firefly" style={{top:'35%',right:'10%',animationDelay:'2s'}}/>
+        <div className="firefly" style={{top:'65%',left:'5%',animationDelay:'4s'}}/>
+        <div className="firefly" style={{top:'80%',right:'8%',animationDelay:'1s'}}/>
       </div>
 
-      {saved.length===0?(
-        <div className="text-center py-16">
-          <div className="text-5xl mb-4">📚</div>
-          <h3 className="font-serif text-xl font-bold mb-2" style={{color:'var(--text)'}}>Библиотека пуста</h3>
-          <p className="text-sm" style={{color:'var(--text-muted)'}}>Создайте первую сказку!</p>
-        </div>
-      ):(
-        <>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-serif text-lg font-bold" style={{color:'var(--text)'}}>Мои сказки</h3>
-            <span className="text-xs font-bold px-2 py-1 rounded-full" style={{background:'var(--primary-light)',color:'var(--primary)'}}>{saved.length}</span>
+      <div className="relative z-10 max-w-[620px] mx-auto px-4 pt-12 pb-20">
+
+        {/* Header */}
+        <div className="text-center mb-8 pt-4">
+          <div className="flex justify-center mb-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
+              style={{width:56,height:56,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'2px solid rgba(255,255,255,0.25)'}}/>
           </div>
-          <div className="space-y-3">
+          <h1 className="italic font-bold text-2xl mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fff',
+            textShadow:'0 0 18px rgba(212,145,42,0.45)'}}>
+            Волшебная библиотека
+          </h1>
+          <p className="text-sm leading-relaxed max-w-xs mx-auto" style={{color:'rgba(255,255,255,0.55)'}}>
+            Здесь хранятся все истории, которые вы создали для своих малышей. Каждую можно перечитать в любой вечер.
+          </p>
+        </div>
+
+        {/* CTA — create new */}
+        <button onClick={onCreateNew}
+          className="w-full rounded-2xl py-4 font-bold text-sm mb-8 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          style={{background:'#a46713',color:'#fff',boxShadow:'0 0 24px rgba(164,103,19,0.4)'}}>
+          ✨ Создать новую сказку
+        </button>
+
+        {/* Stories list */}
+        {saved.length===0 ? (
+          <div className="text-center py-12">
+            <p className="text-4xl mb-4">🌙</p>
+            <p className="font-serif text-lg font-bold mb-2" style={{color:'rgba(255,255,255,0.8)'}}>Здесь пока тихо...</p>
+            <p className="text-sm" style={{color:'rgba(255,255,255,0.4)'}}>
+              Создайте первую сказку, чтобы она<br/>поселилась в этой библиотеке.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{color:'rgba(255,255,255,0.35)'}}>
+                Ваши истории
+              </span>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{background:'rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)'}}>
+                {saved.length}
+              </span>
+            </div>
             {saved.map(s=>(
-              <div key={s.id} className="bg-white rounded-2xl overflow-hidden flex gap-4 p-4 card-shadow-warm">
-                <div className="w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center text-3xl" style={{background:'var(--primary-light)'}}>📖</div>
-                <div className="flex-1 min-w-0">
-                  <button onClick={()=>onOpen(s)} className="text-left w-full">
-                    <div className="font-bold text-sm truncate" style={{color:'var(--text)'}}>{s.story.title}</div>
-                    <div className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>{s.childName} · {s.savedAt}</div>
-                  </button>
-                  <button onClick={()=>onOpen(s)} className="mt-2 text-xs font-bold px-3 py-1 rounded-full cursor-pointer"
-                    style={{background:'var(--primary-light)',color:'var(--primary)'}}>▶ Читать</button>
+              <div key={s.id} className="rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all"
+                style={{background:'#fffdf8',boxShadow:'0 4px 20px rgba(0,0,0,0.3)'}}
+                onClick={()=>onOpen(s)}>
+                <div className="flex gap-4 p-4 items-center">
+                  <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl"
+                    style={{background:'rgba(13,43,30,0.08)'}}>
+                    📖
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-sm truncate mb-0.5" style={{color:'#0d2b1e'}}>{s.story.title}</div>
+                    <div className="text-xs" style={{color:'#9ca3af'}}>{s.childName} · {s.savedAt}</div>
+                  </div>
+                  <button onClick={e=>{e.stopPropagation();onDelete(s.id)}}
+                    className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer text-lg flex-shrink-0 px-1"
+                    aria-label="Удалить">×</button>
                 </div>
-                <button onClick={()=>onDelete(s.id)} className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer text-xl flex-shrink-0 self-start">×</button>
               </div>
             ))}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -1318,7 +1361,7 @@ export default function Home() {
             {mobileTab==='library'&&(
               <>
                 <MobileTopBar title="Мои сказки"/>
-                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>
+                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
                   <button onClick={()=>setMobileTab('create')}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-sm font-semibold cursor-pointer"
@@ -1343,7 +1386,7 @@ export default function Home() {
                     ← К созданию
                   </button>
                 </div>
-                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>
+                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
               </div>
             ) : (
               <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
