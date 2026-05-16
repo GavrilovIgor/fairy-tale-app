@@ -366,12 +366,19 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
 // Hero desktop: Stitch screen 31f3c84c (1376×768), mobile: 9bb16ef2 (768×1376)
 
 const LAST_CHILD_KEY = 'ft-last-child'
-function getLastChild():{name:string;age:string}{ try{return JSON.parse(localStorage.getItem(LAST_CHILD_KEY)||'{}')}catch{return {name:'',age:''}} }
+function getLastChild():{name:string;age:string}{
+  try{ const d=JSON.parse(localStorage.getItem(LAST_CHILD_KEY)||'{}'); return {name:d.name||'',age:d.age||''} }
+  catch{ return {name:'',age:''} }
+}
 function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CHILD_KEY,JSON.stringify({name,age}))}catch{} }
 
 function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;user?:User|null}) {
-  const last = typeof window!=='undefined' ? getLastChild() : {name:'',age:''}
-  const [form,setForm] = useState<FormData>({childName:last.name,age:last.age,hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
+  const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
+
+  useEffect(()=>{
+    const last = getLastChild()
+    if(last.name||last.age) setForm(f=>({...f,childName:last.name,age:last.age}))
+  },[])
   const [step,setStep] = useState(1)
 
   const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
