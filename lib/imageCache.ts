@@ -19,15 +19,15 @@ export function cleanPrompt(prompt: string): string {
   return prompt.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, ' ').trim().slice(0, 120)
 }
 
-export function seedForIndex(index: number): string {
-  return String(index * 137 + 42)
+export function seedForIndex(index: number, storySeed = 0): string {
+  return String(storySeed + index * 137 + 42)
 }
 
-const STYLE_VERSION = 'v3-pixar'
-const STYLE_SUFFIX = "Pixar 3D animation style, cinematic magical lighting, vibrant rich colors, highly detailed, children's fairy tale art, dreamlike atmosphere, 8K quality, no text, no letters, no watermarks"
+const STYLE_VERSION = 'v4-pixar'
+const STYLE_SUFFIX = "Pixar 3D animation style, cinematic magical lighting, vibrant rich colors, highly detailed, children's fairy tale illustration, dreamlike warm atmosphere, 8K quality, no text, no letters, no watermarks, no signatures, no photographer credits"
 
 function buildUrl(cp: string, seed: string, w: number, h: number): string {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(`${cp}, ${STYLE_SUFFIX}`)}?width=${w}&height=${h}&nologo=true&seed=${seed}&enhance=true`
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(`${cp}, ${STYLE_SUFFIX}`)}?width=${w}&height=${h}&nologo=true&nofeed=true&seed=${seed}&enhance=true`
 }
 
 function cacheKey(cp: string, seed: string): string {
@@ -82,8 +82,8 @@ export async function fetchAndCache(cp: string, seed: string): Promise<CacheEntr
 }
 
 // Fire-and-forget: start fetching images while story is being shown
-export function prefetchImages(scenes: { imagePrompt: string }[]): void {
+export function prefetchImages(scenes: { imagePrompt: string }[], storySeed = 0): void {
   scenes.forEach((scene, i) => {
-    void fetchAndCache(cleanPrompt(scene.imagePrompt), seedForIndex(i))
+    void fetchAndCache(cleanPrompt(scene.imagePrompt), seedForIndex(i, storySeed))
   })
 }

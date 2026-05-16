@@ -92,11 +92,11 @@ ${scenarioHint}
   "scenes": [
     {
       "text": "Сцена 1: шаги 1–4. Узнаваемый герой, появление проблемы, называние эмоции, встреча с помощником.",
-      "imagePrompt": "cute ${hero} looking worried in a cozy magical forest setting, soft warm light, watercolor children book illustration"
+      "imagePrompt": "cute ${hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
     },
     {
       "text": "Сцена 2: шаги 5–7. Герой находит ресурс, делает шаг, момент трансформации, тёплый финал.",
-      "imagePrompt": "happy confident ${hero} in a warm magical place with friends, golden light, watercolor children book illustration"
+      "imagePrompt": "happy confident ${hero} character in a glowing magical clearing, golden sunlight, friends nearby, triumphant mood"
     }
   ],
   "discussion": [
@@ -123,12 +123,13 @@ ${scenarioHint}
       const story = JSON.parse(jsonText)
 
       if (story.scenes) {
+        story.storySeed = Math.floor(Math.random() * 99991)
         story.scenes = story.scenes.map((scene: { text: string; imagePrompt: string }) => ({
           ...scene,
           text: scene.text?.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/_{1,2}(.+?)_{1,2}/g, '$1') ?? '',
           imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
         }))
-        prefetchImages(story.scenes)
+        prefetchImages(story.scenes, story.storySeed)
       }
 
       return NextResponse.json(story)

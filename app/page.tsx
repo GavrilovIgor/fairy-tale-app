@@ -48,7 +48,7 @@ function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Scene { text:string; imagePrompt:string }
-interface Story { title:string; scenes:Scene[]; discussion?:string[]; anchor?:{title:string;description:string} }
+interface Story { title:string; scenes:Scene[]; discussion?:string[]; anchor?:{title:string;description:string}; storySeed?:number }
 interface SavedStory { id:string; savedAt:string; childName:string; story:Story; images?:Record<number,string> }
 type SituationType = 'fear'|'emotion'|'adaptation'|'behavior'|'preparation'|'fun'
 interface FormData { childName:string; age:string; hero:string; situation:string; situationType:SituationType; favorites:string; lesson:string }
@@ -91,10 +91,10 @@ const SITUATION_SUGGESTIONS: Record<SituationType,string[]> = {
 }
 const FAVORITES_OPTIONS = ['динозавры','принцессы','супергерои','машинки','животные','космос','единороги','рыцари','феи','море','рисование','спорт']
 const LESSON_SUGGESTIONS = ['быть смелым','делиться с другими','говорить правду','быть добрым','не бояться нового','справляться со злостью','дружить','слушаться родителей']
-const imgUrl = (p:string,i:number) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${i*137+42}`
+const imgUrl = (p:string,i:number,storySeed=0) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${storySeed+i*137+42}`
 
 // ── Image component ───────────────────────────────────────────────────────────
-function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index:number;sharp?:boolean;preloadedSrc?:string}) {
+function StoryImage({prompt,index,sharp=false,preloadedSrc,storySeed=0}:{prompt:string;index:number;sharp?:boolean;preloadedSrc?:string;storySeed?:number}) {
   const [phase,setPhase] = useState<'loading'|'done'|'fallback'>(preloadedSrc?'done':'loading')
   const [src,setSrc] = useState<string|null>(preloadedSrc??null)
   const mounted = useRef(true)
@@ -103,7 +103,7 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index
     if(!mounted.current)return
     setPhase('loading'); setSrc(null)
     try {
-      const url = attempt>0?`${imgUrl(prompt,index)}&t=${Date.now()}`:imgUrl(prompt,index)
+      const url = attempt>0?`${imgUrl(prompt,index,storySeed)}&t=${Date.now()}`:imgUrl(prompt,index,storySeed)
       const res = await fetch(url)
       if(!res.ok)throw new Error(`${res.status}`)
       const blob = await res.blob()
@@ -952,7 +952,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             {/* Full-width illustration — no rounded corners, bleeds to edges */}
             <section className="w-full border-b border-gray-200">
               <div className="w-full bg-[#fdfaf5]" style={{aspectRatio:'4/3'}}>
-                <StoryImage prompt={scene.imagePrompt} index={i} sharp preloadedSrc={imageCache?.[i]}/>
+                <StoryImage prompt={scene.imagePrompt} index={i} sharp preloadedSrc={imageCache?.[i]} storySeed={story.storySeed}/>
               </div>
             </section>
 
@@ -1274,7 +1274,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
 async function generatePDF(story:Story) {
   const dataUrls = await Promise.all(story.scenes.map(async(scene,i)=>{
     try {
-      const res = await fetch(imgUrl(scene.imagePrompt,i)+'&retry=0')
+      const res = await fetch(imgUrl(scene.imagePrompt,i,story.storySeed)+'&retry=0')
       if(!res.ok)return null
       const blob = await res.blob()
       return new Promise<string>((resolve,reject)=>{ const r=new FileReader(); r.onload=()=>resolve(r.result as string); r.onerror=reject; r.readAsDataURL(blob) })
@@ -1464,7 +1464,7 @@ export default function Home() {
         return null
       }
       const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
-        const base=imgUrl(scene.imagePrompt,i)
+        const base=imgUrl(scene.imagePrompt,i,json.storySeed??0)
         // Try up to 4 times — Pollinations can be slow
         for(let attempt=0;attempt<4;attempt++){
           const url=attempt===0?base:`${base}&t=${Date.now()}`
