@@ -173,10 +173,15 @@ function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfi
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
             style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
-          <span className="italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700,color:'#fff',
-            textShadow:'0 0 18px rgba(212,145,42,0.55), 0 0 36px rgba(212,145,42,0.2)'}}>
-            Волшебная Сказка
-          </span>
+          <div className="flex flex-col gap-0">
+            <span className="italic leading-tight" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700,color:'#fff',
+              textShadow:'0 0 18px rgba(212,145,42,0.55), 0 0 36px rgba(212,145,42,0.2)'}}>
+              Волшебная Сказка
+            </span>
+            <span className="tracking-wide" style={{fontSize:9,fontWeight:500,color:'rgba(255,255,255,0.38)',letterSpacing:'0.08em'}}>
+              Метод сказкотерапии · для детей 3–10 лет
+            </span>
+          </div>
         </a>
         {user ? (
           <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
@@ -546,10 +551,15 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
               style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
-            <span className="italic drop-shadow-md" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'#fff',
-              textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
-              Волшебная Сказка
-            </span>
+            <div className="flex flex-col gap-0">
+              <span className="italic drop-shadow-md leading-tight" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'#fff',
+                textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
+                Волшебная Сказка
+              </span>
+              <span style={{fontSize:8,fontWeight:500,color:'rgba(255,255,255,0.35)',letterSpacing:'0.07em'}}>
+                Метод сказкотерапии · для детей 3–10 лет
+              </span>
+            </div>
           </a>
           <div className="flex items-center gap-3">
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
@@ -574,7 +584,6 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
-          <p className="text-white/50 text-[10px] md:text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
           <h1 className="text-[28px] md:text-[46px] leading-tight font-bold text-white mb-1.5 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             Сказка, которая помогает
           </h1>
