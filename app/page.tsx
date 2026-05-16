@@ -392,10 +392,10 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero-desktop.jpg" alt="Волшебный лес с лисёнком"
           className="hidden md:block absolute inset-0 w-full h-full object-cover object-top" />
-        {/* Top gradient — fully hides Stitch baked nav text */}
-        <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{height:'20%',background:'linear-gradient(to bottom, rgba(10,31,20,0.97) 0%, rgba(10,31,20,0.65) 50%, transparent 100%)'}}/>
-        {/* Bottom gradient — fully hides Stitch baked body text */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{height:'72%',background:'linear-gradient(to bottom, transparent 0%, rgba(10,31,20,0.25) 25%, rgba(10,31,20,0.82) 50%, rgba(10,31,20,0.98) 70%, rgba(10,31,20,1) 100%)'}}/>
+        {/* Top gradient — solid dark at top, fully hides Stitch nav logo */}
+        <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{height:'18%',background:'linear-gradient(to bottom, rgba(10,31,20,1) 0%, rgba(10,31,20,0.85) 55%, transparent 100%)'}}/>
+        {/* Bottom gradient — reaches solid before Stitch title starts (~62% from top) */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{height:'65%',background:'linear-gradient(to bottom, transparent 0%, rgba(10,31,20,0.8) 30%, rgba(10,31,20,1) 42%, rgba(10,31,20,1) 100%)'}}/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
           <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
