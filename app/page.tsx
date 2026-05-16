@@ -574,15 +574,15 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
-          <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
-          <h1 className="text-[28px] md:text-[48px] leading-tight font-bold text-white mb-1 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
-            Создайте волшебную сказку
+          <p className="text-white/50 text-[10px] md:text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
+          <h1 className="text-[28px] md:text-[46px] leading-tight font-bold text-white mb-1.5 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
+            Сказка, которая помогает
           </h1>
-          <h2 className="text-[18px] md:text-[28px] italic text-white/85 mb-3" style={{fontFamily:'Literata,Georgia,serif'}}>
-            для вашего ребёнка
+          <h2 className="text-[17px] md:text-[24px] italic text-white/75 mb-3 max-w-sm md:max-w-xl" style={{fontFamily:'Literata,Georgia,serif'}}>
+            справиться с настоящей проблемой ребёнка
           </h2>
-          <p className="hidden md:block text-white/70 text-[15px] max-w-lg mb-5 leading-relaxed">
-            Мягкая персональная история, которая поможет малышу справиться со страхом, новой ситуацией или сложным переживанием
+          <p className="text-white/55 text-[13px] md:text-[15px] max-w-xs md:max-w-lg mb-5 leading-relaxed">
+            Страх, ревность, новый садик, злость — персональная история по методу детских психологов за 30 секунд
           </p>
           <button type="button" onClick={handleRandom} disabled={isLoading}
             className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
@@ -590,6 +590,68 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             ✨ Попробовать волшебство
           </button>
           <p className="text-white/45 text-[13px]">или заполните форму ниже для персональной сказки <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
+        </div>
+      </section>
+
+      {/* ══ SECTION 1.5 — ПОЧЕМУ ЭТО РАБОТАЕТ ══ */}
+      <section style={{background:'#071812'}} className="py-12 md:py-16 px-5">
+        <div className="max-w-[560px] mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-3" style={{color:'rgba(212,145,42,0.65)'}}>О методе</p>
+            <h2 className="text-[22px] md:text-[28px] font-bold italic mb-4" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+              Почему это работает?
+            </h2>
+            <div className="w-10 h-px mx-auto" style={{background:'rgba(212,145,42,0.35)'}}/>
+          </div>
+          <div className="flex flex-col gap-3">
+            {([
+              {
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                ),
+                title: 'Ребёнок видит себя в герое',
+                text: 'Персонаж переживает то же — это безопасный способ встретиться со страхом или трудной ситуацией',
+              },
+              {
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                ),
+                title: 'История переживается изнутри',
+                text: 'В сказке ребёнок эмоционально проходит путь от тревоги к решению — в полной безопасности',
+              },
+              {
+                icon: (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:20,height:20}}>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                ),
+                title: 'Опыт переносится в реальную жизнь',
+                text: 'После чтения вы вместе обсудите — что помогло герою и как это поможет именно вашему малышу',
+              },
+            ] as {icon:React.ReactNode;title:string;text:string}[]).map((item,i)=>(
+              <div key={i} className="flex items-start gap-4 rounded-2xl p-5" style={{background:'#0f2818',border:'1px solid rgba(212,145,42,0.18)'}}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{background:'rgba(212,145,42,0.12)',color:'#d4912a',border:'1px solid rgba(212,145,42,0.25)'}}>
+                  {item.icon}
+                </div>
+                <div>
+                  <h3 className="font-bold text-[14px] mb-1.5" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+                    {item.title}
+                  </h3>
+                  <p className="text-[12px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
+                    {item.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-[11px] italic mt-8" style={{color:'rgba(212,145,42,0.6)'}}>
+            Метод сказкотерапии — признанная практика детских психологов
+          </p>
         </div>
       </section>
 
