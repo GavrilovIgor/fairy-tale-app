@@ -911,15 +911,11 @@ function LoadingScreen({ childName }: { childName?: string }) {
         <div key={i} className="loading-firefly" style={{top:f.top,left:f.left,width:f.w,height:f.w,animationDelay:f.delay,animationDuration:f.dur}}/>
       ))}
 
-      {/* UI — absolute bottom, evenly spaced */}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center px-6 pb-8 gap-5">
+      {/* UI — absolute bottom */}
+      <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center px-6 pb-8 gap-4">
         <h1 style={{fontFamily:'Literata,Georgia,serif',fontSize:28,fontWeight:700,color:'#f9f9f7',lineHeight:1.2}}>
           Сказка создаётся...
         </h1>
-
-        <p style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontSize:14,fontStyle:'italic',color:'#82a48f'}}>
-          {childName ? `${childName} уже ждёт своей истории` : 'Твой герой уже ждёт своей истории'}
-        </p>
 
         <div className="flex justify-center gap-2 w-full">
           {steps.map((s,i)=>(
