@@ -153,16 +153,16 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index
 }
 
 // ── Desktop Navigation ────────────────────────────────────────────────────────
-function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfile}:{
+function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfile,onMyStories}:{
   activeTab:string;onTabChange:(t:string)=>void
-  user:User|null;onShowAuth:()=>void;onSignOut:()=>void;onEditProfile:()=>void
+  user:User|null;onShowAuth:()=>void;onSignOut:()=>void;onEditProfile:()=>void;onMyStories:()=>void
 }) {
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
         <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
         {user ? (
-          <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile}/>
+          <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
         ) : (
           <button onClick={onShowAuth}
             className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
@@ -1200,9 +1200,15 @@ export default function Home() {
   const handleShare=async()=>{
     if(!story)return
     const text=`${story.title}\n\n${story.scenes.map(s=>s.text).join('\n\n')}`
-    const isTg=!!window.Telegram?.WebApp
-    if(!isTg&&navigator.share){try{await navigator.share({title:story.title,text})}catch{}}
-    else{await navigator.clipboard.writeText(text);setShareStatus(isTg?'copied-tg':'copied');setTimeout(()=>setShareStatus('idle'),3000)}
+    // Всегда пробуем нативный share sheet (iOS/Android/desktop Safari)
+    if(navigator.share){
+      try{ await navigator.share({title:story.title,text,url:window.location.href}); return }
+      catch(e){ if((e as Error).name==='AbortError') return } // пользователь закрыл — ок
+    }
+    // Fallback — копирование в буфер
+    await navigator.clipboard.writeText(text)
+    setShareStatus('copied')
+    setTimeout(()=>setShareStatus('idle'),3000)
   }
 
   const handleDownloadPDF=async()=>{
@@ -1253,7 +1259,7 @@ export default function Home() {
       {(status==='idle'||status==='loading')&&(
         <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}
           user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}
-          onEditProfile={()=>setShowProfile(true)}/>
+          onEditProfile={()=>setShowProfile(true)} onMyStories={()=>setMobileTab('library')}/>
       )}
 
       {/* Content */}
@@ -1306,7 +1312,7 @@ export default function Home() {
       {(status==='done'||status==='reading')&&story&&(
         <>
           {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)}/>
+          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>setMobileTab('library')}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}

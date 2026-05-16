@@ -34,9 +34,9 @@ function Avatar({ user, size = 32 }: { user: User; size?: number }) {
 }
 
 export function UserMenu({
-  user, onSignOut, onEditProfile
+  user, onSignOut, onEditProfile, onMyStories
 }: {
-  user: User; onSignOut: () => void; onEditProfile: () => void
+  user: User; onSignOut: () => void; onEditProfile: () => void; onMyStories: () => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -75,15 +75,22 @@ export function UserMenu({
           </div>
           {/* Actions */}
           <div className="py-1">
+            <button onClick={() => { setOpen(false); onMyStories() }}
+              className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
+              style={{ color: '#374151' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>menu_book</span>
+              Мои сказки
+            </button>
             <button onClick={() => { setOpen(false); onEditProfile() }}
               className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
               style={{ color: '#374151' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>person</span>
               Редактировать профиль
             </button>
+            <div className="h-px mx-4 my-1" style={{ background: 'rgba(0,0,0,0.07)' }}/>
             <button onClick={() => { setOpen(false); onSignOut() }}
               className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-50 transition-colors"
-              style={{ color: '#374151' }}>
+              style={{ color: '#9ca3af' }}>
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>logout</span>
               Выйти
             </button>
