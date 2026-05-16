@@ -603,54 +603,81 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
       </section>
 
       {/* ══ SECTION 1.5 — ПОЧЕМУ ЭТО РАБОТАЕТ ══ */}
-      <section style={{background:'#071812'}} className="py-12 md:py-16 px-5">
-        <div className="max-w-[480px] mx-auto">
+      <section className="relative py-12 md:py-16 px-5 overflow-hidden" style={{background:'#0d2b1e'}}>
+        {/* Background: fireflies + stars (как в секции формы) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="bokeh w-72 h-72 top-[-60px] right-[-40px]" style={{background:'#1a4a34'}}/>
+          <div className="bokeh w-56 h-56 bottom-[10%] left-[-30px]" style={{background:'#143d2b'}}/>
+          {([
+            {t:'10%',l:'4%',d:'0s'},{t:'30%',r:'6%',d:'2s'},{t:'55%',l:'8%',d:'1s'},
+            {t:'70%',r:'10%',d:'3s'},{t:'85%',l:'3%',d:'1.5s'},{t:'20%',r:'25%',d:'4s'},
+            {t:'45%',l:'45%',d:'0.5s'},{t:'75%',r:'40%',d:'2.5s'},
+          ] as {t:string;l?:string;r?:string;d:string}[]).map((p,i)=>(
+            <div key={i} className="firefly" style={{top:p.t,...(p.l?{left:p.l}:{}),...(p.r?{right:p.r}:{}),animationDelay:p.d}}/>
+          ))}
+          {Array.from({length:14},(_,i)=>(
+            <div key={i} style={{
+              position:'absolute',width:i%3===0?'2px':'1.5px',height:i%3===0?'2px':'1.5px',
+              borderRadius:'50%',background:'rgba(255,255,255,0.6)',
+              top:`${5+(i*6.7)%88}%`,left:`${3+(i*13.1)%94}%`,
+              animation:`twinkle ${2+(i%3)*0.9}s ease-in-out infinite`,animationDelay:`${(i*0.4)%3}s`
+            }}/>
+          ))}
+        </div>
+
+        <div className="relative z-10 max-w-[480px] mx-auto">
           {/* Heading */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-9">
             <h2 className="text-[26px] md:text-[32px] font-bold italic mb-3" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
               Почему это работает?
             </h2>
             <div className="w-12 h-[2px] mx-auto rounded-full" style={{background:'rgba(212,145,42,0.55)'}}/>
           </div>
 
-          {/* Cards — centered vertical layout (как в Stitch) */}
+          {/* Cards */}
           <div className="flex flex-col gap-4">
             {([
               {
-                img: '/why/icon-fox.jpg',
-                imgPos: 'center center',
+                img: '/wizard/hero-fox.jpg',
+                imgPos: 'center 40%',
+                emoji: '🦊',
                 title: 'Ребёнок видит себя в герое',
                 text: 'Персонаж переживает то же, что и ваш малыш — это безопасный способ встретиться со страхом.',
               },
               {
-                img: '/why/icon-book.jpg',
-                imgPos: 'center center',
+                img: '/wizard/magic-book.jpg',
+                imgPos: 'center 30%',
+                emoji: '📖',
                 title: 'История проживается, а не рассказывается',
                 text: 'В сказке ребёнок эмоционально проходит путь от тревоги к решению.',
               },
               {
                 img: '/story-fallback-0.jpg',
-                imgPos: 'center 40%',
+                imgPos: 'center 35%',
+                emoji: '✨',
                 title: 'Опыт переносится в реальную жизнь',
                 text: 'После чтения вы вместе обсудите — что герой сделал и как это поможет малышу.',
               },
-            ] as {img:string;imgPos:string;title:string;text:string}[]).map((item,i)=>(
-              <div key={i} className="rounded-2xl px-6 pt-6 pb-6 text-center"
-                style={{background:'#0f2818',border:'1px solid rgba(212,145,42,0.15)'}}>
-                {/* Circular icon */}
-                <div className="w-14 h-14 rounded-full mx-auto mb-4 overflow-hidden"
-                  style={{border:'2px solid rgba(212,145,42,0.35)',boxShadow:'0 0 16px rgba(212,145,42,0.2)'}}>
+            ] as {img:string;imgPos:string;emoji:string;title:string;text:string}[]).map((item,i)=>(
+              <div key={i} className="rounded-2xl overflow-hidden text-center"
+                style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(212,145,42,0.2)',backdropFilter:'blur(8px)'}}>
+                {/* Full-width image strip */}
+                <div className="w-full h-36 overflow-hidden relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.img} alt="" aria-hidden
                     className="w-full h-full object-cover"
                     style={{objectPosition:item.imgPos}}/>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(13,43,30,0.95)]"/>
                 </div>
-                <h3 className="font-bold text-[15px] mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-                  {item.title}
-                </h3>
-                <p className="text-[13px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
-                  {item.text}
-                </p>
+                {/* Text */}
+                <div className="px-6 pt-3 pb-6">
+                  <h3 className="font-bold text-[15px] mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+                    {item.title}
+                  </h3>
+                  <p className="text-[13px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
+                    {item.text}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
