@@ -1,6 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { AuthModal } from '@/components/AuthModal'
+import type { User } from '@supabase/supabase-js'
 
 declare global {
   interface Window {
@@ -136,15 +139,35 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index
 }
 
 // ── Desktop Navigation ────────────────────────────────────────────────────────
-function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:string)=>void}) {
-  // Transparent floating nav — Stitch hero screen
+function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut}:{
+  activeTab:string;onTabChange:(t:string)=>void
+  user:User|null;onShowAuth:()=>void;onSignOut:()=>void
+}) {
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
         <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
-        <button className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
-          Войти
-        </button>
+        {user ? (
+          <div className="flex items-center gap-3">
+            {user.user_metadata?.avatar_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.user_metadata.avatar_url} alt="avatar"
+                style={{width:32,height:32,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.4)'}}/>
+            )}
+            <span className="text-white/80 text-sm font-medium">
+              {user.user_metadata?.name?.split(' ')[0] || user.email?.split('@')[0]}
+            </span>
+            <button onClick={onSignOut}
+              className="text-white/60 text-xs hover:text-white/90 cursor-pointer transition-colors">
+              Выйти
+            </button>
+          </div>
+        ) : (
+          <button onClick={onShowAuth}
+            className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
+            Войти
+          </button>
+        )}
       </div>
     </header>
   )
@@ -341,7 +364,7 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
 // ── Create Story Form — Stitch "Ночная сказка" design ────────────────────────
 // Hero desktop: Stitch screen 31f3c84c (1376×768), mobile: 9bb16ef2 (768×1376)
 
-function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void}) {
+function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;user?:User|null}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const [step,setStep] = useState(1)
 
@@ -402,7 +425,16 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
             </button>
-            <button className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+            {user ? (
+              user.user_metadata?.avatar_url
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={user.user_metadata.avatar_url} alt="avatar" style={{width:32,height:32,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.5)'}}/>
+                : <div style={{width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:14,fontWeight:700}}>
+                    {(user.email?.[0]??'U').toUpperCase()}
+                  </div>
+            ) : (
+              <button onClick={onShowAuth} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+            )}
           </div>
         </div>
         {/* Bottom gradient — covers lower portion for text readability */}
@@ -1014,11 +1046,49 @@ export default function Home() {
   const [checkingPayment,setCheckingPayment] = useState(false)
   const [mobileTab,setMobileTab] = useState<MobileTab>('create')
   const [desktopTab,setDesktopTab] = useState('create')
+  const [user,setUser] = useState<User|null>(null)
+  const [showAuth,setShowAuth] = useState(false)
   const storyRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+
+  // ── Migrate localStorage stories to Supabase ────────────────────────────────
+  const migrateLocalStories = useCallback(async(userId:string)=>{
+    const local = loadSaved()
+    if(local.length===0) return
+    for(const s of local){
+      await supabase.from('stories').upsert({
+        id: s.id, user_id: userId, title: s.story.title,
+        child_name: s.childName, data: s.story,
+      }, {onConflict:'id'}).select()
+    }
+  },[supabase])
+
+  // ── Load stories from Supabase ───────────────────────────────────────────────
+  const loadDbStories = useCallback(async()=>{
+    const {data} = await supabase.from('stories').select('*').order('created_at',{ascending:false})
+    if(data?.length){
+      const dbStories:SavedStory[] = data.map(s=>({
+        id:s.id, savedAt:new Date(s.created_at).toLocaleDateString('ru-RU'),
+        childName:s.child_name, story:s.data
+      }))
+      const local = loadSaved()
+      const merged = [...dbStories, ...local.filter(l=>!dbStories.find(d=>d.id===l.id))]
+      setSaved(merged); saveTos(merged)
+    }
+  },[supabase])
 
   useEffect(()=>{
     window.Telegram?.WebApp?.ready(); window.Telegram?.WebApp?.expand()
     setSaved(loadSaved()); setUsageCount(getDailyUsage()); setExtraState(getExtra())
+
+    // Auth state
+    supabase.auth.getUser().then(({data:{user}})=>{ setUser(user); if(user) loadDbStories() })
+    const {data:{subscription}} = supabase.auth.onAuthStateChange((_,session)=>{
+      const u = session?.user ?? null
+      setUser(u)
+      if(u){ migrateLocalStories(u.id); loadDbStories() }
+    })
+    return ()=>subscription.unsubscribe()
     const params=new URLSearchParams(window.location.search)
     if(params.get('owner')==='1'){ try{localStorage.setItem(K.owner,'1')}catch{} }
     const paymentId=params.get('payment_id'), plan=params.get('plan')
@@ -1084,15 +1154,24 @@ export default function Home() {
     }catch{setError('Не удалось подключиться к серверу.');setStatus('idle')}
   }
 
-  const handleSave=()=>{
+  const handleSave=async()=>{
     if(!story)return
     const entry:SavedStory={id:Date.now().toString(),savedAt:new Date().toLocaleDateString('ru-RU'),childName:currentChildName,story}
     const updated=[entry,...saved]; setSaved(updated); saveTos(updated); setAlreadySaved(true)
+    if(user){
+      await supabase.from('stories').insert({
+        id:entry.id, user_id:user.id, title:story.title,
+        child_name:currentChildName, data:story
+      })
+    }
   }
 
-  const handleDelete=(id:string)=>{
+  const handleDelete=async(id:string)=>{
     const updated=saved.filter(s=>s.id!==id); setSaved(updated); saveTos(updated)
+    if(user){ await supabase.from('stories').delete().eq('id',id).eq('user_id',user.id) }
   }
+
+  const handleSignOut=async()=>{ await supabase.auth.signOut(); setUser(null) }
 
   const handleShare=async()=>{
     if(!story)return
@@ -1134,9 +1213,13 @@ export default function Home() {
         <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra())}}/>
       )}
 
+      {/* Auth modal */}
+      {showAuth&&<AuthModal onClose={()=>setShowAuth(false)}/>}
+
       {/* Desktop nav */}
       {(status==='idle'||status==='loading')&&(
-        <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}/>
+        <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}
+          user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}/>
       )}
 
       {/* Content */}
@@ -1160,7 +1243,7 @@ export default function Home() {
         <>
           {/* Mobile: no tab bar — nav via header icon */}
           <div className="md:hidden">
-            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')}/>}
+            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')} onShowAuth={()=>setShowAuth(true)} user={user}/>}
             {mobileTab==='library'&&(
               <>
                 <MobileTopBar title="Мои сказки"/>
@@ -1179,7 +1262,7 @@ export default function Home() {
 
           {/* Desktop: full form + footer */}
           <div className="hidden md:block">
-            <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined}/>
+            <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
           </div>
         </>
       )}
@@ -1189,7 +1272,7 @@ export default function Home() {
       {(status==='done'||status==='reading')&&story&&(
         <>
           {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}}/>
+          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
