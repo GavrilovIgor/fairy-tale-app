@@ -338,7 +338,7 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
 // ── Create Story Form — Stitch "Ночная сказка" design ────────────────────────
 // Hero desktop: Stitch screen 31f3c84c (1376×768), mobile: 9bb16ef2 (768×1376)
 
-function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean}) {
+function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
 
@@ -374,12 +374,17 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
         {/* Mobile transparent header — overlaid on fox image */}
         <div className="md:hidden absolute top-0 left-0 right-0 z-20 flex justify-between items-center px-6 pt-12 pb-4">
           <div className="italic drop-shadow-md" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'white'}}>Волшебная Сказка</div>
-          <button className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+          <div className="flex items-center gap-3">
+            <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
+              <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
+            </button>
+            <button className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+          </div>
         </div>
         {/* Bottom gradient — covers lower portion for text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
           <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
           <h1 className="text-[28px] md:text-[48px] leading-tight font-bold text-white mb-1 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             Создайте волшебную сказку
@@ -878,24 +883,28 @@ export default function Home() {
 
       {status==='idle'&&showForm&&(
         <>
-          {/* Mobile: tabs */}
+          {/* Mobile: no tab bar — nav via header icon */}
           <div className="md:hidden">
-            {mobileTab!=='create'&&<MobileTopBar title="Волшебная Сказка"/>}
-            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false}/>}
-            {mobileTab==='library'&&<LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>}
-            {mobileTab==='profile'&&(
-              <div className="px-5 pb-28 text-center pt-16">
-                <div className="text-6xl mb-4">👤</div>
-                <h3 className="font-serif text-xl font-bold mb-2" style={{color:'var(--text)'}}>Профиль</h3>
-                <p className="text-sm" style={{color:'var(--text-muted)'}}>Скоро здесь появится личный кабинет</p>
-              </div>
+            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')}/>}
+            {mobileTab==='library'&&(
+              <>
+                <MobileTopBar title="Мои сказки"/>
+                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+                  <button onClick={()=>setMobileTab('create')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-sm font-semibold cursor-pointer"
+                    style={{background:'rgba(10,31,20,0.9)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.15)'}}>
+                    <span className="material-symbols-outlined" style={{fontSize:18}}>arrow_back</span>
+                    Назад
+                  </button>
+                </div>
+              </>
             )}
-            <MobileTabBar active={mobileTab} onChange={setMobileTab}/>
           </div>
 
           {/* Desktop: full form + footer */}
           <div className="hidden md:block">
-            <CreateForm onGenerate={generate} isLoading={false}/>
+            <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined}/>
           </div>
         </>
       )}
@@ -913,11 +922,6 @@ export default function Home() {
             onShare={handleShare} shareStatus={shareStatus}
             onDownloadPDF={handleDownloadPDF} pdfLoading={pdfLoading} pdfError={pdfError}
           />
-          {/* Mobile tab bar during reading */}
-          <MobileTabBar active={mobileTab} onChange={(t)=>{
-            if(t==='create'){setStatus('idle');setStory(null)}
-            else setMobileTab(t)
-          }}/>
         </>
       )}
     </div>
