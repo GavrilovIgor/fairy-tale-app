@@ -43,6 +43,11 @@ export default function RootLayout({
     >
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+        {/* Prevent browser scroll restoration — always start at top */}
+        <script dangerouslySetInnerHTML={{__html:`
+          if('scrollRestoration' in history){history.scrollRestoration='manual'}
+          window.scrollTo(0,0)
+        `}}/>
       </head>
       <body className="min-h-full flex flex-col">
         {children}

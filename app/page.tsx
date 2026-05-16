@@ -428,7 +428,7 @@ function getLastChild():{name:string;age:string}{
 }
 function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CHILD_KEY,JSON.stringify({name,age}))}catch{} }
 
-function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;user?:User|null}) {
+function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
 
   useEffect(()=>{
@@ -503,12 +503,15 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
             </button>
             {user ? (
-              user.user_metadata?.avatar_url
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={user.user_metadata.avatar_url} alt="avatar" style={{width:32,height:32,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.5)'}}/>
-                : <div style={{width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:14,fontWeight:700}}>
-                    {(user.email?.[0]??'U').toUpperCase()}
-                  </div>
+              <button onClick={onShowProfile} className="cursor-pointer hover:opacity-80 transition-opacity" style={{lineHeight:0,border:'none',background:'none',padding:0}}>
+                {user.user_metadata?.avatar_url
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={user.user_metadata.avatar_url} alt="avatar" style={{width:32,height:32,borderRadius:'50%',objectFit:'cover',border:'2px solid rgba(255,255,255,0.5)'}}/>
+                  : <div style={{width:32,height:32,borderRadius:'50%',background:'rgba(255,255,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:14,fontWeight:700}}>
+                      {(user.email?.[0]??'U').toUpperCase()}
+                    </div>
+                }
+              </button>
             ) : (
               <button onClick={onShowAuth} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
             )}
@@ -1435,10 +1438,9 @@ export default function Home() {
         <>
           {/* Mobile: no tab bar — nav via header icon */}
           <div className="md:hidden">
-            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')} onShowAuth={()=>setShowAuth(true)} user={user}/>}
+            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} user={user}/>}
             {mobileTab==='library'&&(
               <>
-                <MobileTopBar title="Мои сказки"/>
                 <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
                   <button onClick={()=>setMobileTab('create')}
@@ -1456,7 +1458,7 @@ export default function Home() {
           <div className="hidden md:block">
             {desktopTab==='library'
               ? <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
-              : <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
+              : <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} user={user}/>
             }
           </div>
         </>
