@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AuthModal } from '@/components/AuthModal'
 import { NameModal } from '@/components/NameModal'
@@ -148,11 +150,33 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc,storySeed=0}:{prompt:
   )
 }
 
+// ── Language Switcher ─────────────────────────────────────────────────────────
+function LangSwitcher() {
+  const locale = useLocale()
+  const pathname = usePathname()
+  const router = useRouter()
+  const toggle = () => {
+    const next = locale === 'ru' ? 'en' : 'ru'
+    // Strip current locale prefix and add new one
+    const base = pathname.replace(/^\/(en|ru)/, '') || '/'
+    const newPath = next === 'ru' ? (base || '/') : `/en${base === '/' ? '' : base}`
+    router.push(newPath)
+  }
+  return (
+    <button onClick={toggle}
+      className="flex items-center gap-1.5 text-white/60 hover:text-white/90 transition-colors cursor-pointer text-xs font-semibold tracking-wider"
+      style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',padding:'5px 12px',borderRadius:999}}>
+      {locale === 'ru' ? '🇺🇸 EN' : '🇷🇺 RU'}
+    </button>
+  )
+}
+
 // ── Desktop Navigation ────────────────────────────────────────────────────────
 function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfile,onMyStories}:{
   activeTab:string;onTabChange:(t:string)=>void
   user:User|null;onShowAuth:()=>void;onSignOut:()=>void;onEditProfile:()=>void;onMyStories:()=>void
 }) {
+  const t = useTranslations('nav')
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
@@ -163,21 +187,24 @@ function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfi
           <div className="flex flex-col gap-0">
             <span className="italic leading-tight" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700,color:'#fff',
               textShadow:'0 0 18px rgba(212,145,42,0.55), 0 0 36px rgba(212,145,42,0.2)'}}>
-              Волшебная Сказка
+              {t('logo')}
             </span>
             <span className="tracking-wide" style={{fontSize:9,fontWeight:500,color:'rgba(255,255,255,0.38)',letterSpacing:'0.08em'}}>
-              Метод сказкотерапии · для детей 3–10 лет
+              {t('tagline')}
             </span>
           </div>
         </a>
-        {user ? (
-          <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
-        ) : (
-          <button onClick={onShowAuth}
-            className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
-            Войти
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <LangSwitcher/>
+          {user ? (
+            <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
+          ) : (
+            <button onClick={onShowAuth}
+              className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
+              {t('login')}
+            </button>
+          )}
+        </div>
       </div>
     </header>
   )
@@ -222,19 +249,21 @@ function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)
 
 // ── Site Footer (from Stitch screen 4371a933) ────────────────────────────────
 function SiteFooter() {
+  const t = useTranslations('footer')
+  const locale = useLocale()
   return (
     <footer className="print:hidden" style={{background:'#0a1f14',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
       <div className="max-w-[900px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3">
-        <div className="italic text-sm font-bold" style={{fontFamily:'Literata,Georgia,serif',color:'rgba(255,255,255,0.5)'}}>Волшебная Сказка</div>
+        <div className="italic text-sm font-bold" style={{fontFamily:'Literata,Georgia,serif',color:'rgba(255,255,255,0.5)'}}>{t('logo')}</div>
         <div className="flex flex-wrap justify-center gap-x-5 gap-y-1">
-          <a href="/privacy" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
-            Политика конфиденциальности
+          <a href={locale === 'en' ? '/en/privacy' : '/privacy'} className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
+            {t('privacy')}
           </a>
-          <a href={`mailto:gigor92@gmail.com`} className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
-            Написать нам
+          <a href="mailto:gigor92@gmail.com" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
+            {t('contact')}
           </a>
         </div>
-        <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>© 2026 Волшебная Сказка</p>
+        <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>{t('copy')}</p>
       </div>
     </footer>
   )
