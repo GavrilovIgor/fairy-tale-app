@@ -385,17 +385,11 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
           Dark forest, fox image, text at bottom 30%
       ══════════════════════════════════════════════════════ */}
       <section className="relative h-screen w-full overflow-hidden" style={{background:'#0d2b1e'}}>
-        {/* Responsive hero image: portrait on mobile, landscape on desktop */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero-mobile.jpg" alt="Волшебный лес с лисёнком"
-          className="md:hidden absolute inset-0 w-full h-full object-cover object-center" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero-desktop.jpg" alt="Волшебный лес с лисёнком"
-          className="hidden md:block absolute inset-0 w-full h-full object-cover object-top" />
-        {/* Top gradient — solid dark at top, fully hides Stitch nav logo */}
-        <div className="absolute top-0 left-0 right-0 pointer-events-none" style={{height:'18%',background:'linear-gradient(to bottom, rgba(10,31,20,1) 0%, rgba(10,31,20,0.85) 55%, transparent 100%)'}}/>
-        {/* Bottom gradient — reaches solid before Stitch title starts (~62% from top) */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{height:'65%',background:'linear-gradient(to bottom, transparent 0%, rgba(10,31,20,0.8) 30%, rgba(10,31,20,1) 42%, rgba(10,31,20,1) 100%)'}}/>
+          className="absolute inset-0 w-full h-full object-cover object-top md:object-center" />
+        {/* Bottom gradient — covers lower portion for text readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-20 md:pb-10">
           <p className="hidden md:block text-white/55 text-[11px] font-semibold tracking-[0.15em] uppercase mb-3">✦ Терапевтические сказки для детей ✦</p>
