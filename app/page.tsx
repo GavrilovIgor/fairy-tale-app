@@ -1089,6 +1089,8 @@ export default function Home() {
   },[supabase])
 
   useEffect(()=>{
+    window.scrollTo(0,0)
+    if('scrollRestoration' in history) history.scrollRestoration='manual'
     window.Telegram?.WebApp?.ready(); window.Telegram?.WebApp?.expand()
     setSaved(loadSaved()); setUsageCount(getDailyUsage()); setExtraState(getExtra())
 
