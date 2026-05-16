@@ -249,7 +249,7 @@ function SiteFooter() {
 }
 
 // ── Paywall ───────────────────────────────────────────────────────────────────
-function Paywall({onPaid,onClose}:{onPaid:()=>void;onClose?:()=>void}) {
+function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;userId?:string}) {
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'code'>('choose')
   const [code,setCode] = useState('')
@@ -259,7 +259,7 @@ function Paywall({onPaid,onClose}:{onPaid:()=>void;onClose?:()=>void}) {
   const buyYookassa = async(plan:'three_stories'|'unlimited_30d')=>{
     setLoading(plan)
     try {
-      const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan})})
+      const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,userId})})
       const data = await res.json()
       if(!res.ok)throw new Error(data.error)
       if(data.paymentId){
@@ -1193,6 +1193,21 @@ export default function Home() {
     }
   },[supabase])
 
+  // ── Load premium status from Supabase ───────────────────────────────────────
+  const loadPremiumStatus = useCallback(async(userId:string)=>{
+    const {data} = await supabase.from('purchases').select('*').eq('user_id',userId).order('created_at',{ascending:false})
+    if(!data?.length) return
+    const now = Date.now()
+    const activeUnlimited = data.find(p=>p.plan==='unlimited_30d'&&p.expires_at&&new Date(p.expires_at).getTime()>now)
+    if(activeUnlimited){
+      const ts = new Date(activeUnlimited.expires_at).getTime()
+      setPaidUntil(ts); try{localStorage.setItem('ft-paid-until',String(ts))}catch{}
+      return
+    }
+    const extra = data.filter(p=>p.plan==='three_stories'&&(p.stories_remaining??0)>0).reduce((s,p)=>s+(p.stories_remaining??0),0)
+    if(extra>0){ setExtraState(extra); try{localStorage.setItem('ft-extra',String(extra))}catch{} }
+  },[supabase])
+
   // ── Load stories from Supabase ───────────────────────────────────────────────
   const loadDbStories = useCallback(async()=>{
     const {data} = await supabase.from('stories').select('*').order('created_at',{ascending:false})
@@ -1214,12 +1229,12 @@ export default function Home() {
     setSaved(loadSaved()); setUsageCount(getDailyUsage()); setExtraState(getExtra())
 
     // Auth state
-    supabase.auth.getUser().then(({data:{user}})=>{ setUser(user); if(user) loadDbStories() })
+    supabase.auth.getUser().then(({data:{user}})=>{ setUser(user); if(user){ loadDbStories(); loadPremiumStatus(user.id) } })
     const {data:{subscription}} = supabase.auth.onAuthStateChange((event,session)=>{
       const u = session?.user ?? null
       setUser(u)
       if(u){
-        migrateLocalStories(u.id); loadDbStories()
+        migrateLocalStories(u.id); loadDbStories(); loadPremiumStatus(u.id)
         if(event==='SIGNED_IN' && !u.user_metadata?.full_name && !u.user_metadata?.name){
           setShowName(true)
         }
@@ -1393,7 +1408,7 @@ export default function Home() {
       )}
 
       {!checkingPayment&&showPaywall&&(
-        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra())}} onClose={()=>setShowPaywall(false)}/>
+        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra());if(user)loadPremiumStatus(user.id)}} onClose={()=>setShowPaywall(false)} userId={user?.id}/>
       )}
 
       {/* Auth modal */}

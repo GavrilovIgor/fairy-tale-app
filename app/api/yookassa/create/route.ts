@@ -11,7 +11,7 @@ const PLANS = {
 }
 
 export async function POST(req: NextRequest) {
-  const { plan, telegramId } = await req.json()
+  const { plan, telegramId, userId } = await req.json()
   const selected = PLANS[plan as keyof typeof PLANS]
   if (!selected) return NextResponse.json({ error: 'Unknown plan' }, { status: 400 })
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         payment_subject: 'service',
       }],
     },
-    metadata: { plan, telegramId: telegramId?.toString() ?? '' },
+    metadata: { plan, telegramId: telegramId?.toString() ?? '', userId: userId ?? '' },
   }
 
   const auth = Buffer.from(`${SHOP_ID}:${SECRET_KEY}`).toString('base64')

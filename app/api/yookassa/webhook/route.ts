@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { writePurchase } from '@/lib/supabase/admin'
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
 const OWNER_CHAT_ID = process.env.OWNER_CHAT_ID!
@@ -25,10 +26,25 @@ export async function POST(req: NextRequest) {
   }
 
   const payment = event.object
-  const plan = payment.metadata?.plan
+  const plan = payment.metadata?.plan as string
   const telegramId = payment.metadata?.telegramId
+  const userId = payment.metadata?.userId as string | undefined
   const amount = payment.amount?.value
   const planLabel = plan === 'unlimited_30d' ? 'Безлимит на 30 дней' : '3 сказки'
+
+  // Пишем в Supabase — надёжный сервер-сайд fallback
+  if (userId) {
+    const isUnlimited = plan === 'unlimited_30d'
+    await writePurchase({
+      user_id: userId,
+      plan,
+      payment_id: payment.id,
+      stories_remaining: isUnlimited ? null : 3,
+      expires_at: isUnlimited
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        : null,
+    }).catch(e => console.error('Supabase write error:', e))
+  }
 
   // Уведомление пользователю в Telegram (если пришёл из бота)
   if (telegramId) {

@@ -99,11 +99,12 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-sm font-bold" style={{ color: '#0d2b1e' }}>Активна</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                    style={{ background: '#dcfce7', color: '#15803d' }}>✓</span>
+                  <span className="text-sm font-bold" style={{ color: '#0d2b1e' }}>Premium</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full font-bold italic"
+                    style={{ background: 'linear-gradient(135deg,#c4812a,#a46713)', color: '#fff',
+                      boxShadow: '0 2px 8px rgba(164,103,19,0.35)' }}>✦ PRO</span>
                 </div>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>до {paidDate}</p>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>активна до {paidDate}</p>
               </div>
               <button onClick={() => { onClose(); onShowPaywall?.() }}
                 className="text-xs font-semibold cursor-pointer hover:opacity-70 transition-opacity"
