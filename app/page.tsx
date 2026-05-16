@@ -253,6 +253,10 @@ function Paywall({onPaid}:{onPaid:()=>void}) {
       const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan})})
       const data = await res.json()
       if(!res.ok)throw new Error(data.error)
+      // Сохраняем payment_id ДО редиректа — чтобы проверить даже если пользователь нажмёт "назад"
+      if(data.paymentId){
+        try{ localStorage.setItem('ft-pending-pay', JSON.stringify({id:data.paymentId,plan,ts:Date.now()})) }catch{}
+      }
       window.location.href = data.confirmationUrl
     } catch { setLoading(null); alert('Ошибка платежа, попробуйте позже') }
   }
@@ -1165,17 +1169,22 @@ export default function Home() {
       setUser(u)
       if(u){
         migrateLocalStories(u.id); loadDbStories()
-        // Show name modal on first sign-in if no name set
         if(event==='SIGNED_IN' && !u.user_metadata?.full_name && !u.user_metadata?.name){
           setShowName(true)
         }
       }
     })
-    return ()=>subscription.unsubscribe()
-    const params=new URLSearchParams(window.location.search)
-    if(params.get('owner')==='1'){ try{localStorage.setItem(K.owner,'1')}catch{} }
-    const paymentId=params.get('payment_id'), plan=params.get('plan')
-    if(paymentId&&plan){
+
+    // ── Payment check ────────────────────────────────────────────────────────
+    const applyPayment=(plan:string)=>{
+      if(plan==='unlimited_30d') setPaidUntil(Date.now()+30*24*60*60*1000)
+      else setExtra(getExtra()+3)
+      setUsageCount(getDailyUsage()); setExtraState(getExtra())
+      setCheckingPayment(false); setShowPaywall(false)
+      try{ localStorage.removeItem('ft-pending-pay') }catch{}
+    }
+
+    const pollPayment=(paymentId:string, plan:string)=>{
       window.history.replaceState({},'',' /'); setCheckingPayment(true)
       let attempts=0
       const poll=async()=>{
@@ -1183,18 +1192,37 @@ export default function Home() {
         try{
           const r=await fetch(`/api/yookassa/check?payment_id=${paymentId}`)
           const data=await r.json()
-          if(data.paid){
-            if(data.plan==='unlimited_30d')setPaidUntil(Date.now()+30*24*60*60*1000)
-            else setExtra(getExtra()+3)
-            setUsageCount(getDailyUsage()); setExtraState(getExtra())
-            setCheckingPayment(false); setShowPaywall(false); return
-          }
+          if(data.paid){ applyPayment(plan); return }
         }catch{}
-        if(attempts<20)setTimeout(poll,3000)
-        else{setCheckingPayment(false);setShowPaywall(true)}
+        if(attempts<20) setTimeout(poll,3000)
+        else{ setCheckingPayment(false); setShowPaywall(true) }
       }
       poll()
     }
+
+    // 1. Проверяем URL параметры (редирект от YooKassa)
+    const params=new URLSearchParams(window.location.search)
+    if(params.get('owner')==='1'){ try{localStorage.setItem(K.owner,'1')}catch{} }
+    const urlPaymentId=params.get('payment_id'), urlPlan=params.get('plan')
+    if(urlPaymentId&&urlPlan){
+      pollPayment(urlPaymentId, urlPlan)
+    } else {
+      // 2. Проверяем pending платёж из localStorage (если пользователь нажал "назад")
+      try{
+        const pending=localStorage.getItem('ft-pending-pay')
+        if(pending){
+          const {id,plan,ts}=JSON.parse(pending)
+          // Проверяем только если не старше 2 часов
+          if(Date.now()-ts < 2*60*60*1000){
+            pollPayment(id, plan)
+          } else {
+            localStorage.removeItem('ft-pending-pay')
+          }
+        }
+      }catch{}
+    }
+
+    return ()=>subscription.unsubscribe()
   },[])
 
   const generate = async(data:FormData)=>{
