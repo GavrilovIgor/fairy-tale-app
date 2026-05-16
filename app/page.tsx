@@ -171,11 +171,11 @@ function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)
   ]
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around py-3 px-4 print:hidden"
-      style={{background:'#fff',borderTop:'1px solid var(--border-light)',boxShadow:'0 -2px 12px rgba(26,58,42,0.06)'}}>
+      style={{background:'rgba(10,31,20,0.97)',backdropFilter:'blur(12px)',borderTop:'1px solid rgba(255,255,255,0.08)'}}>
       {tabs.map(([id,label,icon])=>(
         <button key={id} onClick={()=>onChange(id)}
           className="flex flex-col items-center gap-0.5 cursor-pointer transition-all"
-          style={{color:active===id?'var(--accent)':'var(--text-muted)'}}>
+          style={{color:active===id?'#d4912a':'rgba(255,255,255,0.45)'}}>
           <span className="material-symbols-outlined" style={{fontSize:22}}>{icon}</span>
           <span className="text-xs font-semibold">{label}</span>
         </button>
@@ -367,10 +367,15 @@ function CreateForm({onGenerate,isLoading}:{onGenerate:(f:FormData)=>Promise<voi
           SECTION 1 — HERO (Stitch: screen a7285ac6)
           Dark forest, fox image, text at bottom 30%
       ══════════════════════════════════════════════════════ */}
-      <section className="relative h-screen w-full overflow-hidden" style={{background:'#0d2b1e'}}>
+      <section className="relative h-[88vh] md:h-screen w-full overflow-hidden" style={{background:'#0d2b1e'}}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero-desktop.jpg" alt="Волшебный лес с лисёнком"
-          className="absolute inset-0 w-full h-full object-cover object-top md:object-center" />
+          className="absolute inset-0 w-full h-full object-cover object-[center_20%] md:object-center" />
+        {/* Mobile transparent header — overlaid on fox image */}
+        <div className="md:hidden absolute top-0 left-0 right-0 z-20 flex justify-between items-center px-6 pt-12 pb-4">
+          <div className="italic drop-shadow-md" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'white'}}>Волшебная Сказка</div>
+          <button className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+        </div>
         {/* Bottom gradient — covers lower portion for text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
