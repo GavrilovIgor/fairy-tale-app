@@ -1253,6 +1253,8 @@ export default function Home() {
       try{ localStorage.removeItem('ft-pending-pay') }catch{}
     }
 
+    const clearPending=()=>{ try{localStorage.removeItem('ft-pending-pay')}catch{} }
+
     const pollPayment=(paymentId:string, plan:string)=>{
       window.history.replaceState({},'',' /'); setCheckingPayment(true)
       let attempts=0
@@ -1261,10 +1263,10 @@ export default function Home() {
         try{
           const r=await fetch(`/api/yookassa/check?payment_id=${paymentId}`)
           const data=await r.json()
-          if(data.paid){ applyPayment(plan); return }
+          if(data.paid){ applyPayment(plan); clearPending(); return }
         }catch{}
-        if(attempts<20) setTimeout(poll,3000)
-        else{ setCheckingPayment(false); setShowPaywall(true) }
+        if(attempts<10) setTimeout(poll,3000)
+        else{ clearPending(); setCheckingPayment(false) } // не нашли — тихо закрываем
       }
       poll()
     }
@@ -1401,11 +1403,16 @@ export default function Home() {
     <div className="min-h-screen print:bg-white">
       {/* Payment checking */}
       {checkingPayment&&(
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{background:'rgba(26,26,46,0.7)',backdropFilter:'blur(8px)'}}>
-          <div className="bg-white rounded-3xl p-10 max-w-sm w-full text-center card-shadow">
-            <div className="text-5xl mb-4 animate-spin">⏳</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{background:'rgba(10,31,20,0.85)',backdropFilter:'blur(8px)'}}>
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center" style={{boxShadow:'0 20px 60px rgba(0,0,0,0.4)'}}>
+            <div className="text-5xl mb-4" style={{animation:'spin 2s linear infinite',display:'inline-block'}}>⏳</div>
             <h2 className="font-serif text-xl font-bold mb-2" style={{color:'var(--primary)'}}>Проверяем оплату...</h2>
-            <p className="text-sm" style={{color:'var(--text-muted)'}}>СБП-платёж подтверждается банком</p>
+            <p className="text-sm mb-6" style={{color:'var(--text-muted)'}}>СБП-платёж подтверждается банком, это занимает до 30 секунд</p>
+            <button onClick={()=>{ try{localStorage.removeItem('ft-pending-pay')}catch{} setCheckingPayment(false) }}
+              className="text-xs cursor-pointer hover:opacity-70 transition-opacity"
+              style={{color:'var(--text-muted)'}}>
+              Закрыть и проверить позже
+            </button>
           </div>
         </div>
       )}
