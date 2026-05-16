@@ -9,11 +9,15 @@ function getSubscriptionInfo() {
   try {
     const paidUntil = parseInt(localStorage.getItem('ft-paid-until') || '0', 10)
     const extra = parseInt(localStorage.getItem('ft-extra') || '0', 10)
-    const count = parseInt(localStorage.getItem('ft-count') || '0', 10)
-    return { paidUntil, extra, count }
+    return { paidUntil, extra }
   } catch {
-    return { paidUntil: 0, extra: 0, count: 0 }
+    return { paidUntil: 0, extra: 0 }
   }
+}
+
+function getReferralLink(userId: string) {
+  const code = userId.slice(0, 8)
+  return `https://skazka-ai.vercel.app/?ref=${code}`
 }
 
 export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
@@ -26,8 +30,10 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
   const [newName, setNewName] = useState(name)
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [sub, setSub] = useState({ paidUntil: 0, extra: 0, count: 0 })
+  const [copied, setCopied] = useState(false)
+  const [sub, setSub] = useState({ paidUntil: 0, extra: 0 })
   const supabase = createClient()
+  const refLink = getReferralLink(user.id)
 
   useEffect(() => { setSub(getSubscriptionInfo()) }, [])
 
@@ -47,6 +53,24 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
   const paidDate = isPaid
     ? new Date(sub.paidUntil).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
+
+  const copyRefLink = async () => {
+    try {
+      await navigator.clipboard.writeText(refLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // fallback для старых браузеров
+      const el = document.createElement('textarea')
+      el.value = refLink
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-4"
@@ -117,21 +141,21 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
                     {sub.extra} {sub.extra === 1 ? 'сказка' : sub.extra < 5 ? 'сказки' : 'сказок'}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                    style={{ background: '#fef3c7', color: '#d97706' }}>оплачено</span>
+                    style={{ background: '#fef3c7', color: '#d97706' }}>бонус</span>
                 </div>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>осталось на балансе</p>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>осталось</p>
               </div>
               <button onClick={() => { onClose(); onShowPaywall?.() }}
-                className="text-xs font-semibold cursor-pointer hover:opacity-70 transition-opacity"
-                style={{ color: '#a46713' }}>
-                Пополнить
+                className="text-xs font-bold px-3 py-1.5 rounded-full cursor-pointer hover:opacity-90 transition-all"
+                style={{ background: '#a46713', color: '#fff' }}>
+                ✨ Купить
               </button>
             </div>
           ) : (
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold mb-0.5" style={{ color: '#0d2b1e' }}>Бесплатный</p>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>2 сказки раз в 2 дня</p>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>299 ₽/мес · 1490 ₽/год</p>
               </div>
               <button onClick={() => { onClose(); onShowPaywall?.() }}
                 className="text-xs font-bold px-3 py-1.5 rounded-full cursor-pointer hover:opacity-90 transition-all"
@@ -140,6 +164,27 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Referral block */}
+        <div className="rounded-2xl p-4 mt-3" style={{ background: '#f0f7f3', border: '1px solid rgba(13,43,30,0.08)' }}>
+          <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#466252' }}>
+            Пригласи друга
+          </p>
+          <p className="text-xs mb-3" style={{ color: '#6b7280' }}>
+            Друг оплатит — ты получишь 1 месяц бесплатно
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 rounded-xl px-3 py-2 text-xs font-mono truncate"
+              style={{ background: '#e8f2ec', color: '#0d2b1e', border: '1px solid rgba(13,43,30,0.1)' }}>
+              {refLink}
+            </div>
+            <button onClick={copyRefLink}
+              className="flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all"
+              style={{ background: copied ? '#2d6a4f' : '#0d2b1e', color: '#fff' }}>
+              {copied ? '✓' : 'Копировать'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

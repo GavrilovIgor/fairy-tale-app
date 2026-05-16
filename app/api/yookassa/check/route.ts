@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writePurchase } from '@/lib/supabase/admin'
+import { writePurchase, awardReferrer } from '@/lib/supabase/admin'
 
 const SHOP_ID = process.env.YOOKASSA_SHOP_ID!
 const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
+
+function planExpires(plan: string) {
+  if (plan === 'yearly_sub') return new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+}
 
 export async function GET(req: NextRequest) {
   const paymentId = req.nextUrl.searchParams.get('payment_id')
@@ -20,18 +25,16 @@ export async function GET(req: NextRequest) {
   const plan = data.metadata?.plan as string
   const userId = data.metadata?.userId as string | undefined
 
-  // Если оплата успешна и знаем userId — пишем в Supabase
   if (data.paid && userId) {
-    const isUnlimited = plan === 'unlimited_30d'
     await writePurchase({
       user_id: userId,
       plan,
       payment_id: data.id,
-      stories_remaining: isUnlimited ? null : 3,
-      expires_at: isUnlimited
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        : null,
+      stories_remaining: null,
+      expires_at: planExpires(plan),
     })
+
+    await awardReferrer(userId).catch(e => console.error('awardReferrer error:', e))
   }
 
   return NextResponse.json({

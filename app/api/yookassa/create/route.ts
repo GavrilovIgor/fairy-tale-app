@@ -6,8 +6,8 @@ const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
 const BASE_URL = 'https://skazka-ai.vercel.app'
 
 const PLANS = {
-  three_stories: { amount: '149.00', description: 'Волшебная Сказка — 3 сказки' },
-  unlimited_30d: { amount: '349.00', description: 'Волшебная Сказка — безлимит 30 дней' },
+  monthly_sub: { amount: '299.00', description: 'Волшебная Сказка — подписка на 1 месяц' },
+  yearly_sub:  { amount: '1490.00', description: 'Волшебная Сказка — подписка на 1 год' },
 }
 
 export async function POST(req: NextRequest) {

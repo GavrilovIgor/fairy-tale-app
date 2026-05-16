@@ -15,24 +15,11 @@ declare global {
 }
 
 // ── Storage helpers ───────────────────────────────────────────────────────────
-const K = { date:'ft-date', count:'ft-count', extra:'ft-extra', paid:'ft-paid-until', stories:'ft-saved', owner:'ft-owner' }
-const FREE_LIMIT = 2        // сказок бесплатно
-const FREE_PERIOD_DAYS = 2  // раз в N дней
+const K = { total:'ft-total', extra:'ft-extra', paid:'ft-paid-until', stories:'ft-saved', owner:'ft-owner', ref:'ft-referral' }
+const FREE_ANON_LIMIT = 3   // пожизненный лимит для незарегистрированных
 
-// Возвращает ключ периода (каждые N дней — один период)
-const periodKey = () => {
-  const d = new Date()
-  const dayOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(),0,0).getTime()) / 86400000)
-  return `${d.getFullYear()}-p${Math.floor(dayOfYear / FREE_PERIOD_DAYS)}`
-}
-
-function getDailyUsage() {
-  try {
-    if (localStorage.getItem(K.date) !== periodKey()) { localStorage.setItem(K.date,periodKey()); localStorage.setItem(K.count,'0'); return 0 }
-    return parseInt(localStorage.getItem(K.count)||'0',10)
-  } catch { return 0 }
-}
-function incUsage() { try { localStorage.setItem(K.count,String(getDailyUsage()+1)) } catch{} }
+function getAnonUsed() { try { return parseInt(localStorage.getItem(K.total)||'0',10) } catch { return 0 } }
+function incUsage() { try { localStorage.setItem(K.total,String(getAnonUsed()+1)) } catch{} }
 function getExtra() { try { return parseInt(localStorage.getItem(K.extra)||'0',10) } catch { return 0 } }
 function setExtra(n:number) { try { localStorage.setItem(K.extra,String(Math.max(0,n))) } catch{} }
 function getPaidUntil() { try { return parseInt(localStorage.getItem(K.paid)||'0',10) } catch { return 0 } }
@@ -42,7 +29,7 @@ function isDevMode() {
 }
 function isOwner() { try { return localStorage.getItem(K.owner)==='1' } catch { return false } }
 function isPremium() { return isDevMode() || isOwner() || getPaidUntil() > Date.now() }
-function canGenerate() { return isPremium() || getDailyUsage()<FREE_LIMIT || getExtra()>0 }
+function canGenerate() { return isPremium() || getAnonUsed()<FREE_ANON_LIMIT || getExtra()>0 }
 function loadSaved(): SavedStory[] { try { return JSON.parse(localStorage.getItem(K.stories)||'[]') } catch { return [] } }
 function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify(s)) }
 
@@ -257,7 +244,7 @@ function SiteFooter() {
 function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;userId?:string}) {
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'email'|'code'>('choose')
-  const [pendingPlan,setPendingPlan] = useState<'three_stories'|'unlimited_30d'|null>(null)
+  const [pendingPlan,setPendingPlan] = useState<'monthly_sub'|'yearly_sub'|null>(null)
   const [email,setEmail] = useState('')
   const [emailErr,setEmailErr] = useState('')
   const [emailLoading,setEmailLoading] = useState(false)
@@ -265,7 +252,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   const [codeErr,setCodeErr] = useState('')
   const [codeLoading,setCodeLoading] = useState(false)
 
-  const buyYookassa = async(plan:'three_stories'|'unlimited_30d', resolvedUserId?:string)=>{
+  const buyYookassa = async(plan:'monthly_sub'|'yearly_sub', resolvedUserId?:string)=>{
     const uid = resolvedUserId ?? userId
     setLoading(plan)
     try {
@@ -280,7 +267,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   }
 
   // Если не залогинен — сначала создаём аккаунт по email
-  const handlePlanClick = (plan:'three_stories'|'unlimited_30d')=>{
+  const handlePlanClick = (plan:'monthly_sub'|'yearly_sub')=>{
     if(userId){ buyYookassa(plan); return }
     setPendingPlan(plan); setScreen('email')
   }
@@ -402,22 +389,28 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
         </p>
 
         <div className="flex flex-col gap-3 mb-4">
-          {/* Plan: 3 stories */}
-          <button onClick={()=>handlePlanClick('three_stories')} disabled={!!loading}
-            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
-            style={{background:'linear-gradient(135deg,#c4812a,#a46713)',boxShadow:'0 4px 20px rgba(164,103,19,0.35)'}}>
-            <span>{loading==='three_stories'?'Переходим...':'3 сказки'}</span>
-            <span className="text-xl font-black">149 ₽</span>
-          </button>
-          {/* Plan: 30 days */}
-          <button onClick={()=>handlePlanClick('unlimited_30d')} disabled={!!loading}
-            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
+          {/* Plan: yearly — выгоднее, показываем первым */}
+          <button onClick={()=>handlePlanClick('yearly_sub')} disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5 relative overflow-hidden"
             style={{background:'#0d2b1e',boxShadow:'0 4px 20px rgba(13,43,30,0.3)'}}>
             <div className="text-left">
-              <div>{loading==='unlimited_30d'?'Переходим...':'30 дней безлимит'}</div>
-              <div className="text-[11px] font-normal opacity-60">Выгоднее для регулярного чтения</div>
+              <div className="flex items-center gap-2">
+                <span>{loading==='yearly_sub'?'Переходим...':'1 год безлимит'}</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:'#c4812a'}}>−58%</span>
+              </div>
+              <div className="text-[11px] font-normal opacity-60">124 ₽/мес · 5 месяцев в подарок</div>
             </div>
-            <span className="text-xl font-black">349 ₽</span>
+            <span className="text-xl font-black">1490 ₽</span>
+          </button>
+          {/* Plan: monthly */}
+          <button onClick={()=>handlePlanClick('monthly_sub')} disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
+            style={{background:'linear-gradient(135deg,#c4812a,#a46713)',boxShadow:'0 4px 20px rgba(164,103,19,0.35)'}}>
+            <div className="text-left">
+              <div>{loading==='monthly_sub'?'Переходим...':'1 месяц безлимит'}</div>
+              <div className="text-[11px] font-normal opacity-70">Отменить в любой момент</div>
+            </div>
+            <span className="text-xl font-black">299 ₽</span>
           </button>
         </div>
 
@@ -1350,13 +1343,18 @@ export default function Home() {
     const {data} = await supabase.from('purchases').select('*').eq('user_id',userId).order('created_at',{ascending:false})
     if(!data?.length) return
     const now = Date.now()
-    const activeUnlimited = data.find(p=>p.plan==='unlimited_30d'&&p.expires_at&&new Date(p.expires_at).getTime()>now)
-    if(activeUnlimited){
-      const ts = new Date(activeUnlimited.expires_at).getTime()
+    const activeSub = data.find(p=>
+      ['monthly_sub','yearly_sub','referral_reward'].includes(p.plan)&&
+      p.expires_at&&new Date(p.expires_at).getTime()>now
+    )
+    if(activeSub){
+      const ts = new Date(activeSub.expires_at).getTime()
       setPaidUntil(ts); try{localStorage.setItem('ft-paid-until',String(ts))}catch{}
       return
     }
-    const extra = data.filter(p=>p.plan==='three_stories'&&(p.stories_remaining??0)>0).reduce((s,p)=>s+(p.stories_remaining??0),0)
+    const extra = data
+      .filter(p=>['registration_bonus','three_stories'].includes(p.plan)&&(p.stories_remaining??0)>0)
+      .reduce((s,p)=>s+(p.stories_remaining??0),0)
     if(extra>0){ setExtraState(extra); try{localStorage.setItem('ft-extra',String(extra))}catch{} }
   },[supabase])
 
@@ -1378,7 +1376,7 @@ export default function Home() {
     window.scrollTo(0,0)
     if('scrollRestoration' in history) history.scrollRestoration='manual'
     window.Telegram?.WebApp?.ready(); window.Telegram?.WebApp?.expand()
-    setSaved(loadSaved()); setUsageCount(getDailyUsage()); setExtraState(getExtra())
+    setSaved(loadSaved()); setUsageCount(getAnonUsed()); setExtraState(getExtra())
 
     // Auth state
     supabase.auth.getUser().then(({data:{user}})=>{ setUser(user); if(user){ loadDbStories(); loadPremiumStatus(user.id) } })
@@ -1387,17 +1385,26 @@ export default function Home() {
       setUser(u)
       if(u){
         migrateLocalStories(u.id); loadDbStories(); loadPremiumStatus(u.id)
-        if(event==='SIGNED_IN' && !u.user_metadata?.full_name && !u.user_metadata?.name){
-          setShowName(true)
+        if(event==='SIGNED_IN'){
+          if(!u.user_metadata?.full_name && !u.user_metadata?.name) setShowName(true)
+          // Бонус за регистрацию (+3 сказки)
+          fetch('/api/user/register-bonus',{method:'POST'}).then(()=>loadPremiumStatus(u.id)).catch(()=>{})
+          // Реферальная привязка
+          const refCode = localStorage.getItem(K.ref)
+          if(refCode){
+            fetch('/api/referral/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({referrerCode:refCode})})
+              .then(()=>{ try{localStorage.removeItem(K.ref)}catch{} }).catch(()=>{})
+          }
         }
       }
     })
 
     // ── Payment check ────────────────────────────────────────────────────────
     const applyPayment=(plan:string)=>{
-      if(plan==='unlimited_30d') setPaidUntil(Date.now()+30*24*60*60*1000)
+      if(plan==='yearly_sub') setPaidUntil(Date.now()+365*24*60*60*1000)
+      else if(plan==='monthly_sub') setPaidUntil(Date.now()+30*24*60*60*1000)
       else setExtra(getExtra()+3)
-      setUsageCount(getDailyUsage()); setExtraState(getExtra())
+      setUsageCount(getAnonUsed()); setExtraState(getExtra())
       setCheckingPayment(false); setShowPaywall(false)
       try{ localStorage.removeItem('ft-pending-pay') }catch{}
     }
@@ -1420,9 +1427,11 @@ export default function Home() {
       poll()
     }
 
-    // 1. Проверяем URL параметры (редирект от YooKassa)
+    // 1. Проверяем URL параметры
     const params=new URLSearchParams(window.location.search)
     if(params.get('owner')==='1'){ try{localStorage.setItem(K.owner,'1')}catch{} }
+    const refCode = params.get('ref')
+    if(refCode){ try{localStorage.setItem(K.ref,refCode)}catch{} }
     const urlPaymentId=params.get('payment_id'), urlPlan=params.get('plan')
     if(urlPaymentId&&urlPlan){
       pollPayment(urlPaymentId, urlPlan)
@@ -1478,7 +1487,7 @@ export default function Home() {
       await Promise.allSettled(loaders)
 
       const ex=getExtra()
-      if(ex>0){setExtra(ex-1);setExtraState(ex-1)}else{incUsage();setUsageCount(getDailyUsage())}
+      if(ex>0){setExtra(ex-1);setExtraState(ex-1)}else{incUsage();setUsageCount(getAnonUsed())}
       setStory(json); setCurrentChildName(data.childName); setAlreadySaved(false)
       setImageCache(cache)
       setStatus('done')
@@ -1567,7 +1576,7 @@ export default function Home() {
       )}
 
       {!checkingPayment&&showPaywall&&(
-        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra());if(user)loadPremiumStatus(user.id)}} onClose={()=>setShowPaywall(false)} userId={user?.id}/>
+        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getAnonUsed());setExtraState(getExtra());if(user)loadPremiumStatus(user.id)}} onClose={()=>setShowPaywall(false)} userId={user?.id}/>
       )}
 
       {/* Auth modal */}

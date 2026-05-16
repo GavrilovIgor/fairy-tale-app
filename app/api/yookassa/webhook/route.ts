@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writePurchase } from '@/lib/supabase/admin'
+import { writePurchase, awardReferrer } from '@/lib/supabase/admin'
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
 const OWNER_CHAT_ID = process.env.OWNER_CHAT_ID!
@@ -17,10 +17,20 @@ async function sendMessage(chatId: string | number, text: string, keyboard?: obj
   })
 }
 
+function planLabel(plan: string) {
+  if (plan === 'monthly_sub') return 'Подписка на 1 месяц'
+  if (plan === 'yearly_sub') return 'Подписка на 1 год'
+  return plan
+}
+
+function planExpires(plan: string) {
+  if (plan === 'yearly_sub') return new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+}
+
 export async function POST(req: NextRequest) {
   const event = await req.json()
 
-  // ЮКасса шлёт разные типы уведомлений
   if (event.event !== 'payment.succeeded') {
     return NextResponse.json({ ok: true })
   }
@@ -30,36 +40,32 @@ export async function POST(req: NextRequest) {
   const telegramId = payment.metadata?.telegramId
   const userId = payment.metadata?.userId as string | undefined
   const amount = payment.amount?.value
-  const planLabel = plan === 'unlimited_30d' ? 'Безлимит на 30 дней' : '3 сказки'
 
-  // Пишем в Supabase — надёжный сервер-сайд fallback
   if (userId) {
-    const isUnlimited = plan === 'unlimited_30d'
     await writePurchase({
       user_id: userId,
       plan,
       payment_id: payment.id,
-      stories_remaining: isUnlimited ? null : 3,
-      expires_at: isUnlimited
-        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        : null,
+      stories_remaining: null,
+      expires_at: planExpires(plan),
     }).catch(e => console.error('Supabase write error:', e))
+
+    // Награда реферера если это первая оплата реферала
+    await awardReferrer(userId).catch(e => console.error('awardReferrer error:', e))
   }
 
-  // Уведомление пользователю в Telegram (если пришёл из бота)
   if (telegramId) {
     await sendMessage(
       telegramId,
-      `✅ Оплата <b>${amount} ₽</b> прошла успешно!\n\n<b>${planLabel}</b> активирован — возвращайся в приложение ✨\n\nЧек отправлен автоматически.`,
+      `✅ Оплата <b>${amount} ₽</b> прошла успешно!\n\n<b>${planLabel(plan)}</b> активирован — возвращайся в приложение ✨\n\nЧек отправлен автоматически.`,
       OPEN_APP_KB,
     )
   }
 
-  // Уведомление владельцу
   if (OWNER_CHAT_ID) {
     await sendMessage(
       OWNER_CHAT_ID,
-      `💰 Новая оплата ЮКасса!\nТариф: ${planLabel}\nСумма: ${amount} ₽\nTelegram ID: ${telegramId || 'нет'}\nPayment ID: ${payment.id}\n\n✅ Чек выставлен автоматически`,
+      `💰 Новая оплата ЮКасса!\nТариф: ${planLabel(plan)}\nСумма: ${amount} ₽\nTelegram ID: ${telegramId || 'нет'}\nPayment ID: ${payment.id}\n\n✅ Чек выставлен автоматически`,
     )
   }
 

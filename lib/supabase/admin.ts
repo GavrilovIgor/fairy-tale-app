@@ -20,6 +20,49 @@ export async function writePurchase(purchase: PurchaseRow) {
   return supabaseAdmin.from('purchases').upsert(purchase, { onConflict: 'payment_id' })
 }
 
+export async function writeRegistrationBonus(userId: string) {
+  // Идемпотентно — один бонус на пользователя
+  const { data: existing } = await supabaseAdmin
+    .from('purchases')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('plan', 'registration_bonus')
+    .single()
+  if (existing) return
+
+  await supabaseAdmin.from('purchases').insert({
+    user_id: userId,
+    plan: 'registration_bonus',
+    stories_remaining: 3,
+    expires_at: null,
+  })
+}
+
+export async function awardReferrer(refereeId: string) {
+  // Ищем незавершённый реферал
+  const { data: ref } = await supabaseAdmin
+    .from('referrals')
+    .select('*')
+    .eq('referee_id', refereeId)
+    .eq('rewarded', false)
+    .single()
+  if (!ref) return
+
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+  await Promise.all([
+    supabaseAdmin.from('purchases').insert({
+      user_id: ref.referrer_id,
+      plan: 'referral_reward',
+      stories_remaining: null,
+      expires_at: expiresAt,
+    }),
+    supabaseAdmin
+      .from('referrals')
+      .update({ rewarded: true })
+      .eq('id', ref.id),
+  ])
+}
+
 export async function getUserPremiumStatus(userId: string): Promise<{
   isPremium: boolean
   paidUntil: number | null
@@ -35,21 +78,23 @@ export async function getUserPremiumStatus(userId: string): Promise<{
 
   const now = new Date()
 
-  // Активная безлимитная подписка
-  const activeUnlimited = data.find(p =>
-    p.plan === 'unlimited_30d' && p.expires_at && new Date(p.expires_at) > now
+  // Активная подписка (месяц, год, реферальная награда)
+  const activeSub = data.find(p =>
+    ['monthly_sub', 'yearly_sub', 'referral_reward'].includes(p.plan) &&
+    p.expires_at &&
+    new Date(p.expires_at) > now
   )
-  if (activeUnlimited) {
+  if (activeSub) {
     return {
       isPremium: true,
-      paidUntil: new Date(activeUnlimited.expires_at).getTime(),
+      paidUntil: new Date(activeSub.expires_at).getTime(),
       extraStories: 0,
     }
   }
 
-  // Сумма оставшихся сказок
+  // Сумма оставшихся сказок (registration_bonus + старые three_stories)
   const extraStories = data
-    .filter(p => p.plan === 'three_stories' && (p.stories_remaining ?? 0) > 0)
+    .filter(p => ['registration_bonus', 'three_stories'].includes(p.plan) && (p.stories_remaining ?? 0) > 0)
     .reduce((sum, p) => sum + (p.stories_remaining ?? 0), 0)
 
   return { isPremium: false, paidUntil: null, extraStories }
