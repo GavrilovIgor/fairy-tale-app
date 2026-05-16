@@ -796,7 +796,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/loading-forest.jpg" alt="" aria-hidden
         className="absolute inset-0 w-full h-full object-cover"
-        style={{objectPosition:'center 28%'}}/>
+        style={{objectPosition:'center 45%'}}/>
 
       {/* Gradient overlay: image visible top 50%, fades to solid dark at 75% */}
       <div className="absolute inset-0" style={{
