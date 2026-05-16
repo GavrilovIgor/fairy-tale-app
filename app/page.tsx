@@ -340,6 +340,8 @@ function MultiSuggestionChips({options,value,onChange}:{options:string[];value:s
 
 function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void}) {
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
+  const [step,setStep] = useState(1)
+
   const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
 
   const handleRandom = async()=>{
@@ -349,17 +351,29 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
     setForm(rf); await onGenerate(rf)
   }
 
-  const CHIP_TYPES = [
-    {id:'fear'        as SituationType, label:'Страх'},
-    {id:'emotion'     as SituationType, label:'Эмоции'},
-    {id:'adaptation'  as SituationType, label:'Новое'},
-    {id:'preparation' as SituationType, label:'Событие'},
-    {id:'behavior'    as SituationType, label:'Поведение'},
-    {id:'fun'         as SituationType, label:'Просто сказка'},
+  const canNext = () => {
+    if(step===1) return form.childName.trim().length>0 && form.age.length>0
+    if(step===2) return form.hero.trim().length>0
+    if(step===3) return form.situation.trim().length>0
+    return true
+  }
+
+  const toggleFav = (f2:string) => setForm(f=>{
+    const arr=f.favorites?f.favorites.split(',').map(s=>s.trim()).filter(Boolean):[]
+    return {...f, favorites: arr.includes(f2)?arr.filter(s=>s!==f2).join(', '):[...arr,f2].join(', ')}
+  })
+
+  const HERO_CARDS = [
+    {name:'котёнок',emoji:'🐱'},{name:'щенок',emoji:'🐶'},{name:'лисёнок',emoji:'🦊'},
+    {name:'дракончик',emoji:'🐉'},{name:'зайчонок',emoji:'🐰'},{name:'медвежонок',emoji:'🐻'},
+    {name:'принцесса',emoji:'👸'},{name:'рыцарь',emoji:'⚔️'},{name:'волшебник',emoji:'🧙'},{name:'фея',emoji:'🧚'},
   ]
+  const AGE_GROUPS = ['3-4 года','5-6 лет','7-8 лет','9-10 лет']
 
   const chip = (active:boolean) => `form-chip${active?' form-chip-active':''}`
   const sub  = (active:boolean) => `form-subchip${active?' form-subchip-active':''}`
+
+  const STEP_LABELS = ['О ком сказка?','Главный герой','Что происходит?','Последний штрих']
 
   return (
     <>
@@ -404,138 +418,199 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          SECTION 2 — FORM (Stitch: screen e6fa9ca5)
-          Dark forest bg, fireflies, centered card max-w-740
-      ══════════════════════════════════════════════════════ */}
-      <section className="relative min-h-screen w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
-        {/* Bokeh + Fireflies */}
+      {/* ══ SECTION 2 — WIZARD FORM ══ */}
+      <section className="relative w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
+        {/* Background: bokeh + more fireflies + star particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="bokeh w-96 h-96 top-[-100px] left-[-100px]" style={{background:'#1a4a34'}}/>
           <div className="bokeh w-80 h-80 bottom-[20%] right-[-50px]" style={{background:'#143d2b'}}/>
-          <div className="firefly top-[20%] left-[15%]" style={{animationDelay:'0s'}}/>
-          <div className="firefly top-[40%] right-[20%]" style={{animationDelay:'2s'}}/>
-          <div className="firefly top-[60%] left-[25%]" style={{animationDelay:'4s'}}/>
-          <div className="firefly top-[80%] right-[10%]" style={{animationDelay:'1s'}}/>
-          <div className="firefly top-[10%] right-[30%]" style={{animationDelay:'3s'}}/>
+          {/* Fireflies ×12 */}
+          {([
+            {t:'8%',l:'6%',d:'0s'},{t:'22%',r:'8%',d:'1.5s'},{t:'38%',l:'12%',d:'3s'},
+            {t:'55%',r:'14%',d:'0.7s'},{t:'70%',l:'5%',d:'2.2s'},{t:'85%',r:'6%',d:'4s'},
+            {t:'15%',r:'28%',d:'1s'},{t:'48%',l:'30%',d:'3.5s'},{t:'62%',r:'32%',d:'2s'},
+            {t:'30%',l:'50%',d:'0.3s'},{t:'78%',l:'42%',d:'4.5s'},{t:'92%',r:'22%',d:'1.8s'},
+          ] as {t:string;l?:string;r?:string;d:string}[]).map((p,i)=>(
+            <div key={i} className="firefly" style={{top:p.t,...(p.l?{left:p.l}:{}),...(p.r?{right:p.r}:{}),animationDelay:p.d}}/>
+          ))}
+          {/* Star particles ×18 */}
+          {Array.from({length:18},(_,i)=>(
+            <div key={i} style={{
+              position:'absolute',width:i%4===0?'2.5px':'1.5px',height:i%4===0?'2.5px':'1.5px',
+              borderRadius:'50%',background:'rgba(255,255,255,0.75)',pointerEvents:'none',
+              top:`${8+(i*5.3)%84}%`,left:`${4+(i*11.7)%92}%`,
+              animation:`twinkle ${2.5+(i%3)*0.8}s ease-in-out infinite`,animationDelay:`${(i*0.45)%3}s`
+            }}/>
+          ))}
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 w-full max-w-[740px] mx-auto px-4 flex flex-col items-center">
-          {/* Heading */}
-          <div className="text-center mb-10">
-            <h2 className="font-bold text-[32px] md:text-[44px] leading-tight mb-4" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-              Давай создавать волшебство
+        <div className="relative z-10 w-full max-w-[560px] mx-auto px-4 flex flex-col items-center">
+          {/* Section heading */}
+          <div className="text-center mb-8">
+            <h2 className="font-bold text-[28px] md:text-[38px] leading-tight mb-3" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
+              Составим сказку вместе
             </h2>
-            <p className="text-[15px] max-w-[520px] mx-auto leading-relaxed" style={{color:'rgba(254,249,243,0.65)'}}>
-              Выбери элементы, которые нравятся вашему малышу, и наша магия сплетёт из них неповторимую историю, полную доброты и чудес.
+            <p className="text-[14px] leading-relaxed" style={{color:'rgba(254,249,243,0.55)'}}>
+              4 шага — и ваша персональная история готова
             </p>
-            <div className="text-yellow-300 text-xl mt-3">✦</div>
           </div>
 
-          {/* Form Card */}
-          <div className="w-full rounded-[24px] p-6 md:p-10" style={{background:'#fffdf8',boxShadow:'0 20px 40px rgba(0,0,0,0.3)'}}>
-            <form onSubmit={async e=>{e.preventDefault();await onGenerate(form)}} className="flex flex-col gap-8">
+          {/* Wizard card */}
+          <div className="w-full rounded-[24px] p-6 md:p-8" style={{background:'#fffdf8',boxShadow:'0 20px 50px rgba(0,0,0,0.35)'}}>
 
-              {/* ── Имя + Возраст ── */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Progress bar */}
+            <div className="flex items-center gap-2 mb-1">
+              {[1,2,3,4].map(s=>(
+                <div key={s} style={{
+                  flex:1,height:5,borderRadius:999,transition:'all 0.35s',
+                  background:s<step?'#0d2b1e':s===step?'#a46713':'rgba(0,0,0,0.1)'
+                }}/>
+              ))}
+            </div>
+            <p className="text-[11px] font-semibold mb-6" style={{color:'#a46713'}}>
+              Шаг {step} из 4 — {STEP_LABELS[step-1]}{step===4?' (необязательно)':''}
+            </p>
+
+            {/* ── STEP 1: Имя + возраст ── */}
+            {step===1&&(
+              <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Имя ребёнка</label>
-                  <input value={form.childName} required placeholder="Введите имя"
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Как зовут малыша?</label>
+                  <input value={form.childName} placeholder="Например, Соня или Миша" autoFocus
                     onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
                     className="form-input-night" />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Возраст</label>
-                  <div className="flex flex-wrap gap-2">
-                    {['3 года','4 года','5 лет','6 лет','7 лет','8 лет','9 лет','10+ лет'].map(a=>(
+                <div className="flex flex-col gap-3">
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Сколько лет?</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {AGE_GROUPS.map(a=>(
                       <button key={a} type="button" onClick={()=>setForm(f=>({...f,age:a}))}
-                        className={chip(form.age===a)}>{a}</button>
+                        className="py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer"
+                        style={form.age===a
+                          ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
+                          :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
+                        {a}
+                      </button>
                     ))}
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* ── Главный герой ── */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Главный герой</label>
-                <div className="flex flex-wrap gap-2">
-                  {HERO_SUGGESTIONS.map(h=>(
-                    <button key={h} type="button" onClick={()=>setForm(f=>({...f,hero:h}))}
-                      className={chip(form.hero===h)}>{h}</button>
+            {/* ── STEP 2: Герой ── */}
+            {step===2&&(
+              <div className="flex flex-col gap-4">
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Выберите персонажа</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {HERO_CARDS.map(h=>(
+                    <button key={h.name} type="button" onClick={()=>setForm(f=>({...f,hero:h.name}))}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
+                      style={form.hero===h.name
+                        ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
+                        :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
+                      <span style={{fontSize:22}}>{h.emoji}</span>
+                      <span>{h.name}</span>
+                    </button>
                   ))}
                 </div>
-                <label className="text-[10px] font-semibold uppercase tracking-widest mt-2" style={{color:'#727973'}}>или напишите своё</label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#727973]/50" style={{fontSize:20}}>auto_stories</span>
-                  <input value={form.hero} required placeholder="Маленький лисёнок, храбрый рыцарь..."
+                <div className="flex flex-col gap-1 mt-1">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или свой вариант</label>
+                  <input value={HERO_CARDS.some(h=>h.name===form.hero)?'':form.hero}
+                    placeholder="Маленькая звёздочка, храбрый рыцарь..."
                     onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
-                    className="form-input-night pl-12" />
+                    className="form-input-night" />
                 </div>
               </div>
+            )}
 
-              {/* ── Тема сказки ── */}
-              <div className="flex flex-col gap-3">
+            {/* ── STEP 3: Ситуация ── */}
+            {step===3&&(
+              <div className="flex flex-col gap-4">
                 <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Тема сказки</label>
-                <div className="flex flex-wrap gap-2">
-                  {CHIP_TYPES.map(t=>(
-                    <button key={t.id} type="button" onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                      className={chip(form.situationType===t.id)}>{t.label}{form.situationType===t.id?' ★':''}</button>
+                <div className="grid grid-cols-2 gap-2">
+                  {SIT_TYPES.map(t=>(
+                    <button key={t.id} type="button"
+                      onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+                      className="flex items-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
+                      style={form.situationType===t.id
+                        ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
+                        :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
+                      <span style={{fontSize:18}}>{t.emoji}</span>
+                      <div>
+                        <div>{t.label}</div>
+                        <div className="text-[10px] font-normal opacity-60">{t.hint.slice(0,18)}...</div>
+                      </div>
+                    </button>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-2 mt-1 p-4 rounded-xl" style={{background:'#f7f3ed'}}>
-                  {SITUATION_SUGGESTIONS[form.situationType].map(s=>(
+                <div className="flex flex-wrap gap-2 p-3 rounded-xl" style={{background:'#f7f3ed'}}>
+                  {SITUATION_SUGGESTIONS[form.situationType].slice(0,5).map(s=>(
                     <button key={s} type="button" onClick={()=>setForm(f=>({...f,situation:s}))}
                       className={sub(form.situation===s)}>{s}</button>
                   ))}
                 </div>
-                <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или опишите точнее</label>
-                <input value={form.situation} required placeholder={sitType.hint}
-                  onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
-                  className="form-input-night" />
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или опишите точнее</label>
+                  <input value={form.situation} placeholder={sitType.hint}
+                    onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
+                    className="form-input-night" />
+                </div>
               </div>
+            )}
 
-              {/* ── Любимые вещи ── */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Любимые вещи и интересы</label>
+            {/* ── STEP 4: Опционально ── */}
+            {step===4&&(
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Что любит ребёнок?</label>
+                  <p className="text-xs mt-0.5" style={{color:'rgba(70,98,82,0.6)'}}>делает сказку по-настоящему личной</p>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {FAVORITES_OPTIONS.map(f2=>(
-                    <button key={f2} type="button"
-                      onClick={()=>setForm(f=>{
-                        const arr=f.favorites?f.favorites.split(',').map(s=>s.trim()).filter(Boolean):[]
-                        return {...f, favorites: arr.includes(f2) ? arr.filter(s=>s!==f2).join(', ') : [...arr,f2].join(', ')}
-                      })}
+                    <button key={f2} type="button" onClick={()=>toggleFav(f2)}
                       className={chip(form.favorites.includes(f2))}>{f2}</button>
                   ))}
                 </div>
-                <label className="text-[10px] font-semibold uppercase tracking-widest mt-1" style={{color:'#727973'}}>или напишите своё</label>
-                <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
-                  onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
-                  className="form-input-night" />
-              </div>
-
-              {/* ── Чему учит ── */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Чему учит сказка?</label>
-                <div className="flex flex-wrap gap-2">
-                  {LESSON_SUGGESTIONS.map(l=>(
-                    <button key={l} type="button" onClick={()=>setForm(f=>({...f,lesson:l}))}
-                      className={chip(form.lesson===l)}>{l}</button>
-                  ))}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или напишите своё</label>
+                  <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
+                    onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
+                    className="form-input-night" />
                 </div>
-                <label className="text-[10px] font-semibold uppercase tracking-widest mt-1" style={{color:'#727973'}}>или напишите своё</label>
-                <input value={form.lesson} placeholder="Доброте, дружбе, честности..."
-                  onChange={e=>setForm(f=>({...f,lesson:e.target.value}))}
-                  className="form-input-night" />
               </div>
+            )}
 
-              {/* ── CTA ── */}
-              <button type="submit" disabled={isLoading}
-                className="w-full h-14 rounded-xl text-white font-bold text-sm uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
-                style={{background:'#0d2b1e'}}>
-                {isLoading ? 'Создаём сказку...' : '✨ Создать сказку'}
+            {/* Navigation */}
+            <div className="flex gap-3 mt-7">
+              {step>1&&(
+                <button type="button" onClick={()=>setStep(s=>s-1)}
+                  className="px-5 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-all hover:opacity-80"
+                  style={{background:'#f7f3ed',color:'#466252'}}>
+                  ← Назад
+                </button>
+              )}
+              {step<4&&(
+                <button type="button" onClick={()=>setStep(s=>s+1)} disabled={!canNext()}
+                  className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
+                  style={{background:'#0d2b1e'}}>
+                  Далее →
+                </button>
+              )}
+              {step===4&&(
+                <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
+                  className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
+                  style={{background:'#a46713'}}>
+                  {isLoading?'Создаём...':'✨ Создать сказку'}
+                </button>
+              )}
+            </div>
+            {step===4&&(
+              <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
+                className="w-full text-center text-xs mt-3 cursor-pointer hover:opacity-70 transition-opacity"
+                style={{color:'rgba(70,98,82,0.5)'}}>
+                Пропустить и создать без деталей →
               </button>
-            </form>
+            )}
           </div>
         </div>
       </section>
