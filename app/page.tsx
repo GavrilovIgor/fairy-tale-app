@@ -398,7 +398,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
                 <span>{loading==='yearly_sub'?'Переходим...':'1 год безлимит'}</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:'#c4812a'}}>−58%</span>
               </div>
-              <div className="text-[11px] font-normal opacity-60">124 ₽/мес · 5 месяцев в подарок</div>
+              <div className="text-[11px] font-normal opacity-60">124 ₽/мес · 3 месяца в подарок</div>
             </div>
             <span className="text-xl font-black">1490 ₽</span>
           </button>
