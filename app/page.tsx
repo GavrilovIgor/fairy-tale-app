@@ -40,7 +40,7 @@ function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Scene { text:string; imagePrompt:string }
 interface Story { title:string; scenes:Scene[]; discussion?:string[]; anchor?:{title:string;description:string} }
-interface SavedStory { id:string; savedAt:string; childName:string; story:Story }
+interface SavedStory { id:string; savedAt:string; childName:string; story:Story; images?:Record<number,string> }
 type SituationType = 'fear'|'emotion'|'adaptation'|'behavior'|'preparation'|'fun'
 interface FormData { childName:string; age:string; hero:string; situation:string; situationType:SituationType; favorites:string; lesson:string }
 type MobileTab = 'create'|'library'|'profile'
@@ -1196,7 +1196,19 @@ export default function Home() {
 
   const handleSave=async()=>{
     if(!story)return
-    const entry:SavedStory={id:Date.now().toString(),savedAt:new Date().toLocaleDateString('ru-RU'),childName:currentChildName,story}
+    // Конвертируем blob-URL картинок в base64 для хранения в localStorage
+    const images:Record<number,string>={}
+    await Promise.all(Object.entries(imageCache).map(async([k,blobUrl])=>{
+      try{
+        const res=await fetch(blobUrl)
+        const blob=await res.blob()
+        const dataUrl=await new Promise<string>(resolve=>{
+          const r=new FileReader(); r.onloadend=()=>resolve(r.result as string); r.readAsDataURL(blob)
+        })
+        images[parseInt(k)]=dataUrl
+      }catch{}
+    }))
+    const entry:SavedStory={id:Date.now().toString(),savedAt:new Date().toLocaleDateString('ru-RU'),childName:currentChildName,story,images}
     const updated=[entry,...saved]; setSaved(updated); saveTos(updated); setAlreadySaved(true)
     if(user){
       await supabase.from('stories').insert({
@@ -1236,8 +1248,10 @@ export default function Home() {
   }
 
   const openSaved=(s:SavedStory)=>{
-    setStory(s.story); setCurrentChildName(s.childName); setAlreadySaved(true); setStatus('reading')
-    setMobileTab('create')
+    setStory(s.story); setCurrentChildName(s.childName); setAlreadySaved(true)
+    // Загружаем сохранённые картинки сразу — без запросов к Pollinations
+    setImageCache(s.images||{})
+    setStatus('reading'); setMobileTab('create')
   }
 
   const showForm = isPremium() || usageCount<1 || extra>0
