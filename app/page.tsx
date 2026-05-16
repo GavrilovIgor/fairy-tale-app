@@ -1053,19 +1053,27 @@ export default function Home() {
       const json=await res.json()
       if(!res.ok){setError(json.error||'Ошибка генерации');setStatus('idle');return}
 
-      // Pre-load all illustrations — user stays on loading screen until ready
+      // Pre-load all illustrations with retry — user stays on loading screen until ready
       const cache:Record<number,string>={}
-      const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
+      const fetchImg=async(url:string):Promise<Blob|null>=>{
         try{
-          const r=await fetch(imgUrl(scene.imagePrompt,i))
-          if(r.ok){const blob=await r.blob();cache[i]=URL.createObjectURL(blob)}
+          const r=await fetch(url)
+          if(r.ok)return await r.blob()
         }catch{}
+        return null
+      }
+      const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
+        const base=imgUrl(scene.imagePrompt,i)
+        // Try up to 4 times — Pollinations can be slow
+        for(let attempt=0;attempt<4;attempt++){
+          const url=attempt===0?base:`${base}&t=${Date.now()}`
+          const blob=await fetchImg(url)
+          if(blob){cache[i]=URL.createObjectURL(blob);return}
+          if(attempt<3)await new Promise(r=>setTimeout(r,3000*(attempt+1)))
+        }
+        // After 4 failed attempts — give up, StoryImage will show retry button
       })
-      // Wait for images, but max 25s so user isn't stuck forever
-      await Promise.race([
-        Promise.allSettled(loaders),
-        new Promise<void>(resolve=>setTimeout(resolve,25000))
-      ])
+      await Promise.allSettled(loaders)
 
       const ex=getExtra()
       if(ex>0){setExtra(ex-1);setExtraState(ex-1)}else{incUsage();setUsageCount(getDailyUsage())}
