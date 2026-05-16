@@ -364,9 +364,16 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
   })
 
   const HERO_CARDS = [
-    {name:'котёнок',emoji:'🐱'},{name:'щенок',emoji:'🐶'},{name:'лисёнок',emoji:'🦊'},
-    {name:'дракончик',emoji:'🐉'},{name:'зайчонок',emoji:'🐰'},{name:'медвежонок',emoji:'🐻'},
-    {name:'принцесса',emoji:'👸'},{name:'рыцарь',emoji:'⚔️'},{name:'волшебник',emoji:'🧙'},{name:'фея',emoji:'🧚'},
+    {name:'лисёнок',  img:'/wizard/hero-fox.jpg'},
+    {name:'котёнок',  img:'/wizard/hero-cat.jpg'},
+    {name:'щенок',    img:'/wizard/hero-dog.jpg'},
+    {name:'дракончик',img:'/wizard/hero-dragon.jpg'},
+    {name:'зайчонок', img:'/wizard/hero-bunny.jpg'},
+    {name:'медвежонок',img:'/wizard/hero-bear.jpg'},
+    {name:'принцесса',img:'/wizard/hero-princess.jpg'},
+    {name:'рыцарь',   img:'/wizard/hero-knight.jpg'},
+    {name:'волшебник',img:'/wizard/hero-wizard.jpg'},
+    {name:'фея',      img:'/wizard/hero-fairy.jpg'},
   ]
   const AGE_GROUPS = ['3-4 года','5-6 лет','7-8 лет','9-10 лет']
 
@@ -504,11 +511,14 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
                 <div className="grid grid-cols-2 gap-2">
                   {HERO_CARDS.map(h=>(
                     <button key={h.name} type="button" onClick={()=>setForm(f=>({...f,hero:h.name}))}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
                       style={form.hero===h.name
                         ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
                         :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
-                      <span style={{fontSize:22}}>{h.emoji}</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={h.img} alt={h.name}
+                        style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',flexShrink:0,
+                          boxShadow: form.hero===h.name ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none'}}/>
                       <span>{h.name}</span>
                     </button>
                   ))}
