@@ -160,7 +160,15 @@ function DesktopNav({activeTab,onTabChange,user,onShowAuth,onSignOut,onEditProfi
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
       <div className="w-full px-10 py-6 flex justify-between items-center">
-        <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
+        <div className="flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
+            style={{width:28,height:28,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
+          <span className="italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700,color:'#fff',
+            textShadow:'0 0 18px rgba(212,145,42,0.55), 0 0 36px rgba(212,145,42,0.2)'}}>
+            Волшебная Сказка
+          </span>
+        </div>
         {user ? (
           <UserMenu user={user} onSignOut={onSignOut} onEditProfile={onEditProfile} onMyStories={onMyStories}/>
         ) : (
@@ -433,7 +441,15 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
           className="absolute inset-0 w-full h-full object-cover object-[center_20%] md:object-center" />
         {/* Mobile transparent header — overlaid on fox image */}
         <div className="md:hidden absolute top-0 left-0 right-0 z-20 flex justify-between items-center px-6 pt-12 pb-4">
-          <div className="italic drop-shadow-md" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'white'}}>Волшебная Сказка</div>
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
+              style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
+            <span className="italic drop-shadow-md" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'#fff',
+              textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
+              Волшебная Сказка
+            </span>
+          </div>
           <div className="flex items-center gap-3">
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
