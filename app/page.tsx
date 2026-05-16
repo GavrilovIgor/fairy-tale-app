@@ -187,17 +187,17 @@ function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)
 // ── Site Footer (from Stitch screen 4371a933) ────────────────────────────────
 function SiteFooter() {
   return (
-    <footer className="bg-surface-container-low border-t border-outline-variant/10 pt-stack-xl pb-stack-lg print:hidden">
-      <div className="px-edge-margin-desktop flex flex-col md:flex-row justify-between items-center gap-stack-md">
-        <div className="font-headline-md text-headline-md text-primary">Magic Fairy Tales</div>
-        <div className="flex gap-stack-lg">
-          {['Политика конфиденциальности','Условия использования','Контакты','Поддержка'].map(t=>(
-            <a key={t} href="#" className="font-caption text-caption text-on-surface-variant hover:text-secondary transition-colors">{t}</a>
+    <footer className="print:hidden" style={{background:'#0a1f14',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+      <div className="max-w-[900px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div className="italic text-sm font-bold" style={{fontFamily:'Literata,Georgia,serif',color:'rgba(255,255,255,0.5)'}}>Волшебная Сказка</div>
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-1">
+          {['Политика конфиденциальности','Условия использования','Контакты'].map(t=>(
+            <a key={t} href="#" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
+              {t}
+            </a>
           ))}
         </div>
-        <p className="font-caption text-caption text-on-surface-variant text-center md:text-right">
-          © 2024 Magic Fairy Tales. All rights reserved. Crafted with care for little dreamers.
-        </p>
+        <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>© 2025 Волшебная Сказка</p>
       </div>
     </footer>
   )
