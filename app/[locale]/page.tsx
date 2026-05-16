@@ -509,6 +509,7 @@ function getLastChild():{name:string;age:string}{
 function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CHILD_KEY,JSON.stringify({name,age}))}catch{} }
 
 function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
+  const t = useTranslations()
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
 
   useEffect(()=>{
@@ -555,7 +556,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
   const chip = (active:boolean) => `form-chip${active?' form-chip-active':''}`
   const sub  = (active:boolean) => `form-subchip${active?' form-subchip-active':''}`
 
-  const STEP_LABELS = ['О ком сказка?','Главный герой','Что происходит?','Последний штрих']
+  const STEP_LABELS = [t('wizard.step1Label'),t('wizard.step2Label'),t('wizard.step3Label'),t('wizard.step4Label')]
 
   return (
     <>
@@ -576,14 +577,15 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             <div className="flex flex-col gap-0">
               <span className="italic drop-shadow-md leading-tight" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'#fff',
                 textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
-                Волшебная Сказка
+                {t('nav.logo')}
               </span>
               <span style={{fontSize:8,fontWeight:500,color:'rgba(255,255,255,0.35)',letterSpacing:'0.07em'}}>
-                Метод сказкотерапии · для детей 3–10 лет
+                {t('nav.tagline')}
               </span>
             </div>
           </a>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <LangSwitcher/>
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
             </button>
@@ -598,7 +600,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 }
               </button>
             ) : (
-              <button onClick={onShowAuth} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>Войти</button>
+              <button onClick={onShowAuth} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>{t('nav.login')}</button>
             )}
           </div>
         </div>
@@ -607,20 +609,20 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
           <h1 className="text-[28px] md:text-[46px] leading-tight font-bold text-white mb-1.5 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
-            Сказка, которая помогает
+            {t('hero.h1')}
           </h1>
           <h2 className="text-[17px] md:text-[24px] italic text-white/75 mb-3 max-w-sm md:max-w-xl" style={{fontFamily:'Literata,Georgia,serif'}}>
-            справиться с настоящей проблемой ребёнка
+            {t('hero.h2')}
           </h2>
           <p className="text-white/55 text-[13px] md:text-[15px] max-w-xs md:max-w-lg mb-5 leading-relaxed">
-            Страх, ревность, новый садик, злость — персональная история по методу детских психологов за 30 секунд
+            {t('hero.subtitle')}
           </p>
           <button type="button" onClick={handleRandom} disabled={isLoading}
             className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
-            ✨ Попробовать волшебство
+            ✨ {t('hero.cta')}
           </button>
-          <p className="text-white/45 text-[13px]">или заполните форму ниже для персональной сказки <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
+          <p className="text-white/45 text-[13px]">{t('hero.ctaHint')} <span className="material-symbols-outlined align-middle text-sm">arrow_downward</span></p>
         </div>
       </section>
 
@@ -651,7 +653,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
           {/* Heading */}
           <div className="text-center mb-9">
             <h2 className="text-[26px] md:text-[32px] font-bold italic mb-3" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-              Почему это работает?
+              {t('why.title')}
             </h2>
             <div className="w-12 h-[2px] mx-auto rounded-full" style={{background:'rgba(212,145,42,0.55)'}}/>
           </div>
@@ -659,28 +661,10 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
           {/* Cards */}
           <div className="flex flex-col gap-4">
             {([
-              {
-                img: '/wizard/hero-fox.jpg',
-                imgPos: 'center 40%',
-                emoji: '🦊',
-                title: 'Ребёнок видит себя в герое',
-                text: 'Персонаж переживает то же, что и ваш малыш — это безопасный способ встретиться со страхом.',
-              },
-              {
-                img: '/wizard/magic-book.jpg',
-                imgPos: 'center 30%',
-                emoji: '📖',
-                title: 'История проживается, а не рассказывается',
-                text: 'В сказке ребёнок эмоционально проходит путь от тревоги к решению.',
-              },
-              {
-                img: '/story-fallback-0.jpg',
-                imgPos: 'center 35%',
-                emoji: '✨',
-                title: 'Опыт переносится в реальную жизнь',
-                text: 'После чтения вы вместе обсудите — что герой сделал и как это поможет малышу.',
-              },
-            ] as {img:string;imgPos:string;emoji:string;title:string;text:string}[]).map((item,i)=>(
+              { img: '/wizard/hero-fox.jpg', imgPos: 'center 40%', titleKey: 'why.card1Title', textKey: 'why.card1Text' },
+              { img: '/wizard/magic-book.jpg', imgPos: 'center 30%', titleKey: 'why.card2Title', textKey: 'why.card2Text' },
+              { img: '/story-fallback-0.jpg', imgPos: 'center 35%', titleKey: 'why.card3Title', textKey: 'why.card3Text' },
+            ] as {img:string;imgPos:string;titleKey:string;textKey:string}[]).map((item,i)=>(
               <div key={i} className="rounded-2xl overflow-hidden text-center"
                 style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(212,145,42,0.2)',backdropFilter:'blur(8px)'}}>
                 {/* Full-width image strip */}
@@ -694,10 +678,10 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 {/* Text */}
                 <div className="px-6 pt-3 pb-6">
                   <h3 className="font-bold text-[15px] mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-                    {item.title}
+                    {t(item.titleKey as Parameters<typeof t>[0])}
                   </h3>
                   <p className="text-[13px] leading-relaxed" style={{color:'rgba(254,249,243,0.5)'}}>
-                    {item.text}
+                    {t(item.textKey as Parameters<typeof t>[0])}
                   </p>
                 </div>
               </div>
@@ -706,7 +690,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
 
           {/* Bottom quote */}
           <p className="text-center text-[11px] italic mt-8" style={{color:'rgba(212,145,42,0.65)'}}>
-            «Метод сказкотерапии — признанная практика детских психологов»
+            {t('why.quote')}
           </p>
         </div>
       </section>
@@ -741,10 +725,10 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
           {/* Section heading */}
           <div className="text-center mb-8">
             <h2 className="font-bold text-[28px] md:text-[38px] leading-tight mb-3" style={{fontFamily:'Literata,Georgia,serif',color:'#fef9f3'}}>
-              Составим сказку вместе
+              {t('wizard.title')}
             </h2>
             <p className="text-[14px] leading-relaxed" style={{color:'rgba(254,249,243,0.55)'}}>
-              4 шага — и ваша персональная история готова
+              {t('wizard.subtitle')}
             </p>
           </div>
 
