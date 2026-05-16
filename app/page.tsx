@@ -662,7 +662,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
                 </button>
               )}
               {step===4&&(
-                <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
+                <button type="button" onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form)}} disabled={isLoading}
                   className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
                   style={{background:'#a46713'}}>
                   {isLoading?'Создаём...':'✨ Создать сказку'}
@@ -673,7 +673,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,user}:{onGene
               <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
                 className="w-full text-center text-xs mt-3 cursor-pointer hover:opacity-70 transition-opacity"
                 style={{color:'rgba(70,98,82,0.5)'}}>
-                Пропустить и создать без деталей →
+                Пропустить и создать →
               </button>
             )}
           </div>
