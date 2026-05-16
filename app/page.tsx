@@ -796,17 +796,17 @@ function LoadingScreen({ childName }: { childName?: string }) {
         <div key={i} className="loading-firefly" style={{top:f.top,left:f.left,width:f.w,height:f.w,animationDelay:f.delay,animationDuration:f.dur}}/>
       ))}
 
-      {/* Forest + book hero — top half */}
-      <div className="relative flex-none" style={{height:'55vh'}}>
+      {/* Forest + book hero */}
+      <div className="relative flex-none" style={{height:'45vh',minHeight:260,maxHeight:480}}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/loading-forest.jpg" alt="" aria-hidden
           className="absolute inset-0 w-full h-full object-cover"
-          style={{objectPosition:'center 55%'}}/>
-        <div className="absolute inset-0" style={{background:'linear-gradient(to bottom,transparent 58%,#0d2b1e 100%)'}}/>
+          style={{objectPosition:'center 60%'}}/>
+        <div className="absolute inset-0" style={{background:'linear-gradient(to bottom,transparent 55%,#0d2b1e 100%)'}}/>
       </div>
 
-      {/* Content — bottom half, evenly spaced */}
-      <div className="flex-1 flex flex-col justify-between items-center text-center px-6 py-8">
+      {/* Content — fills remaining space, evenly spaced */}
+      <div className="flex-1 flex flex-col justify-between items-center text-center px-6 py-6">
         <h1 style={{fontFamily:'Literata,Georgia,serif',fontSize:28,fontWeight:700,color:'#f9f9f7',lineHeight:1.2}}>
           Сказка создаётся...
         </h1>
