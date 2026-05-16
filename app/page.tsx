@@ -16,10 +16,19 @@ declare global {
 
 // ── Storage helpers ───────────────────────────────────────────────────────────
 const K = { date:'ft-date', count:'ft-count', extra:'ft-extra', paid:'ft-paid-until', stories:'ft-saved', owner:'ft-owner' }
-const today = () => new Date().toLocaleDateString('en-CA')
+const FREE_LIMIT = 2        // сказок бесплатно
+const FREE_PERIOD_DAYS = 2  // раз в N дней
+
+// Возвращает ключ периода (каждые N дней — один период)
+const periodKey = () => {
+  const d = new Date()
+  const dayOfYear = Math.floor((d.getTime() - new Date(d.getFullYear(),0,0).getTime()) / 86400000)
+  return `${d.getFullYear()}-p${Math.floor(dayOfYear / FREE_PERIOD_DAYS)}`
+}
+
 function getDailyUsage() {
   try {
-    if (localStorage.getItem(K.date) !== today()) { localStorage.setItem(K.date,today()); localStorage.setItem(K.count,'0'); return 0 }
+    if (localStorage.getItem(K.date) !== periodKey()) { localStorage.setItem(K.date,periodKey()); localStorage.setItem(K.count,'0'); return 0 }
     return parseInt(localStorage.getItem(K.count)||'0',10)
   } catch { return 0 }
 }
@@ -33,7 +42,7 @@ function isDevMode() {
 }
 function isOwner() { try { return localStorage.getItem(K.owner)==='1' } catch { return false } }
 function isPremium() { return isDevMode() || isOwner() || getPaidUntil() > Date.now() }
-function canGenerate() { return isPremium() || getDailyUsage()<1 || getExtra()>0 }
+function canGenerate() { return isPremium() || getDailyUsage()<FREE_LIMIT || getExtra()>0 }
 function loadSaved(): SavedStory[] { try { return JSON.parse(localStorage.getItem(K.stories)||'[]') } catch { return [] } }
 function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify(s)) }
 
@@ -240,7 +249,7 @@ function SiteFooter() {
 }
 
 // ── Paywall ───────────────────────────────────────────────────────────────────
-function Paywall({onPaid}:{onPaid:()=>void}) {
+function Paywall({onPaid,onClose}:{onPaid:()=>void;onClose?:()=>void}) {
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'code'>('choose')
   const [code,setCode] = useState('')
@@ -253,13 +262,13 @@ function Paywall({onPaid}:{onPaid:()=>void}) {
       const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan})})
       const data = await res.json()
       if(!res.ok)throw new Error(data.error)
-      // Сохраняем payment_id ДО редиректа — чтобы проверить даже если пользователь нажмёт "назад"
       if(data.paymentId){
         try{ localStorage.setItem('ft-pending-pay', JSON.stringify({id:data.paymentId,plan,ts:Date.now()})) }catch{}
       }
       window.location.href = data.confirmationUrl
     } catch { setLoading(null); alert('Ошибка платежа, попробуйте позже') }
   }
+
   const redeemCode = async()=>{
     if(!code.trim())return
     setCodeLoading(true); setCodeErr('')
@@ -272,62 +281,96 @@ function Paywall({onPaid}:{onPaid:()=>void}) {
     finally { setCodeLoading(false) }
   }
 
-  const overlay = 'fixed inset-0 z-50 flex items-center justify-center px-4'
-  const overlayBg = {background:'rgba(26,26,46,0.6)',backdropFilter:'blur(8px)'}
+  const overlay = 'fixed inset-0 z-50 flex items-end md:items-center justify-center'
+  const overlayBg = {background:'rgba(10,31,20,0.85)',backdropFilter:'blur(8px)'}
 
-  if(screen==='code') return (
-    <div className={overlay} style={overlayBg}>
-      <div className="bg-white rounded-3xl p-8 max-w-sm w-full card-shadow">
-        <button onClick={()=>setScreen('choose')} className="text-sm mb-4 cursor-pointer" style={{color:'var(--text-muted)'}}>← Назад</button>
-        <div className="text-center text-4xl mb-4">🔑</div>
-        <h3 className="font-serif text-xl font-bold text-center mb-4" style={{color:'var(--primary)'}}>Код активации</h3>
-        <input value={code} onChange={e=>{setCode(e.target.value.toUpperCase());setCodeErr('')}}
-          placeholder="XXXXXXXX" maxLength={8}
-          className="w-full border-2 rounded-xl px-4 py-3 text-center text-lg font-mono tracking-widest focus:outline-none mb-3"
-          style={{borderColor:codeErr?'#ef4444':'var(--border)'}} />
-        {codeErr&&<p className="text-red-500 text-sm text-center mb-3">{codeErr}</p>}
-        <button onClick={redeemCode} disabled={codeLoading||code.length<6}
-          className="w-full rounded-2xl py-3.5 font-bold text-white disabled:opacity-50 cursor-pointer hover:opacity-90"
-          style={{background:'var(--primary)'}}>
-          {codeLoading?'Проверяем...':'✅ Активировать'}
-        </button>
+  const CardWrapper = ({children}:{children:React.ReactNode})=>(
+    <div className={overlay} style={overlayBg} onClick={e=>{if(e.target===e.currentTarget)onClose?.()}}>
+      <div className="w-full md:max-w-sm rounded-t-3xl md:rounded-3xl overflow-hidden"
+        style={{background:'#fffdf8',boxShadow:'0 -8px 40px rgba(0,0,0,0.4)'}}>
+        {/* Fox header */}
+        <div className="relative h-32 overflow-hidden" style={{background:'#0d2b1e'}}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/hero-desktop.jpg" alt="" aria-hidden
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{objectPosition:'center 15%',opacity:0.6}}/>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#fffdf8]"/>
+          {onClose&&(
+            <button onClick={onClose}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+              style={{background:'rgba(255,255,255,0.2)',color:'white',fontSize:18}}>×</button>
+          )}
+          <div className="absolute bottom-3 left-0 right-0 text-center">
+            <span className="italic font-bold text-base" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e',
+              textShadow:'0 0 12px rgba(212,145,42,0.4)'}}>Волшебная Сказка</span>
+          </div>
+        </div>
+        {children}
       </div>
     </div>
   )
 
+  if(screen==='code') return (
+    <CardWrapper>
+      <div className="p-6">
+        <button onClick={()=>setScreen('choose')} className="text-sm mb-4 cursor-pointer flex items-center gap-1" style={{color:'#9ca3af'}}>
+          ← Назад
+        </button>
+        <h3 className="italic font-bold text-xl text-center mb-5" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
+          Код активации
+        </h3>
+        <input value={code} onChange={e=>{setCode(e.target.value.toUpperCase());setCodeErr('')}}
+          placeholder="XXXXXXXX" maxLength={8} autoFocus
+          className="w-full border-2 rounded-xl px-4 py-3 text-center text-xl font-mono tracking-[0.3em] focus:outline-none mb-3"
+          style={{borderColor:codeErr?'#ef4444':'rgba(13,43,30,0.2)',background:'#f7f3ed'}} />
+        {codeErr&&<p className="text-red-500 text-sm text-center mb-3">{codeErr}</p>}
+        <button onClick={redeemCode} disabled={codeLoading||code.length<6}
+          className="w-full rounded-xl py-3.5 font-bold text-white disabled:opacity-50 cursor-pointer hover:opacity-90 transition-all"
+          style={{background:'#0d2b1e'}}>
+          {codeLoading?'Проверяем...':'Активировать'}
+        </button>
+      </div>
+    </CardWrapper>
+  )
+
   return (
-    <div className={overlay} style={overlayBg}>
-      <div className="bg-white rounded-3xl p-7 max-w-sm w-full card-shadow">
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-3">📖</div>
-          <h2 className="font-serif text-xl font-bold" style={{color:'var(--primary)'}}>Продолжить создавать сказки</h2>
-          <p className="text-sm mt-1" style={{color:'var(--text-muted)'}}>Выберите тариф</p>
-        </div>
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          {[{plan:'three_stories' as const,label:'3 сказки',price:'149 ₽',tag:null},{plan:'unlimited_30d' as const,label:'30 дней',price:'349 ₽',tag:'Выгоднее'}].map(t=>(
-            <div key={t.plan} className="relative rounded-2xl p-4 text-center"
-              style={t.tag?{background:'var(--primary-light)',border:`2px solid var(--primary)`}:{background:'#fffbeb',border:'2px solid #fde68a'}}>
-              {t.tag&&<div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs px-2 py-0.5 rounded-full font-bold" style={{background:'var(--primary)'}}>{t.tag}</div>}
-              <div className="text-sm font-bold mt-1" style={{color:'var(--primary)'}}>{t.label}</div>
-              <div className="text-2xl font-black text-gray-900 my-1">{t.price}</div>
+    <CardWrapper>
+      <div className="p-6">
+        <h2 className="italic font-bold text-xl text-center mb-1" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
+          Продолжить волшебство
+        </h2>
+        <p className="text-center text-sm mb-5" style={{color:'#9ca3af'}}>
+          Бесплатная сказка закончилась — создайте ещё
+        </p>
+
+        <div className="flex flex-col gap-3 mb-4">
+          {/* Plan: 3 stories */}
+          <button onClick={()=>buyYookassa('three_stories')} disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
+            style={{background:'linear-gradient(135deg,#c4812a,#a46713)',boxShadow:'0 4px 20px rgba(164,103,19,0.35)'}}>
+            <span>{loading==='three_stories'?'Переходим...':'3 сказки'}</span>
+            <span className="text-xl font-black">149 ₽</span>
+          </button>
+          {/* Plan: 30 days */}
+          <button onClick={()=>buyYookassa('unlimited_30d')} disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
+            style={{background:'#0d2b1e',boxShadow:'0 4px 20px rgba(13,43,30,0.3)'}}>
+            <div className="text-left">
+              <div>{loading==='unlimited_30d'?'Переходим...':'30 дней безлимит'}</div>
+              <div className="text-[11px] font-normal opacity-60">Выгоднее для регулярного чтения</div>
             </div>
-          ))}
+            <span className="text-xl font-black">349 ₽</span>
+          </button>
         </div>
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          {(['three_stories','unlimited_30d'] as const).map((plan,i)=>(
-            <button key={plan} onClick={()=>buyYookassa(plan)} disabled={!!loading}
-              className="rounded-2xl py-3.5 font-bold text-white flex items-center justify-center cursor-pointer disabled:opacity-60 hover:opacity-90"
-              style={{background:i===0?'linear-gradient(135deg,#f59e0b,#d97706)':'var(--primary)'}}>
-              {loading===plan?'⏳':`💳 ${i===0?'149':'349'} ₽`}
-            </button>
-          ))}
-        </div>
-        <p className="text-center text-xs mb-2" style={{color:'var(--text-muted)'}}>СБП · Карта · SberPay · Mir Pay</p>
-        <button onClick={()=>setScreen('code')} className="w-full text-xs py-1.5 cursor-pointer hover:opacity-80" style={{color:'var(--text-muted)'}}>
+
+        <p className="text-center text-xs mb-3" style={{color:'#b0b8b0'}}>СБП · Карта · SberPay · Mir Pay</p>
+        <button onClick={()=>setScreen('code')}
+          className="w-full text-xs py-2 cursor-pointer hover:opacity-70 transition-opacity text-center"
+          style={{color:'#b0b8b0'}}>
           Есть код активации →
         </button>
       </div>
-    </div>
+    </CardWrapper>
   )
 }
 
@@ -1342,7 +1385,7 @@ export default function Home() {
       )}
 
       {!checkingPayment&&showPaywall&&(
-        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra())}}/>
+        <Paywall onPaid={()=>{setShowPaywall(false);setUsageCount(getDailyUsage());setExtraState(getExtra())}} onClose={()=>setShowPaywall(false)}/>
       )}
 
       {/* Auth modal */}
@@ -1364,24 +1407,8 @@ export default function Home() {
           onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library');setDesktopTab('library')}}/>
       )}
 
-      {/* Content */}
-      {status==='idle'&&!showForm&&(
-        <div className="max-w-2xl mx-auto px-4 py-16 pb-28 md:pb-16">
-          <div className="bg-white rounded-3xl p-10 text-center card-shadow">
-            <div className="text-6xl mb-4">📖</div>
-            <h2 className="font-serif text-2xl font-bold mb-3" style={{color:'var(--primary)'}}>Бесплатные сказки закончились</h2>
-            <p className="mb-8" style={{color:'var(--text-muted)'}}>Разблокируйте доступ — создавайте сказки для любой ситуации</p>
-            <button onClick={()=>setShowPaywall(true)}
-              className="w-full rounded-2xl py-4 text-white font-bold text-base cursor-pointer hover:opacity-90 transition-opacity"
-              style={{background:'var(--primary)'}}>
-              ✨ Разблокировать сказки
-            </button>
-            <p className="text-xs mt-4" style={{color:'var(--text-muted)'}}>От 149 ₽ · СБП · Карта · SberPay</p>
-          </div>
-        </div>
-      )}
-
-      {status==='idle'&&showForm&&(
+      {/* Content — всегда показываем форму, пейволл появляется при попытке создать */}
+      {status==='idle'&&(
         <>
           {/* Mobile: no tab bar — nav via header icon */}
           <div className="md:hidden">
