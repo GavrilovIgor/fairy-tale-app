@@ -686,24 +686,95 @@ function LibraryScreen({saved,onOpen,onDelete}:{saved:SavedStory[];onOpen:(s:Sav
 }
 
 // ── Loading screen ────────────────────────────────────────────────────────────
-function LoadingScreen() {
+function LoadingScreen({ childName }: { childName?: string }) {
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const totalMs = 28000, stepMs = 150
+    let elapsed = 0
+    const timer = setInterval(() => {
+      elapsed += stepMs
+      const t = Math.min(elapsed / totalMs, 1)
+      const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2
+      setProgress(Math.min(Math.round(eased * 90), 90))
+      if (t >= 1) clearInterval(timer)
+    }, stepMs)
+    return () => clearInterval(timer)
+  }, [])
+
+  const activeStep = progress < 33 ? 0 : progress < 66 ? 1 : 2
+  const steps = ['Придумываем героя', 'Плетём сюжет', 'Рисуем картинки']
+  const fireflies = [
+    {top:'10%',left:'7%', w:3,delay:'0s',  dur:'9s' },
+    {top:'22%',left:'83%',w:4,delay:'1.5s',dur:'11s'},
+    {top:'38%',left:'15%',w:3,delay:'3s',  dur:'8s' },
+    {top:'30%',left:'70%',w:3,delay:'0.8s',dur:'13s'},
+    {top:'15%',left:'52%',w:2,delay:'2.2s',dur:'10s'},
+    {top:'60%',left:'88%',w:3,delay:'4s',  dur:'12s'},
+    {top:'73%',left:'28%',w:2,delay:'1.2s',dur:'9s' },
+    {top:'82%',left:'62%',w:3,delay:'5s',  dur:'10s'},
+  ]
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-16 pb-28 md:pb-16">
-      <div className="bg-white rounded-3xl p-16 text-center card-shadow">
-        <div className="relative inline-block mb-8">
-          <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center float-anim" style={{background:'var(--primary-light)'}}>
-            <span className="text-5xl">🪄</span>
-          </div>
-          <div className="absolute -top-2 -right-2 text-2xl twinkle">✨</div>
-          <div className="absolute -bottom-2 -left-2 text-xl twinkle" style={{animationDelay:'0.7s'}}>⭐</div>
-        </div>
-        <h2 className="font-serif text-2xl font-bold mb-2" style={{color:'var(--primary)'}}>Создаём сказку...</h2>
-        <p className="text-sm font-medium" style={{color:'var(--text-muted)'}}>Волшебство занимает около минуты</p>
-        <div className="mt-8 flex justify-center gap-2">
-          {[0,1,2].map(i=>(
-            <div key={i} className="w-2.5 h-2.5 rounded-full animate-pulse" style={{background:'var(--primary)',opacity:0.5,animationDelay:`${i*0.2}s`}}/>
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden" style={{background:'#0d2b1e'}}>
+      {fireflies.map((f,i)=>(
+        <div key={i} className="loading-firefly" style={{top:f.top,left:f.left,width:f.w,height:f.w,animationDelay:f.delay,animationDuration:f.dur}}/>
+      ))}
+
+      {/* Forest + book hero — top half */}
+      <div className="relative flex-none" style={{height:'50vh'}}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/loading-forest.jpg" alt="" aria-hidden
+          className="absolute inset-0 w-full h-full object-cover object-center"/>
+        <div className="absolute inset-0" style={{background:'linear-gradient(to bottom,transparent 62%,#0d2b1e 100%)'}}/>
+      </div>
+
+      {/* Content — bottom half, evenly spaced */}
+      <div className="flex-1 flex flex-col justify-between items-center text-center px-6 py-8">
+        <h1 style={{fontFamily:'Literata,Georgia,serif',fontSize:28,fontWeight:700,color:'#f9f9f7',lineHeight:1.2}}>
+          Сказка создаётся...
+        </h1>
+
+        <p style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontSize:14,fontStyle:'italic',color:'#82a48f'}}>
+          {childName ? `${childName} уже ждёт своей истории` : 'Твой герой уже ждёт своей истории'}
+        </p>
+
+        <div className="flex justify-center gap-2 w-full">
+          {steps.map((s,i)=>(
+            <div key={i} className="rounded-full flex items-center justify-center"
+              style={{
+                padding:'6px 10px',
+                background: i===activeStep ? '#e7c365' : 'rgba(255,255,255,0.06)',
+                border: i===activeStep ? 'none' : '1px solid rgba(255,255,255,0.15)',
+                boxShadow: i===activeStep ? '0 0 12px rgba(231,195,101,0.45)' : 'none',
+                transition:'all 0.6s ease',
+              }}>
+              <span style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontSize:11,fontWeight:600,
+                color:i===activeStep?'#2c1700':'rgba(255,255,255,0.35)',whiteSpace:'nowrap'}}>
+                {s}
+              </span>
+            </div>
           ))}
         </div>
+
+        <div style={{width:'100%',maxWidth:280}}>
+          <div className="relative w-full rounded-full" style={{height:7,background:'rgba(255,255,255,0.08)'}}>
+            <div className="absolute top-0 left-0 h-full rounded-full"
+              style={{width:`${progress}%`,background:'linear-gradient(90deg,#C4704A,#e7c365)',transition:'width 0.25s ease'}}>
+              {progress>2&&(
+                <div className="absolute rounded-full" style={{
+                  right:-6,top:'50%',transform:'translateY(-50%)',
+                  width:13,height:13,background:'#e7c365',
+                  boxShadow:'0 0 10px rgba(231,195,101,0.9),0 0 20px rgba(231,195,101,0.5)',
+                }}/>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <p style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontSize:12,color:'rgba(255,255,255,0.25)',textTransform:'uppercase',letterSpacing:'0.08em'}}>
+          Это занимает около 30 секунд
+        </p>
       </div>
     </div>
   )
@@ -796,7 +867,7 @@ export default function Home() {
 
   const generate = async(data:FormData)=>{
     if(!canGenerate()){setShowPaywall(true);return}
-    setStatus('loading'); setError(''); setAlreadySaved(false)
+    setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName)
     try{
       const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
       const json=await res.json()
@@ -909,7 +980,7 @@ export default function Home() {
         </>
       )}
 
-      {status==='loading'&&<LoadingScreen/>}
+      {status==='loading'&&<LoadingScreen childName={currentChildName}/>}
 
       {(status==='done'||status==='reading')&&story&&(
         <>
