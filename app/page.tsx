@@ -79,7 +79,7 @@ const LESSON_SUGGESTIONS = ['быть смелым','делиться с дру�
 const imgUrl = (p:string,i:number) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${i*137+42}`
 
 // ── Image component ───────────────────────────────────────────────────────────
-function StoryImage({prompt,index}:{prompt:string;index:number}) {
+function StoryImage({prompt,index,sharp=false}:{prompt:string;index:number;sharp?:boolean}) {
   const [phase,setPhase] = useState<'loading'|'done'|'fallback'>('loading')
   const [src,setSrc] = useState<string|null>(null)
   const mounted = useRef(true)
@@ -106,7 +106,7 @@ function StoryImage({prompt,index}:{prompt:string;index:number}) {
   const fallbackBgs = [['#FEF3C7','#FDE68A'],['#EDE9FE','#C4B5FD'],['#D1FAE5','#6EE7B7']]
   const [c1,c2] = fallbackBgs[index%3]
   return (
-    <div className="relative w-full overflow-hidden print:shadow-none" style={{background:c1,aspectRatio:'4/3',borderRadius:'1rem'}}>
+    <div className="relative w-full overflow-hidden print:shadow-none" style={{background:c1,aspectRatio:'4/3',borderRadius:sharp?0:'1rem'}}>
       {phase==='loading'&&(
         <div className="absolute inset-0 watercolor-shimmer flex flex-col items-center justify-center gap-2">
           <span className="text-3xl animate-pulse">🎨</span>
@@ -646,91 +646,168 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
 }
 
 
-// ── Story Reading (временный placeholder — ждёт согласования макета) ──────────
+// ── Story Reading — издательский стиль (Stitch 9314fcfa / 403e6050 / 7ca8e409) ─
 function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
   storyRef:React.RefObject<HTMLDivElement|null>
 }) {
+  const serif = "'Lora', Georgia, serif"
+  const sans  = "'Plus Jakarta Sans', sans-serif"
+
   return (
-    <div className="min-h-screen pb-28 md:pb-16 print:pb-0" style={{background:'var(--bg)'}}>
-      <div ref={storyRef}>
-        {story.scenes.map((scene,i)=>(
-          <section key={i} className="max-w-5xl mx-auto px-4 py-10 md:py-14">
-            {i===0&&(
-              <div className="text-center mb-10">
-                <p className="text-label-caps mb-4 flex items-center justify-center gap-2" style={{color:'var(--text-muted)'}}>
-                  <span className="material-symbols-outlined" style={{fontSize:16}}>book_2</span> Глава {i+1}
-                </p>
-                <h2 className="font-serif font-bold leading-tight" style={{fontSize:'clamp(28px,4vw,40px)',color:'var(--text)'}}>
+    <div className="min-h-screen bg-white print:bg-white" style={{fontFamily:sans}}>
+      {/* ── Top nav ── */}
+      <header className="h-[52px] flex items-center px-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-20 print:hidden">
+        <button onClick={onBack} className="p-1 -ml-1 text-gray-800 cursor-pointer hover:opacity-60 transition-opacity" aria-label="Назад">
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </button>
+        <h1 className="text-[15px] font-semibold tracking-wide flex-1 text-center pr-6" style={{fontFamily:sans,color:'#0d2b1e'}}>
+          Волшебная Сказка
+        </h1>
+      </header>
+
+      <div ref={storyRef} className="max-w-[680px] mx-auto pb-10">
+        {/* ── Scenes ── */}
+        {story.scenes.map((scene, i) => (
+          <div key={i}>
+            {/* Chapter header */}
+            <section className="text-center pt-8 pb-5 px-6">
+              <p className="text-[11px] uppercase tracking-widest font-bold mb-3" style={{fontFamily:sans,color:'#9ca3af'}}>
+                ГЛАВА {i+1}
+              </p>
+              {i===0 && (
+                <h2 className="font-bold leading-tight" style={{fontFamily:serif,fontSize:28,color:'#0d2b1e'}}>
                   {story.title}
                 </h2>
+              )}
+            </section>
+
+            {/* Full-width illustration — no rounded corners, bleeds to edges */}
+            <section className="w-full border-b border-gray-200">
+              <div className="w-full bg-[#fdfaf5]" style={{aspectRatio:'4/3'}}>
+                <StoryImage prompt={scene.imagePrompt} index={i} sharp />
               </div>
-            )}
-            <div className={`flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch ${i%2===1?'lg:flex-row-reverse':''}`}>
-              <div className="w-full lg:w-1/2 flex-shrink-0">
-                <div className="relative w-full rounded-3xl overflow-hidden clay-shadow" style={{aspectRatio:'1/1'}}>
-                  <StoryImage prompt={scene.imagePrompt} index={i} />
-                </div>
-              </div>
-              <div className="w-full lg:w-1/2 flex flex-col justify-center">
-                <p className={`text-body-reading leading-relaxed print:text-base ${i===0?'drop-cap':''}`}
-                  style={{color:'var(--text)',fontFamily:'var(--font-serif)'}}>
-                  {scene.text}
-                </p>
-              </div>
-            </div>
-          </section>
+            </section>
+
+            {/* Story text */}
+            <section className="px-6 py-6 print:py-4">
+              <p className={i===0?'drop-cap':''} style={{
+                fontFamily:serif,fontSize:19,lineHeight:2.0,color:'#1f2937',
+                textAlign:'justify',hyphens:'auto'
+              }}>
+                {scene.text}
+              </p>
+            </section>
+          </div>
         ))}
-        {/* Вопросы для обсуждения */}
+
+        {/* ── Discussion questions (Stitch 403e6050) ── */}
         {story.discussion && story.discussion.length > 0 && (
-          <section className="max-w-3xl mx-auto px-4 pb-10 print:pb-6">
-            <div className="rounded-2xl p-6 md:p-8" style={{background:'#f0f5f0',border:'1px solid rgba(26,58,42,0.12)'}}>
-              <div className="flex items-center gap-2 mb-5">
-                <span className="material-symbols-outlined" style={{color:'var(--primary)',fontSize:20}}>forum</span>
-                <h3 className="font-serif font-bold text-lg" style={{color:'var(--primary)'}}>Поговорите с ребёнком</h3>
+          <section className="px-6 py-4 print:py-6">
+            {/* Ornamental divider */}
+            <div className="flex items-center my-6">
+              <div className="h-px bg-gray-200 flex-1"/>
+              <span className="mx-4 text-gray-300 text-lg select-none">✦</span>
+              <div className="h-px bg-gray-200 flex-1"/>
+            </div>
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex justify-center mb-3" style={{color:'#0d2b1e'}}>
+                <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.5 4.5C14.5 4.5 12 7 12 10C12 7 9.5 4.5 6.5 4.5C4 4.5 2 6.5 2 9C2 14.5 12 21.5 12 21.5C12 21.5 22 14.5 22 9C22 6.5 20 4.5 17.5 4.5Z"/>
+                </svg>
               </div>
-              <div className="space-y-4">
-                {story.discussion.map((q,i)=>(
-                  <div key={i} className="flex gap-3 items-start">
-                    <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white mt-0.5" style={{background:'var(--primary)'}}>
-                      {i+1}
-                    </div>
-                    <p className="leading-relaxed" style={{color:'var(--text)',fontFamily:'var(--font-serif)',fontSize:'1.05rem'}}>{q}</p>
+              <h3 className="italic mb-2" style={{fontFamily:serif,fontSize:22,color:'#0d2b1e'}}>
+                Поговорите с ребёнком
+              </h3>
+              <p className="uppercase tracking-wide" style={{fontFamily:sans,fontSize:13,color:'#9ca3af'}}>
+                Три вопроса которые помогут закрепить урок
+              </p>
+            </div>
+            {/* Questions with watermark numbers */}
+            <div>
+              {story.discussion.map((q, i) => (
+                <div key={i} className="relative py-7" style={{borderBottom: i<story.discussion!.length-1?'1px solid #f3f4f6':'none'}}>
+                  <div className="absolute left-0 top-5 select-none pointer-events-none" style={{
+                    fontFamily:serif,fontSize:48,lineHeight:1,
+                    color:'rgba(13,43,30,0.08)',zIndex:0
+                  }}>
+                    {String(i+1).padStart(2,'0')}
                   </div>
-                ))}
-              </div>
+                  <p className="relative pl-12 pr-2 italic" style={{fontFamily:serif,fontSize:17,lineHeight:1.8,color:'#374151',zIndex:1}}>
+                    {q}
+                  </p>
+                </div>
+              ))}
             </div>
           </section>
         )}
 
-        {/* Якорь */}
+        {/* ── Anchor (Stitch 7ca8e409) ── */}
         {story.anchor && (
-          <section className="max-w-3xl mx-auto px-4 pb-12 print:pb-8">
-            <div className="rounded-2xl p-6 md:p-8" style={{background:'#fffbeb',border:'1px solid #fcd34d'}}>
-              <div className="flex items-center gap-2 mb-3">
-                <span style={{fontSize:20}}>✨</span>
-                <h3 className="font-serif font-bold text-lg" style={{color:'#92400e'}}>{story.anchor.title}</h3>
+          <section className="px-4 pb-4 pt-2 print:pb-8">
+            <div className="relative overflow-hidden rounded shadow-sm p-6" style={{
+              background:'#fff',border:'1px solid #e5e7eb',borderTop:'2px solid #d97706'
+            }}>
+              <div className="absolute top-0 left-0 right-0 h-8 pointer-events-none" style={{background:'linear-gradient(to bottom,rgba(217,119,6,0.04),transparent)'}}/>
+              <div className="flex items-center gap-2 mb-4">
+                <svg width="16" height="16" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                  <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/>
+                  <path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/>
+                  <path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>
+                </svg>
+                <span className="uppercase tracking-widest" style={{fontFamily:sans,fontSize:11,color:'#92400e'}}>
+                  ВОЛШЕБНЫЙ ЯКОРЬ
+                </span>
               </div>
-              <p className="leading-relaxed" style={{color:'#78350f',fontFamily:'var(--font-serif)',fontSize:'1.05rem'}}>{story.anchor.description}</p>
+              <h3 className="mb-3" style={{fontFamily:serif,fontSize:20,fontWeight:700,color:'#1a1c1b'}}>
+                {story.anchor.title}
+              </h3>
+              <p className="mb-5" style={{fontFamily:serif,fontSize:16,lineHeight:1.8,color:'#374151'}}>
+                {story.anchor.description}
+              </p>
+              <hr style={{borderColor:'#f3f4f6',marginBottom:16}}/>
+              <p className="text-center italic" style={{fontFamily:serif,fontSize:12,color:'#9ca3af'}}>
+                Повторяйте ритуал перед сном в течение 7 дней
+              </p>
             </div>
           </section>
         )}
 
-        <section className="max-w-5xl mx-auto px-4 py-12 print:hidden">
-          <div className="flex flex-wrap gap-3 justify-center mb-8">
-            <button onClick={onBack} className="clay-btn px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">← Создать новую</button>
-            <button onClick={onSave} disabled={alreadySaved} className="clay-btn px-6 py-3 rounded-full font-semibold text-sm cursor-pointer disabled:opacity-60">
-              {alreadySaved ? '✓ Сохранено' : '💾 Сохранить'}
+        {/* ── Actions ── */}
+        <section className="px-4 pt-2 pb-8 space-y-3 print:hidden">
+          <button onClick={onBack}
+            className="w-full cursor-pointer active:scale-[0.98] transition-transform flex items-center justify-center"
+            style={{height:52,background:'#0d2b1e',color:'#fff',borderRadius:4,fontFamily:serif,fontSize:16,fontWeight:700,border:'none'}}>
+            Создать новую сказку →
+          </button>
+          <div className="flex gap-3">
+            <button onClick={onSave} disabled={alreadySaved}
+              className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
+              style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
+              {alreadySaved?'✓ Сохранено':'Сохранить'}
             </button>
-            <button onClick={onDownloadPDF} disabled={pdfLoading} className="clay-btn-outline px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">
-              {pdfLoading ? 'Создаём...' : '↓ PDF'}
+            <button onClick={onDownloadPDF} disabled={pdfLoading}
+              className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
+              style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
+              {pdfLoading?'Создаём...':'Скачать PDF'}
             </button>
-            <button onClick={onShare} className="clay-btn-outline px-6 py-3 rounded-full font-semibold text-sm cursor-pointer">
-              {shareStatus!=='idle' ? '✓ Скопировано' : '↗ Поделиться'}
+            <button onClick={onShare} aria-label="Поделиться"
+              className="flex-1 flex items-center justify-center cursor-pointer active:scale-[0.98] transition-transform"
+              style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff'}}>
+              {shareStatus!=='idle'
+                ? <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                : <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              }
             </button>
           </div>
-          {pdfError&&<p className="text-center text-sm text-red-500">{pdfError}</p>}
+          {pdfError&&<p className="text-sm text-center text-red-500">{pdfError}</p>}
+          <p className="text-center italic py-2" style={{fontFamily:serif,fontSize:14,color:'#9ca3af'}}>
+            Волшебная Сказка
+          </p>
         </section>
       </div>
     </div>
