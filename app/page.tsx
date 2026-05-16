@@ -1001,9 +1001,11 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
                 style={{background:'#fffdf8',boxShadow:'0 4px 20px rgba(0,0,0,0.3)'}}
                 onClick={()=>onOpen(s)}>
                 <div className="flex gap-4 p-4 items-center">
-                  <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl"
-                    style={{background:'rgba(13,43,30,0.08)'}}>
-                    📖
+                  <div className="w-14 h-14 rounded-xl flex-shrink-0 overflow-hidden"
+                    style={{boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/wizard/magic-book.jpg" alt="" aria-hidden
+                      style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm truncate mb-0.5" style={{color:'#0d2b1e'}}>{s.story.title}</div>
