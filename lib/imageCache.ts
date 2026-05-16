@@ -24,8 +24,8 @@ export function seedForIndex(index: number): string {
 }
 
 function buildUrl(cp: string, seed: string, w: number, h: number): string {
-  const final = `${cp}, children's book watercolor illustration, soft pastel colors, no text, no words`
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(final)}?width=${w}&height=${h}&nologo=true&seed=${seed}`
+  const style = "Pixar 3D animation style, cinematic magical lighting, vibrant rich colors, highly detailed, children's fairy tale art, dreamlike atmosphere, 8K quality, no text, no letters, no watermarks"
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(`${cp}, ${style}`)}?width=${w}&height=${h}&nologo=true&seed=${seed}&enhance=true`
 }
 
 function cacheKey(cp: string, seed: string): string {

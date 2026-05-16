@@ -79,9 +79,9 @@ const LESSON_SUGGESTIONS = ['быть смелым','делиться с дру�
 const imgUrl = (p:string,i:number) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${i*137+42}`
 
 // ── Image component ───────────────────────────────────────────────────────────
-function StoryImage({prompt,index,sharp=false}:{prompt:string;index:number;sharp?:boolean}) {
-  const [phase,setPhase] = useState<'loading'|'done'|'fallback'>('loading')
-  const [src,setSrc] = useState<string|null>(null)
+function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index:number;sharp?:boolean;preloadedSrc?:string}) {
+  const [phase,setPhase] = useState<'loading'|'done'|'fallback'>(preloadedSrc?'done':'loading')
+  const [src,setSrc] = useState<string|null>(preloadedSrc??null)
   const mounted = useRef(true)
   useEffect(()=>{ mounted.current=true; return()=>{ mounted.current=false } },[])
   const load = useCallback(async(attempt=0)=>{
@@ -100,8 +100,11 @@ function StoryImage({prompt,index,sharp=false}:{prompt:string;index:number;sharp
       else setPhase('fallback')
     }
   },[prompt,index])
-  useEffect(()=>{ const t=setTimeout(()=>load(0),index*600); return()=>clearTimeout(t) },[prompt,index,load])
-  useEffect(()=>()=>{ if(src)URL.revokeObjectURL(src) },[src])
+  useEffect(()=>{
+    if(preloadedSrc) return
+    const t=setTimeout(()=>load(0),index*600); return()=>clearTimeout(t)
+  },[prompt,index,load,preloadedSrc])
+  useEffect(()=>()=>{ if(src&&!preloadedSrc)URL.revokeObjectURL(src) },[src,preloadedSrc])
 
   const fallbackBgs = [['#FEF3C7','#FDE68A'],['#EDE9FE','#C4B5FD'],['#D1FAE5','#6EE7B7']]
   const [c1,c2] = fallbackBgs[index%3]
@@ -647,10 +650,10 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
 
 
 // ── Story Reading — издательский стиль (Stitch 9314fcfa / 403e6050 / 7ca8e409) ─
-function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef}:{
+function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef,imageCache}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
-  storyRef:React.RefObject<HTMLDivElement|null>
+  storyRef:React.RefObject<HTMLDivElement|null>;imageCache?:Record<number,string>
 }) {
   const serif = "'Lora', Georgia, serif"
   const sans  = "'Plus Jakarta Sans', sans-serif"
@@ -688,7 +691,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             {/* Full-width illustration — no rounded corners, bleeds to edges */}
             <section className="w-full border-b border-gray-200">
               <div className="w-full bg-[#fdfaf5]" style={{aspectRatio:'4/3'}}>
-                <StoryImage prompt={scene.imagePrompt} index={i} sharp />
+                <StoryImage prompt={scene.imagePrompt} index={i} sharp preloadedSrc={imageCache?.[i]}/>
               </div>
             </section>
 
@@ -1002,6 +1005,7 @@ export default function Home() {
   const [status,setStatus] = useState<'idle'|'loading'|'done'|'reading'>('idle')
   const [story,setStory] = useState<Story|null>(null)
   const [currentChildName,setCurrentChildName] = useState('')
+  const [imageCache,setImageCache] = useState<Record<number,string>>({})
   const [error,setError] = useState('')
   const [saved,setSaved] = useState<SavedStory[]>([])
   const [alreadySaved,setAlreadySaved] = useState(false)
@@ -1047,14 +1051,31 @@ export default function Home() {
   const generate = async(data:FormData)=>{
     if(!canGenerate()){setShowPaywall(true);return}
     setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName)
+    setImageCache({})
     try{
       const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
       const json=await res.json()
       if(!res.ok){setError(json.error||'Ошибка генерации');setStatus('idle');return}
+
+      // Pre-load all illustrations — user stays on loading screen until ready
+      const cache:Record<number,string>={}
+      const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
+        try{
+          const r=await fetch(imgUrl(scene.imagePrompt,i))
+          if(r.ok){const blob=await r.blob();cache[i]=URL.createObjectURL(blob)}
+        }catch{}
+      })
+      // Wait for images, but max 25s so user isn't stuck forever
+      await Promise.race([
+        Promise.allSettled(loaders),
+        new Promise<void>(resolve=>setTimeout(resolve,25000))
+      ])
+
       const ex=getExtra()
       if(ex>0){setExtra(ex-1);setExtraState(ex-1)}else{incUsage();setUsageCount(getDailyUsage())}
-      setStory(json); setCurrentChildName(data.childName); setAlreadySaved(false); setStatus('done')
-      // On mobile, switch to reading after generate
+      setStory(json); setCurrentChildName(data.childName); setAlreadySaved(false)
+      setImageCache(cache)
+      setStatus('done')
       setMobileTab('create')
     }catch{setError('Не удалось подключиться к серверу.');setStatus('idle')}
   }
@@ -1167,7 +1188,12 @@ export default function Home() {
           <DesktopNav activeTab="library" onTabChange={()=>{}}/>
           <StoryReading
             story={story} storyRef={storyRef}
-            onBack={()=>{setStatus('idle');setStory(null)}}
+            imageCache={imageCache}
+            onBack={()=>{
+              Object.values(imageCache).forEach(u=>URL.revokeObjectURL(u))
+              setImageCache({})
+              setStatus('idle');setStory(null)
+            }}
             onSave={handleSave} alreadySaved={alreadySaved}
             onShare={handleShare} shareStatus={shareStatus}
             onDownloadPDF={handleDownloadPDF} pdfLoading={pdfLoading} pdfError={pdfError}
