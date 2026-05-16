@@ -802,11 +802,12 @@ function LoadingScreen({ childName }: { childName?: string }) {
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden" style={{background:'#0d2b1e'}}>
-      {/* Full-screen book image — portrait, fills from top */}
+      {/* Full-screen book image — contain keeps native 768px resolution, no upscale */}
+      {/* Background #0d2b1e fills sides — same color as image bg, seamless */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/loading-forest.jpg" alt="" aria-hidden
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{objectPosition:'center 45%'}}/>
+        className="absolute inset-0 w-full h-full"
+        style={{objectFit:'contain',objectPosition:'center top'}}/>
 
       {/* Gradient overlay: image visible top 50%, fades to solid dark at 75% */}
       <div className="absolute inset-0" style={{
