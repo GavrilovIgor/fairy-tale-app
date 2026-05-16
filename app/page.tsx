@@ -137,26 +137,9 @@ function DesktopNav({activeTab,onTabChange}:{activeTab:string;onTabChange:(t:str
   // Transparent floating nav — Stitch hero screen
   return (
     <header className="fixed top-0 w-full z-50 bg-transparent print:hidden hidden md:block">
-      <div className="max-w-[1200px] mx-auto px-[48px] py-[24px] flex justify-between items-center">
+      <div className="w-full px-10 py-6 flex justify-between items-center">
         <div className="font-headline-lg text-white drop-shadow-md italic" style={{fontFamily:'Literata,Georgia,serif',fontSize:24,fontWeight:700}}>Волшебная Сказка</div>
-        <nav className="hidden md:flex gap-[24px] items-center">
-          {[
-            ['library',  'Сказки'],
-            ['create',   'Магия'],
-            ['benefits', 'Библиотека'],
-            ['support',  'О нас'],
-          ].map(([id,label])=>(
-            <button key={id} onClick={()=>onTabChange(id)}
-              className={`text-sm font-semibold transition-colors cursor-pointer ${
-                activeTab===id
-                  ? 'text-white border-b-2 border-white/50 pb-0.5'
-                  : 'text-white/80 hover:text-white'
-              }`}>
-              {label}
-            </button>
-          ))}
-        </nav>
-        <button className="text-white text-sm font-semibold bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:opacity-80 transition-all cursor-pointer">
+        <button className="text-white text-sm font-semibold bg-white/15 backdrop-blur-md px-5 py-2 rounded-full border border-white/25 hover:bg-white/25 transition-all cursor-pointer">
           Войти
         </button>
       </div>
