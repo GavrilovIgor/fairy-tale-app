@@ -1404,9 +1404,9 @@ export default function Home() {
         setShowName(false)
       }}/>}
       {/* Profile modal */}
-      {showProfile&&user&&<ProfileModal user={user} onClose={()=>setShowProfile(false)} onUpdated={name=>{
-        setUser(u=>u?{...u,user_metadata:{...u.user_metadata,full_name:name}}:u)
-      }}/>}
+      {showProfile&&user&&<ProfileModal user={user} onClose={()=>setShowProfile(false)}
+        onUpdated={name=>{setUser(u=>u?{...u,user_metadata:{...u.user_metadata,full_name:name}}:u)}}
+        onShowPaywall={()=>{setShowProfile(false);setShowPaywall(true)}}/>}
 
       {/* Desktop nav */}
       {(status==='idle'||status==='loading')&&(
