@@ -797,11 +797,12 @@ function LoadingScreen({ childName }: { childName?: string }) {
       ))}
 
       {/* Forest + book hero — top half */}
-      <div className="relative flex-none" style={{height:'50vh'}}>
+      <div className="relative flex-none" style={{height:'55vh'}}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/loading-forest.jpg" alt="" aria-hidden
-          className="absolute inset-0 w-full h-full object-cover object-center"/>
-        <div className="absolute inset-0" style={{background:'linear-gradient(to bottom,transparent 62%,#0d2b1e 100%)'}}/>
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{objectPosition:'center 55%'}}/>
+        <div className="absolute inset-0" style={{background:'linear-gradient(to bottom,transparent 58%,#0d2b1e 100%)'}}/>
       </div>
 
       {/* Content — bottom half, evenly spaced */}
