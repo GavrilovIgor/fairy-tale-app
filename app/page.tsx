@@ -251,15 +251,20 @@ function SiteFooter() {
 // ── Paywall ───────────────────────────────────────────────────────────────────
 function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;userId?:string}) {
   const [loading,setLoading] = useState<string|null>(null)
-  const [screen,setScreen] = useState<'choose'|'code'>('choose')
+  const [screen,setScreen] = useState<'choose'|'email'|'code'>('choose')
+  const [pendingPlan,setPendingPlan] = useState<'three_stories'|'unlimited_30d'|null>(null)
+  const [email,setEmail] = useState('')
+  const [emailErr,setEmailErr] = useState('')
+  const [emailLoading,setEmailLoading] = useState(false)
   const [code,setCode] = useState('')
   const [codeErr,setCodeErr] = useState('')
   const [codeLoading,setCodeLoading] = useState(false)
 
-  const buyYookassa = async(plan:'three_stories'|'unlimited_30d')=>{
+  const buyYookassa = async(plan:'three_stories'|'unlimited_30d', resolvedUserId?:string)=>{
+    const uid = resolvedUserId ?? userId
     setLoading(plan)
     try {
-      const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,userId})})
+      const res = await fetch('/api/yookassa/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan,userId:uid})})
       const data = await res.json()
       if(!res.ok)throw new Error(data.error)
       if(data.paymentId){
@@ -267,6 +272,24 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
       }
       window.location.href = data.confirmationUrl
     } catch { setLoading(null); alert('Ошибка платежа, попробуйте позже') }
+  }
+
+  // Если не залогинен — сначала создаём аккаунт по email
+  const handlePlanClick = (plan:'three_stories'|'unlimited_30d')=>{
+    if(userId){ buyYookassa(plan); return }
+    setPendingPlan(plan); setScreen('email')
+  }
+
+  const submitEmail = async(e:React.FormEvent)=>{
+    e.preventDefault()
+    if(!email.trim()||!email.includes('@')){ setEmailErr('Введите корректный email'); return }
+    setEmailLoading(true); setEmailErr('')
+    try{
+      const res = await fetch('/api/auth/pre-pay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.trim()})})
+      const data = await res.json()
+      if(!res.ok) throw new Error(data.error)
+      await buyYookassa(pendingPlan!, data.userId)
+    } catch { setEmailErr('Ошибка, попробуйте ещё раз'); setEmailLoading(false) }
   }
 
   const redeemCode = async()=>{
@@ -310,6 +333,36 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
     </div>
   )
 
+  if(screen==='email') return (
+    <CardWrapper>
+      <div className="p-6">
+        <button onClick={()=>setScreen('choose')} className="text-sm mb-4 cursor-pointer flex items-center gap-1" style={{color:'#9ca3af'}}>
+          ← Назад
+        </button>
+        <h3 className="italic font-bold text-xl text-center mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
+          Ваш email для аккаунта
+        </h3>
+        <p className="text-xs text-center mb-5" style={{color:'#9ca3af'}}>
+          Подписка привяжется к этому адресу. Войти сможете по ссылке из письма.
+        </p>
+        <form onSubmit={submitEmail} className="flex flex-col gap-3">
+          <input value={email} onChange={e=>{setEmail(e.target.value);setEmailErr('')}}
+            type="email" placeholder="your@email.com" required autoFocus
+            className="form-input-night"/>
+          {emailErr&&<p className="text-xs text-red-500">{emailErr}</p>}
+          <button type="submit" disabled={emailLoading||!email.trim()}
+            className="w-full py-3.5 rounded-xl text-white font-bold text-sm cursor-pointer hover:opacity-90 disabled:opacity-50 transition-all"
+            style={{background:'#a46713'}}>
+            {emailLoading?'Секунду...':'Перейти к оплате →'}
+          </button>
+        </form>
+        <p className="text-[11px] text-center mt-3" style={{color:'#b0b8b0'}}>
+          Имя — первая часть email. Измените потом в профиле.
+        </p>
+      </div>
+    </CardWrapper>
+  )
+
   if(screen==='code') return (
     <CardWrapper>
       <div className="p-6">
@@ -345,14 +398,14 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
 
         <div className="flex flex-col gap-3 mb-4">
           {/* Plan: 3 stories */}
-          <button onClick={()=>buyYookassa('three_stories')} disabled={!!loading}
+          <button onClick={()=>handlePlanClick('three_stories')} disabled={!!loading}
             className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
             style={{background:'linear-gradient(135deg,#c4812a,#a46713)',boxShadow:'0 4px 20px rgba(164,103,19,0.35)'}}>
             <span>{loading==='three_stories'?'Переходим...':'3 сказки'}</span>
             <span className="text-xl font-black">149 ₽</span>
           </button>
           {/* Plan: 30 days */}
-          <button onClick={()=>buyYookassa('unlimited_30d')} disabled={!!loading}
+          <button onClick={()=>handlePlanClick('unlimited_30d')} disabled={!!loading}
             className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
             style={{background:'#0d2b1e',boxShadow:'0 4px 20px rgba(13,43,30,0.3)'}}>
             <div className="text-left">
