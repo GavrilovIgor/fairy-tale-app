@@ -896,7 +896,6 @@ export default function Home() {
           {/* Desktop: full form + footer */}
           <div className="hidden md:block">
             <CreateForm onGenerate={generate} isLoading={false}/>
-            <SiteFooter/>
           </div>
         </>
       )}
