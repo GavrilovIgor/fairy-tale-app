@@ -109,8 +109,19 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc}:{prompt:string;index
   },[prompt,index,load,preloadedSrc])
   useEffect(()=>()=>{ if(src&&!preloadedSrc)URL.revokeObjectURL(src) },[src,preloadedSrc])
 
+  // Local fallback paths (start with /) — show immediately, no spinner, no retry
+  const isLocalFallback = preloadedSrc?.startsWith('/')
   const fallbackBgs = [['#FEF3C7','#FDE68A'],['#EDE9FE','#C4B5FD'],['#D1FAE5','#6EE7B7']]
   const [c1,c2] = fallbackBgs[index%3]
+
+  if (isLocalFallback) return (
+    <div className="relative w-full overflow-hidden print:shadow-none" style={{aspectRatio:'4/3',borderRadius:sharp?0:'1rem'}}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={preloadedSrc} alt={`Иллюстрация ${index+1}`}
+        className="absolute inset-0 w-full h-full object-cover"/>
+    </div>
+  )
+
   return (
     <div className="relative w-full overflow-hidden print:shadow-none" style={{background:c1,aspectRatio:'4/3',borderRadius:sharp?0:'1rem'}}>
       {phase==='loading'&&(
@@ -1141,7 +1152,8 @@ export default function Home() {
           if(blob){cache[i]=URL.createObjectURL(blob);return}
           if(attempt<3)await new Promise(r=>setTimeout(r,3000*(attempt+1)))
         }
-        // After 4 failed attempts — give up, StoryImage will show retry button
+        // After 4 failed attempts — use universal fallback illustration
+        cache[i] = `/story-fallback-${i%2}.jpg`
       })
       await Promise.allSettled(loaders)
 
