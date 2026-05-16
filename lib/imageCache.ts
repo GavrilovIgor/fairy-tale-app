@@ -23,13 +23,15 @@ export function seedForIndex(index: number): string {
   return String(index * 137 + 42)
 }
 
+const STYLE_VERSION = 'v3-pixar'
+const STYLE_SUFFIX = "Pixar 3D animation style, cinematic magical lighting, vibrant rich colors, highly detailed, children's fairy tale art, dreamlike atmosphere, 8K quality, no text, no letters, no watermarks"
+
 function buildUrl(cp: string, seed: string, w: number, h: number): string {
-  const style = "Pixar 3D animation style, cinematic magical lighting, vibrant rich colors, highly detailed, children's fairy tale art, dreamlike atmosphere, 8K quality, no text, no letters, no watermarks"
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(`${cp}, ${style}`)}?width=${w}&height=${h}&nologo=true&seed=${seed}&enhance=true`
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(`${cp}, ${STYLE_SUFFIX}`)}?width=${w}&height=${h}&nologo=true&seed=${seed}&enhance=true`
 }
 
 function cacheKey(cp: string, seed: string): string {
-  return `${cp}:${seed}`
+  return `${STYLE_VERSION}:${cp}:${seed}`
 }
 
 function getEntry(key: string): CacheEntry | null {

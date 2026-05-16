@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(entry.buffer, {
     headers: {
       'Content-Type': entry.contentType,
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
     },
   })
 }

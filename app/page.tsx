@@ -1290,7 +1290,7 @@ export default function Home() {
       {(status==='idle'||status==='loading')&&(
         <DesktopNav activeTab={desktopTab} onTabChange={setDesktopTab}
           user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut}
-          onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library')}}/>
+          onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library');setDesktopTab('library')}}/>
       )}
 
       {/* Content */}
@@ -1331,9 +1331,23 @@ export default function Home() {
             )}
           </div>
 
-          {/* Desktop: full form + footer */}
+          {/* Desktop: form or library */}
           <div className="hidden md:block">
-            <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
+            {desktopTab==='library' ? (
+              <div className="max-w-2xl mx-auto px-4 pt-24 pb-16">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-serif text-2xl font-bold" style={{color:'var(--text)'}}>Мои сказки</h2>
+                  <button onClick={()=>setDesktopTab('create')}
+                    className="text-sm cursor-pointer hover:opacity-70 transition-opacity"
+                    style={{color:'var(--text-muted)'}}>
+                    ← К созданию
+                  </button>
+                </div>
+                <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete}/>
+              </div>
+            ) : (
+              <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} user={user}/>
+            )}
           </div>
         </>
       )}
@@ -1343,7 +1357,7 @@ export default function Home() {
       {(status==='done'||status==='reading')&&story&&(
         <>
           {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library')}}/>
+          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library');setDesktopTab('library')}}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
