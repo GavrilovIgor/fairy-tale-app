@@ -538,17 +538,31 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary}:{onGenerate:(f:FormData
               <div className="flex flex-col gap-4">
                 <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Тема сказки</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {SIT_TYPES.map(t=>(
+                  {([
+                    {id:'fear'        as SituationType, label:'Страх',         img:'/wizard/sit-fear.jpg'},
+                    {id:'emotion'     as SituationType, label:'Эмоции',        img:'/wizard/sit-emotion.jpg'},
+                    {id:'adaptation'  as SituationType, label:'Новое',         img:'/wizard/sit-adaptation.jpg'},
+                    {id:'preparation' as SituationType, label:'Событие',       img:'/wizard/sit-preparation.jpg'},
+                    {id:'behavior'    as SituationType, label:'Поведение',     img:'/wizard/sit-behavior.jpg'},
+                    {id:'fun'         as SituationType, label:'Просто сказка', img:'/wizard/sit-fun.jpg'},
+                  ]).map(t=>(
                     <button key={t.id} type="button"
                       onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
-                      className="flex items-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
                       style={form.situationType===t.id
                         ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
                         :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
-                      <span style={{fontSize:18}}>{t.emoji}</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={t.img} alt={t.label}
+                        style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',flexShrink:0,
+                          boxShadow: form.situationType===t.id ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none'}}/>
                       <div>
                         <div>{t.label}</div>
-                        <div className="text-[10px] font-normal opacity-60">{t.hint.slice(0,18)}...</div>
+                        <div className="text-[10px] font-normal opacity-60">{
+                          {fear:'темнота, врач...',emotion:'злость, ревность...',
+                           adaptation:'садик, переезд...',preparation:'завтра к врачу...',
+                           behavior:'не слушается...',fun:'просто приключение'}[t.id]
+                        }</div>
                       </div>
                     </button>
                   ))}
