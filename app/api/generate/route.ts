@@ -10,19 +10,19 @@ function getAgeProfile(ageStr: string) {
   const n = parseInt(ageStr) || 0
   if (n <= 4) return {
     words: '380–460',
-    style: 'Предложения 4–8 слов. Только знакомые слова. Много повторений и ритма. Конкретные образы без абстракций. Как будто рассказываешь малышу сидя рядом.',
+    style: 'Ориентир: Сутеев, Андрей Усачев. Предложения 4–7 слов — короткие, ёмкие, как маленькие шажки. Только знакомые слова. Ритм и повторы ("Шаг, ещё шажок. Вот так."). Конкретные образы: не "испугался", а "в животике стало холодно". Диалоги живые, без объяснений. Никаких вводных оборотов типа "Нужно сказать, что...".',
   }
   if (n <= 6) return {
     words: '520–640',
-    style: 'Предложения 8–12 слов. 1–2 новых слова объяснены через контекст. Ритм и напевность важны. Много чувственных деталей.',
+    style: 'Ориентир: Киплинг (Маугли), Свен Нурдквист (Петсон и Финдус), собачка Соня. Предложения 8–12 слов с живым ритмом. 1–2 новых слова объяснены через действие. Много деталей: запахи, звуки, текстуры. Диалоги с характером — персонажи говорят по-разному. Без сухих итогов и нравоучений.',
   }
   if (n <= 9) return {
     words: '700–840',
-    style: 'Полноценные литературные предложения. Внутренние монологи героя. Метафоры и сравнения. Эмоциональная нюансировка.',
+    style: 'Ориентир: Евгения Чернышова, Киплинг. Полноценные литературные предложения с внутренним монологом героя. Метафоры и сравнения через бытовое ("страх был как мокрый свитер — тяжёлый и липкий"). Эмоциональная нюансировка. Несколько точек зрения.',
   }
   return {
     words: '900–1080',
-    style: 'Насыщенный литературный язык. Сложные переплетённые эмоции. Глубокие метафоры. Несколько персонажей. Моральная неоднозначность.',
+    style: 'Ориентир: Александр Волков (Волшебник Изумрудного города). Насыщенный литературный язык, сложные переплетённые эмоции. Глубокие метафоры. Несколько персонажей с характерами. Моральная неоднозначность — добро даётся через усилие.',
   }
 }
 
@@ -67,12 +67,19 @@ function buildRuPrompt(p: PromptParams): string {
 
 ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:
 - Текст сказки — обычный текст БЕЗ какой-либо markdown-разметки. Никаких **звёздочек**, _подчёркиваний_, #заголовков или других символов форматирования
-- Тон: тёплый, нежный, обволакивающий — как голос любящего родителя перед сном
+- Тон: тёплый, живой, как голос любящего родителя — не лектора
 - Сенсорные детали в каждой сцене: запахи, звуки, тактильные ощущения
 - Эмоция названа явно хотя бы раз: "это называлось [эмоция]" или "это был [страх/злость/...]"
-- Минимум один живой диалог в каждой сцене
+- Минимум один живой диалог в каждой сцене — персонажи говорят коротко и по-своему
 - Ноль нравоучений в лоб — только через образ и поступок
 - Взрослые и волшебные персонажи НЕ спасают — герой справляется сам
+
+ЗАПРЕЩЕНО (признаки роботизированного текста):
+- Вводные обороты: "Нужно сказать, что...", "Следует отметить...", "Дело в том, что...", "Таким образом..."
+- Перечисления через точку с запятой или нумерованные списки внутри текста
+- Абстрактные формулировки вместо конкретных образов ("испытал страх" вместо "ноги стали ватными")
+- Прямые резюме типа "И понял герой, что..." — только действие, не вывод
+- Слово в слово повторять ситуацию из запроса — переводи в метафору и образ
 
 СЮЖЕТНАЯ МЕХАНИКА ДЛЯ ЭТОЙ ТЕМЫ:
 ${p.scenarioHint}
@@ -83,11 +90,11 @@ ${p.scenarioHint}
   "scenes": [
     {
       "text": "Сцена 1: шаги 1–4. Узнаваемый герой, появление проблемы, называние эмоции, встреча с помощником.",
-      "imagePrompt": "cute ${p.hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
+      "imagePrompt": "cute ${p.hero} character [ОПИСАНИЕ КОНКРЕТНОГО ДЕЙСТВИЯ ИЗ СЦЕНЫ], enchanted magical forest, warm cinematic lighting, watercolor storybook illustration, correct anatomy, exactly two arms, no extra limbs, child-friendly, detailed background"
     },
     {
       "text": "Сцена 2: шаги 5–7. Герой находит ресурс, делает шаг, момент трансформации, тёплый финал.",
-      "imagePrompt": "happy confident ${p.hero} character in a glowing magical clearing, golden sunlight, triumphant mood"
+      "imagePrompt": "cute ${p.hero} character [ОПИСАНИЕ КОНКРЕТНОГО ДЕЙСТВИЯ ИЗ СЦЕНЫ], golden magical clearing, warm sunlight, watercolor storybook illustration, correct anatomy, exactly two arms, no extra limbs, child-friendly, triumphant joyful mood"
     }
   ],
   "discussion": [
@@ -144,11 +151,11 @@ Return ONLY valid JSON, no markdown, no \`\`\`json wrapper:
   "scenes": [
     {
       "text": "Scene 1: steps 1–4. Relatable hero, problem emerges, emotion named, meets helper.",
-      "imagePrompt": "cute ${p.hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
+      "imagePrompt": "cute ${p.hero} character [DESCRIBE THE SPECIFIC ACTION FROM THIS SCENE], enchanted magical forest, warm cinematic lighting, watercolor storybook illustration, correct anatomy, exactly two arms, no extra limbs, child-friendly, detailed background"
     },
     {
       "text": "Scene 2: steps 5–7. Hero finds resource, takes step, transformation moment, warm ending.",
-      "imagePrompt": "happy confident ${p.hero} character in a glowing magical clearing, golden sunlight, triumphant mood"
+      "imagePrompt": "cute ${p.hero} character [DESCRIBE THE SPECIFIC ACTION FROM THIS SCENE], golden magical clearing, warm sunlight, watercolor storybook illustration, correct anatomy, exactly two arms, no extra limbs, child-friendly, triumphant joyful mood"
     }
   ],
   "discussion": [

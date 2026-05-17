@@ -225,13 +225,14 @@ function SiteFooter() {
     <footer className="print:hidden" style={{background:'#0a1f14',borderTop:'1px solid rgba(255,255,255,0.06)'}}>
       <div className="max-w-[900px] mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-3">
         <div className="italic text-sm font-bold" style={{fontFamily:'Literata,Georgia,serif',color:'rgba(255,255,255,0.5)'}}>{t('logo')}</div>
-        <div className="flex flex-wrap justify-center gap-x-5 gap-y-1">
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 items-center">
           <a href={locale === 'en' ? '/en/privacy' : '/privacy'} className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
             {t('privacy')}
           </a>
           <a href="mailto:gigor92@gmail.com" className="text-xs hover:opacity-80 transition-opacity" style={{color:'rgba(255,255,255,0.35)'}}>
             {t('contact')}
           </a>
+          <LangSwitcher/>
         </div>
         <p className="text-xs" style={{color:'rgba(255,255,255,0.25)'}}>{t('copy')}</p>
       </div>
@@ -543,13 +544,17 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
               style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
-            <span className="italic drop-shadow-md whitespace-nowrap" style={{fontFamily:'Literata,Georgia,serif',fontSize:17,fontWeight:700,color:'#fff',
-              textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
-              {t('nav.logo')}
-            </span>
+            <div className="flex flex-col gap-0">
+              <span className="italic drop-shadow-md whitespace-nowrap" style={{fontFamily:'Literata,Georgia,serif',fontSize:17,fontWeight:700,color:'#fff',
+                textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
+                {t('nav.logo')}
+              </span>
+              <span style={{fontSize:9,fontWeight:500,color:'rgba(255,255,255,0.38)',letterSpacing:'0.07em'}}>
+                {t('nav.tagline')}
+              </span>
+            </div>
           </a>
           <div className="flex items-center gap-2">
-            <LangSwitcher/>
             <button onClick={onOpenLibrary} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'7px',borderRadius:999,lineHeight:0}}>
               <span className="material-symbols-outlined" style={{fontSize:20}}>menu_book</span>
             </button>
@@ -572,17 +577,14 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
-          <h1 className="text-[28px] md:text-[46px] leading-tight font-bold text-white mb-1.5 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
+          <h1 className="text-[30px] md:text-[46px] leading-tight font-bold text-white mb-4 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             {t('hero.h1')}
           </h1>
-          <h2 className="text-[17px] md:text-[24px] italic text-white/75 mb-3 max-w-sm md:max-w-xl" style={{fontFamily:'Literata,Georgia,serif'}}>
-            {t('hero.h2')}
-          </h2>
-          <p className="text-white/55 text-[13px] md:text-[15px] max-w-xs md:max-w-lg mb-5 leading-relaxed">
+          <p className="text-white/75 text-[15px] md:text-[17px] max-w-xs md:max-w-lg mb-6 leading-relaxed">
             {t('hero.subtitle')}
           </p>
-          <button type="button" onClick={handleRandom} disabled={isLoading}
-            className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 disabled:opacity-50 cursor-pointer"
+          <button type="button" onClick={()=>document.getElementById('wizard-form')?.scrollIntoView({behavior:'smooth'})}
+            className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
             ✨ {t('hero.cta')}
           </button>
@@ -660,7 +662,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
       </section>
 
       {/* ══ SECTION 2 — WIZARD FORM ══ */}
-      <section className="relative w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
+      <section id="wizard-form" className="relative w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
         {/* Background: bokeh + more fireflies + star particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="bokeh w-96 h-96 top-[-100px] left-[-100px]" style={{background:'#1a4a34'}}/>
@@ -1185,7 +1187,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
       {/* UI — absolute bottom */}
       <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center px-6 pb-8 gap-4">
         <h1 style={{fontFamily:'Literata,Georgia,serif',fontSize:28,fontWeight:700,color:'#f9f9f7',lineHeight:1.2}}>
-          {childName ? t('title', {name: childName}) : t('titleGeneric')}
+          {t('titleGeneric')}
         </h1>
 
         <div className="flex justify-center gap-2 w-full">

@@ -83,7 +83,7 @@
     "randomFavorites": ["dinosaurs and space", "ice cream and painting", "toy cars and building blocks", "princesses and unicorns"]
   },
   "loading": {
-    "title": "Crafting a story for {name}",
+    "title": "Your story is being written...",
     "titleGeneric": "Your story is being written...",
     "step1": "Building the hero",
     "step2": "Shaping the story",
