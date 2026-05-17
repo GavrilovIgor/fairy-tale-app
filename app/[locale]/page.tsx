@@ -581,7 +581,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
           <h1 className="text-[30px] md:text-[46px] leading-tight font-bold text-white mb-4 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             {t('hero.h1')}
           </h1>
-          <p className="text-white/75 text-[15px] md:text-[17px] max-w-sm md:max-w-xl mb-6 leading-relaxed">
+          <p className="text-white/75 text-[15px] md:text-[17px] max-w-sm md:max-w-none mb-6 leading-relaxed md:whitespace-nowrap">
             {t('hero.subtitle')}
           </p>
           <button type="button" onClick={()=>wizardRef.current?.scrollIntoView({behavior:'smooth'})}
