@@ -578,12 +578,9 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
         <div className="absolute bottom-0 left-0 right-0 h-[65%] bg-gradient-to-b from-transparent via-[rgba(10,31,20,0.6)] to-[rgba(10,31,20,0.98)] pointer-events-none"/>
         {/* Text block — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center text-center px-6 md:px-12 pb-8 md:pb-10">
-          <h1 className="text-[30px] md:text-[46px] leading-tight font-bold text-white mb-4 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
+          <h1 className="text-[30px] md:text-[46px] leading-tight font-bold text-white mb-8 tracking-tight" style={{fontFamily:'Literata,Georgia,serif'}}>
             {t('hero.h1')}
           </h1>
-          <p className="text-white/75 text-[15px] md:text-[17px] max-w-sm md:max-w-xl mb-6 leading-relaxed">
-            {t('hero.subtitle')}
-          </p>
           <button type="button" onClick={()=>wizardRef.current?.scrollIntoView({behavior:'smooth'})}
             className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
