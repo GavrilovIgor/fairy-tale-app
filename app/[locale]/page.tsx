@@ -474,6 +474,7 @@ function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CH
 function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
   const t = useTranslations()
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
+  const wizardRef = useRef<HTMLElement>(null)
 
   useEffect(()=>{
     const last = getLastChild()
@@ -583,7 +584,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
           <p className="text-white/75 text-[15px] md:text-[17px] max-w-xs md:max-w-lg mb-6 leading-relaxed">
             {t('hero.subtitle')}
           </p>
-          <button type="button" onClick={()=>document.getElementById('wizard-form')?.scrollIntoView({behavior:'smooth'})}
+          <button type="button" onClick={()=>wizardRef.current?.scrollIntoView({behavior:'smooth'})}
             className="px-7 py-3 md:py-3.5 rounded-full font-bold text-[14px] md:text-[15px] tracking-wide shadow-[0_0_30px_rgba(164,103,19,0.4)] hover:scale-105 transition-all flex items-center gap-2 mb-3 cursor-pointer"
             style={{background:'#a46713',color:'#fff'}}>
             ✨ {t('hero.cta')}
@@ -662,7 +663,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
       </section>
 
       {/* ══ SECTION 2 — WIZARD FORM ══ */}
-      <section id="wizard-form" className="relative w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
+      <section ref={wizardRef} className="relative w-full py-16 md:py-20 overflow-hidden flex flex-col items-center" style={{background:'#0d2b1e'}}>
         {/* Background: bokeh + more fireflies + star particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="bokeh w-96 h-96 top-[-100px] left-[-100px]" style={{background:'#1a4a34'}}/>
