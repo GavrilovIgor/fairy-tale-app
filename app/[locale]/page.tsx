@@ -134,7 +134,7 @@ function LangSwitcher() {
   return (
     <button onClick={toggle}
       className="flex items-center gap-1.5 text-white/60 hover:text-white/90 transition-colors cursor-pointer text-xs font-semibold tracking-wider"
-      style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',padding:'5px 12px',borderRadius:999}}>
+      style={{background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',padding:'4px 8px',borderRadius:999}}>
       {locale === 'ru' ? '🇺🇸 EN' : '🇷🇺 RU'}
     </button>
   )
@@ -242,6 +242,7 @@ function SiteFooter() {
 // ── Paywall ───────────────────────────────────────────────────────────────────
 function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;userId?:string}) {
   const tNav = useTranslations('nav')
+  const tCommonPaywall = useTranslations('common')
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'email'|'code'>('choose')
   const [pendingPlan,setPendingPlan] = useState<'monthly_sub'|'yearly_sub'|null>(null)
@@ -329,7 +330,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
     <CardWrapper>
       <div className="p-6">
         <button onClick={()=>setScreen('choose')} className="text-sm mb-4 cursor-pointer flex items-center gap-1" style={{color:'#9ca3af'}}>
-          ← Назад
+          ← {tCommonPaywall('back')}
         </button>
         <h3 className="italic font-bold text-xl text-center mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
           Ваш email для аккаунта
@@ -359,7 +360,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
     <CardWrapper>
       <div className="p-6">
         <button onClick={()=>setScreen('choose')} className="text-sm mb-4 cursor-pointer flex items-center gap-1" style={{color:'#9ca3af'}}>
-          ← Назад
+          ← {tCommonPaywall('back')}
         </button>
         <h3 className="italic font-bold text-xl text-center mb-5" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
           Код активации
@@ -542,15 +543,10 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/wizard/hero-fox.jpg" alt="" aria-hidden
               style={{width:24,height:24,borderRadius:'50%',objectFit:'cover',objectPosition:'center 20%',border:'1.5px solid rgba(255,255,255,0.35)',flexShrink:0}}/>
-            <div className="flex flex-col gap-0">
-              <span className="italic drop-shadow-md leading-tight" style={{fontFamily:'Literata,Georgia,serif',fontSize:20,fontWeight:700,color:'#fff',
-                textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
-                {t('nav.logo')}
-              </span>
-              <span style={{fontSize:8,fontWeight:500,color:'rgba(255,255,255,0.35)',letterSpacing:'0.07em'}}>
-                {t('nav.tagline')}
-              </span>
-            </div>
+            <span className="italic drop-shadow-md whitespace-nowrap" style={{fontFamily:'Literata,Georgia,serif',fontSize:17,fontWeight:700,color:'#fff',
+              textShadow:'0 0 16px rgba(212,145,42,0.55), 0 0 32px rgba(212,145,42,0.2)'}}>
+              {t('nav.logo')}
+            </span>
           </a>
           <div className="flex items-center gap-2">
             <LangSwitcher/>
@@ -568,7 +564,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 }
               </button>
             ) : (
-              <button onClick={onShowAuth} className="cursor-pointer" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 16px',borderRadius:999,fontSize:13,fontWeight:600}}>{t('nav.login')}</button>
+              <button onClick={onShowAuth} className="cursor-pointer whitespace-nowrap" style={{color:'white',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.25)',padding:'6px 12px',borderRadius:999,fontSize:12,fontWeight:600}}>{t('nav.login')}</button>
             )}
           </div>
         </div>
@@ -887,7 +883,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
     <div className="min-h-screen bg-white print:bg-white" style={{fontFamily:sans}}>
       {/* ── Top nav ── */}
       <header className="h-[52px] flex items-center px-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-20 print:hidden">
-        <button onClick={onBack} className="p-1 -ml-1 text-gray-800 cursor-pointer hover:opacity-60 transition-opacity" aria-label="Назад">
+        <button onClick={onBack} className="p-1 -ml-1 text-gray-800 cursor-pointer hover:opacity-60 transition-opacity" aria-label={t('headerTitle')}>
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
             <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
           </svg>
@@ -1274,6 +1270,7 @@ async function generatePDF(story:Story) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const locale = useLocale()
+  const tCommon = useTranslations('common')
   const [status,setStatus] = useState<'idle'|'loading'|'done'|'reading'>('idle')
   const [story,setStory] = useState<Story|null>(null)
   const [currentChildName,setCurrentChildName] = useState('')
@@ -1583,7 +1580,7 @@ export default function Home() {
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full text-white text-sm font-semibold cursor-pointer"
                     style={{background:'rgba(10,31,20,0.9)',backdropFilter:'blur(8px)',border:'1px solid rgba(255,255,255,0.15)'}}>
                     <span className="material-symbols-outlined" style={{fontSize:18}}>arrow_back</span>
-                    Назад
+                    {tCommon('back')}
                   </button>
                 </div>
               </>

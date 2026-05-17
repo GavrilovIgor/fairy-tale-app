@@ -85,9 +85,9 @@
   "loading": {
     "title": "Crafting a story for {name}",
     "titleGeneric": "Your story is being written...",
-    "step1": "Bringing the hero to life",
-    "step2": "Shaping the journey",
-    "step3": "Painting the illustrations",
+    "step1": "Building the hero",
+    "step2": "Shaping the story",
+    "step3": "Creating artwork",
     "note": "THIS USUALLY TAKES ABOUT 30 SECONDS"
   },
   "story": {
@@ -116,6 +116,10 @@
     "privacy": "Privacy Policy",
     "contact": "Contact us",
     "copy": "© 2026 Magic Fairy Tales"
+  },
+  "common": {
+    "back": "Back",
+    "close": "Close"
   },
   "tabs": {
     "create": "Create",
