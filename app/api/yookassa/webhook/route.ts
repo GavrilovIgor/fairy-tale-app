@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writePurchase, awardReferrer } from '@/lib/supabase/admin'
+import { getPostHog } from '@/lib/posthog-server'
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
 const OWNER_CHAT_ID = process.env.OWNER_CHAT_ID!
@@ -68,6 +69,14 @@ export async function POST(req: NextRequest) {
       `💰 Новая оплата ЮКасса!\nТариф: ${planLabel(plan)}\nСумма: ${amount} ₽\nTelegram ID: ${telegramId || 'нет'}\nPayment ID: ${payment.id}\n\n✅ Чек выставлен автоматически`,
     )
   }
+
+  const ph = getPostHog()
+  ph.capture({
+    distinctId: userId ?? telegramId ?? 'anonymous',
+    event: 'payment_success',
+    properties: { plan, amount: parseFloat(amount), payment_id: payment.id },
+  })
+  await ph.flush()
 
   return NextResponse.json({ ok: true })
 }

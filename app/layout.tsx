@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import { getLocale } from 'next-intl/server';
+import { PostHogProvider } from '@/components/PostHogProvider';
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -27,7 +28,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         `}}/>
       </head>
       <body className="min-h-full flex flex-col">
-        {children}
+        <PostHogProvider>
+          {children}
+        </PostHogProvider>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
       </body>
     </html>

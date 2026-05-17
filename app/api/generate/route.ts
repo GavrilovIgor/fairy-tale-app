@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { prefetchImages } from '@/lib/imageCache'
+import { getPostHog } from '@/lib/posthog-server'
 
 export const maxDuration = 120
 
@@ -211,6 +212,14 @@ export async function POST(req: NextRequest) {
           imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
         }))
         prefetchImages(story.scenes, story.storySeed)
+
+        const ph = getPostHog()
+        ph.capture({
+          distinctId: `server-${req.headers.get('x-forwarded-for') ?? 'unknown'}`,
+          event: 'story_generated',
+          properties: { age, hero, situationType, locale, model: modelName },
+        })
+        await ph.flush()
       }
 
       return NextResponse.json(story)
