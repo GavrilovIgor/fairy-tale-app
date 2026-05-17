@@ -35,8 +35,136 @@ const SCENARIO_INSTRUCTIONS: Record<string, string> = {
   fun: 'Весёлое волшебное приключение с удивительными открытиями. Герой делает что-то доброе и неожиданное, что меняет мир вокруг к лучшему.',
 }
 
+interface PromptParams {
+  childName: string; age: string; hero: string; situation: string
+  situationType: string; favorites: string; lesson: string
+  words: string; style: string; scenarioHint: string
+}
+
+function buildRuPrompt(p: PromptParams): string {
+  return `Ты — мастер сказкотерапии и детской литературы. Создай терапевтическую сказку на русском языке.
+
+ДАННЫЕ:
+- Имя ребёнка: ${p.childName}
+- Возраст: ${p.age}
+- Главный герой: ${p.hero}
+- Ситуация/запрос: ${p.situation}
+- Любимые вещи: ${p.favorites || 'не указано'}
+- Урок: ${p.lesson || 'определи по ситуации'}
+
+ВОЗРАСТНАЯ АДАПТАЦИЯ — СОБЛЮДАЙ СТРОГО:
+- Суммарная длина текста: ${p.words} слов
+- Языковой стиль: ${p.style}
+
+ТЕРАПЕВТИЧЕСКАЯ СТРУКТУРА (строго по порядку, распредели по двум сценам):
+1. Узнаваемый герой — читатель с первых строк чувствует "это похоже на меня" (обстановка, настроение, похожие привычки)
+2. Появление проблемы — герой сталкивается с чем-то аналогичным "${p.situation}"
+3. Эмоция названа телесно — "в животе что-то сжалось", "стало холодно внутри", "щёки запылали" — конкретно и телесно
+4. Волшебный помощник — появляется, но НЕ решает за героя: задаёт нужный вопрос или показывает где искать силу внутри
+5. Герой ищет ресурс внутри себя — пробует, возможно ошибается, пробует снова
+6. Момент трансформации — конкретный поступок, прочувствованный телесно ("вдруг стало легче", "страх стал чуть меньше")
+7. Тёплый конкретный финал — имя "${p.childName}" упоминается органично
+
+ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:
+- Текст сказки — обычный текст БЕЗ какой-либо markdown-разметки. Никаких **звёздочек**, _подчёркиваний_, #заголовков или других символов форматирования
+- Тон: тёплый, нежный, обволакивающий — как голос любящего родителя перед сном
+- Сенсорные детали в каждой сцене: запахи, звуки, тактильные ощущения
+- Эмоция названа явно хотя бы раз: "это называлось [эмоция]" или "это был [страх/злость/...]"
+- Минимум один живой диалог в каждой сцене
+- Ноль нравоучений в лоб — только через образ и поступок
+- Взрослые и волшебные персонажи НЕ спасают — герой справляется сам
+
+СЮЖЕТНАЯ МЕХАНИКА ДЛЯ ЭТОЙ ТЕМЫ:
+${p.scenarioHint}
+
+Верни ТОЛЬКО валидный JSON, без markdown, без обёртки \`\`\`json:
+{
+  "title": "Красивое название сказки",
+  "scenes": [
+    {
+      "text": "Сцена 1: шаги 1–4. Узнаваемый герой, появление проблемы, называние эмоции, встреча с помощником.",
+      "imagePrompt": "cute ${p.hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
+    },
+    {
+      "text": "Сцена 2: шаги 5–7. Герой находит ресурс, делает шаг, момент трансформации, тёплый финал.",
+      "imagePrompt": "happy confident ${p.hero} character in a glowing magical clearing, golden sunlight, triumphant mood"
+    }
+  ],
+  "discussion": [
+    "Вход через героя (безопасно): сформулируй вопрос про чувства героя в конкретный момент сказки",
+    "Личное соединение: сформулируй мягкий вопрос связывающий ситуацию в сказке с опытом ребёнка",
+    "Ресурсный вопрос: сформулируй вопрос про то что помогло герою — и перекинь мостик к ребёнку"
+  ],
+  "anchor": {
+    "title": "Короткое название предмета-якоря (2–3 слова)",
+    "description": "Предмет: [простой предмет легко найти дома]. Ритуал: [одно физическое действие]. Фраза-активация: '[3–5 слов]'. Когда использовать: [конкретная ситуация связанная с '${p.situation}']."
+  }
+}`
+}
+
+function buildEnPrompt(p: PromptParams): string {
+  return `You are a master of story therapy and children's literature. Create a therapeutic fairy tale in English.
+
+STORY DATA:
+- Child's name: ${p.childName}
+- Age: ${p.age}
+- Main character: ${p.hero}
+- Challenge / situation: ${p.situation}
+- Favorite things: ${p.favorites || 'not specified'}
+- Lesson: ${p.lesson || 'determine from the situation'}
+
+AGE ADAPTATION — FOLLOW STRICTLY:
+- Total text length: ${p.words} words
+- Language style: ${p.style}
+
+THERAPEUTIC STRUCTURE (in order, split across two scenes):
+1. Relatable hero — the reader immediately feels "this is like me" (setting, mood, familiar habits)
+2. Problem emerges — the hero faces something analogous to "${p.situation}"
+3. Emotion named physically — "something tightened in their chest", "their cheeks went hot", "legs felt heavy" — specific and bodily
+4. Magical helper — appears but does NOT solve things: asks the right question or points to inner strength
+5. Hero finds their own resource — tries, perhaps stumbles, tries again
+6. Moment of transformation — a concrete act, felt physically ("suddenly it felt lighter", "the fear grew a little smaller")
+7. Warm specific ending — child's name "${p.childName}" woven in naturally
+
+RULES:
+- Plain text ONLY — no **asterisks**, _underscores_, #headers or any markdown formatting
+- Tone: warm, gentle, enveloping — like a loving parent's voice at bedtime
+- Sensory details in every scene: smells, sounds, textures
+- Name the emotion explicitly at least once: "this was called [emotion]" or "it was [fear / anger / ...]"
+- At least one piece of dialogue per scene
+- No moralising — only through image and action
+- Adults and magical helpers do NOT rescue — the hero manages themselves
+
+SCENARIO MECHANICS FOR THIS THEME:
+${p.scenarioHint}
+
+Return ONLY valid JSON, no markdown, no \`\`\`json wrapper:
+{
+  "title": "A beautiful story title in English",
+  "scenes": [
+    {
+      "text": "Scene 1: steps 1–4. Relatable hero, problem emerges, emotion named, meets helper.",
+      "imagePrompt": "cute ${p.hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
+    },
+    {
+      "text": "Scene 2: steps 5–7. Hero finds resource, takes step, transformation moment, warm ending.",
+      "imagePrompt": "happy confident ${p.hero} character in a glowing magical clearing, golden sunlight, triumphant mood"
+    }
+  ],
+  "discussion": [
+    "Entry through the hero (safe): ask about how the hero felt at a specific moment in the story",
+    "Personal connection: a gentle question linking the story to the child's own experience",
+    "Resource question: ask what helped the hero — and bridge it to the child"
+  ],
+  "anchor": {
+    "title": "Short anchor object name (2–3 words)",
+    "description": "Object: [simple everyday object easy to find at home]. Ritual: [one physical action]. Activation phrase: '[3–5 words the child says in a difficult moment]'. When to use: [specific situation related to '${p.situation}']."
+  }
+}`
+}
+
 export async function POST(req: NextRequest) {
-  const { childName, age, hero, situation, situationType, favorites, lesson } = await req.json()
+  const { childName, age, hero, situation, situationType, favorites, lesson, locale = 'ru' } = await req.json()
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -51,64 +179,10 @@ export async function POST(req: NextRequest) {
   const { words, style } = getAgeProfile(age)
   const scenarioHint = SCENARIO_INSTRUCTIONS[situationType] ?? SCENARIO_INSTRUCTIONS.fun
 
-  const prompt = `Ты — мастер сказкотерапии и детской литературы. Создай терапевтическую сказку на русском языке.
-
-ДАННЫЕ:
-- Имя ребёнка: ${childName}
-- Возраст: ${age}
-- Главный герой: ${hero}
-- Ситуация/запрос: ${situation}
-- Любимые вещи: ${favorites || 'не указано'}
-- Урок: ${lesson || 'определи по ситуации'}
-
-ВОЗРАСТНАЯ АДАПТАЦИЯ — СОБЛЮДАЙ СТРОГО:
-- Суммарная длина текста: ${words} слов
-- Языковой стиль: ${style}
-
-ТЕРАПЕВТИЧЕСКАЯ СТРУКТУРА (строго по порядку, распредели по двум сценам):
-1. Узнаваемый герой — читатель с первых строк чувствует "это похоже на меня" (обстановка, настроение, похожие привычки)
-2. Появление проблемы — герой сталкивается с чем-то аналогичным "${situation}"
-3. Эмоция названа телесно — "в животе что-то сжалось", "стало холодно внутри", "щёки запылали" — конкретно и телесно
-4. Волшебный помощник — появляется, но НЕ решает за героя: задаёт нужный вопрос или показывает где искать силу внутри
-5. Герой ищет ресурс внутри себя — пробует, возможно ошибается, пробует снова
-6. Момент трансформации — конкретный поступок, прочувствованный телесно ("вдруг стало легче", "страх стал чуть меньше")
-7. Тёплый конкретный финал — имя "${childName}" упоминается органично
-
-ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА:
-- Текст сказки — обычный текст БЕЗ какой-либо markdown-разметки. Никаких **звёздочек**, _подчёркиваний_, #заголовков или других символов форматирования
-- Тон: тёплый, нежный, обволакивающий — как голос любящего родителя перед сном. Слова несут доброту и ощущение безопасности даже в трудных моментах. Пиши с любовью к герою и к ребёнку который слушает
-- Сенсорные детали в каждой сцене: запахи, звуки, тактильные ощущения
-- Эмоция названа явно хотя бы раз: "это называлось [эмоция]" или "это был [страх/злость/...]"
-- Минимум один живой диалог в каждой сцене
-- Ноль нравоучений в лоб — только через образ и поступок
-- Взрослые и волшебные персонажи НЕ спасают — герой справляется сам
-
-СЮЖЕТНАЯ МЕХАНИКА ДЛЯ ЭТОЙ ТЕМЫ:
-${scenarioHint}
-
-Верни ТОЛЬКО валидный JSON, без markdown, без обёртки \`\`\`json:
-{
-  "title": "Красивое название сказки",
-  "scenes": [
-    {
-      "text": "Сцена 1: шаги 1–4. Узнаваемый герой, появление проблемы, называние эмоции, встреча с помощником.",
-      "imagePrompt": "cute ${hero} character looking worried in an enchanted magical forest, cinematic warm lighting, detailed background"
-    },
-    {
-      "text": "Сцена 2: шаги 5–7. Герой находит ресурс, делает шаг, момент трансформации, тёплый финал.",
-      "imagePrompt": "happy confident ${hero} character in a glowing magical clearing, golden sunlight, friends nearby, triumphant mood"
-    }
-  ],
-  "discussion": [
-    "Вход через героя (безопасно): сформулируй вопрос про чувства героя в конкретный момент сказки — например 'Как ты думаешь, что почувствовал [герой], когда [момент]?'",
-    "Личное соединение: сформулируй мягкий вопрос связывающий ситуацию в сказке с опытом ребёнка — например 'Было ли у тебя когда-нибудь что-то похожее?'",
-    "Ресурсный вопрос: сформулируй вопрос про то что помогло герою — и перекинь мостик к ребёнку: 'А тебе что помогает, когда [ситуация из запроса]?'"
-  ],
-  "anchor": {
-    "title": "Короткое название предмета-якоря (2–3 слова)",
-    "description": "Предмет: [конкретный простой предмет — камушек, браслет, рисунок, перышко — связанный со сказкой или похожий, легко найти дома]. Ритуал: [одно конкретное физическое действие — возьми в руку / сожми / нарисуй / положи под подушку]. Фраза-активация: '[3–5 слов которые ребёнок произносит в трудный момент]'. Когда использовать: [конкретная ситуация из жизни ребёнка связанная с запросом '${situation}']."
-  }
-}`
+  const isEn = locale === 'en'
+  const prompt = isEn
+    ? buildEnPrompt({ childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint })
+    : buildRuPrompt({ childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint })
 
   for (const modelName of MODELS) {
     try {

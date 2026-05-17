@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { AuthModal } from '@/components/AuthModal'
 import { NameModal } from '@/components/NameModal'
@@ -44,42 +43,14 @@ interface FormData { childName:string; age:string; hero:string; situation:string
 type MobileTab = 'create'|'library'|'profile'
 
 // ── Situation config ──────────────────────────────────────────────────────────
-const SIT_TYPES: {id:SituationType;emoji:string;label:string;hint:string}[] = [
-  {id:'fear',       emoji:'😨',label:'Страх',         hint:'боится темноты, собак, врача...'},
-  {id:'emotion',    emoji:'😤',label:'Эмоции',        hint:'злится, ревнует, обижается...'},
-  {id:'adaptation', emoji:'🏠',label:'Новое',         hint:'новый садик, переезд, школа...'},
-  {id:'preparation',emoji:'🗓️',label:'Событие',       hint:'завтра к врачу, стрижка...'},
-  {id:'behavior',   emoji:'🤝',label:'Поведение',     hint:'не делится, не слушается...'},
-  {id:'fun',        emoji:'✨',label:'Просто сказка',hint:'весёлое приключение'},
-]
+// ── SIT_TYPES id list (labels come from messages) ────────────────────────────
+const SIT_TYPE_IDS: SituationType[] = ['fear','emotion','adaptation','preparation','behavior','fun']
 
-const R_NAMES  = ['Маша','Саша','Дима','Аня','Ваня','Катя','Соня','Миша','Даша','Лёша']
-const R_AGES   = ['3-4 года','5-6 лет','7-8 лет','9-10 лет']
-const R_HEROES = ['котёнок Пушок','дракончик Огонёк','щенок Бобик','лисёнок Рыжик','медвежонок Топтыжка','зайчонок Ушастик']
-const R_SITS:{situation:string;situationType:SituationType}[] = [
-  {situation:'боится темноты',          situationType:'fear'},
-  {situation:'боится идти к врачу',     situationType:'fear'},
-  {situation:'не хочет идти в новый садик',situationType:'adaptation'},
-  {situation:'злится и кричит',         situationType:'emotion'},
-  {situation:'ревнует к младшему братику',situationType:'emotion'},
-  {situation:'завтра первый раз к стоматологу',situationType:'preparation'},
-]
-const R_FAVS = ['динозавры и космос','мороженое и рисование','машинки и конструктор','принцессы и единороги']
 const pick = <T,>(a:T[]):T => a[Math.floor(Math.random()*a.length)]
 
-// ── Guided input suggestion data ──────────────────────────────────────────────
-const AGE_OPTIONS = ['3 года','4 года','5 лет','6 лет','7 лет','8 лет','9 лет','10+ лет']
-const HERO_SUGGESTIONS = ['котёнок','щенок','лисёнок','дракончик','зайчонок','медвежонок','принцесса','маленький рыцарь','волшебник','фея']
-const SITUATION_SUGGESTIONS: Record<SituationType,string[]> = {
-  fear:        ['боится темноты','боится собак','боится врача и уколов','боится грозы','боится страшных снов','боится остаться одному'],
-  emotion:     ['злится и кричит','ревнует к братику или сестричке','обижается и замыкается','не хочет делиться','расстраивается из-за мелочей','завидует другу'],
-  adaptation:  ['идёт в новый садик','переехали в новый дом','идёт в первый класс','появился братик или сестричка','новая школа','родители расстались'],
-  behavior:    ['дерётся с другими детьми','говорит неправду','не убирает игрушки','не хочет ложиться спать','капризничает за едой','не слушается'],
-  preparation: ['завтра к стоматологу','завтра к врачу на укол','первый день в садике','первый полёт на самолёте','операция или обследование','переход в новый класс'],
-  fun:         ['хочет стать волшебником','мечтает найти клад','хочет подружиться со всеми животными','хочет стать супергероем'],
-}
-const FAVORITES_OPTIONS = ['динозавры','принцессы','супергерои','машинки','животные','космос','единороги','рыцари','феи','море','рисование','спорт']
-const LESSON_SUGGESTIONS = ['быть смелым','делиться с другими','говорить правду','быть добрым','не бояться нового','справляться со злостью','дружить','слушаться родителей']
+// ── Utility: typed raw messages access for arrays ────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MsgRaw = any
 const imgUrl = (p:string,i:number,storySeed=0) => `/api/image?prompt=${encodeURIComponent(p.trim().slice(0,120))}&seed=${storySeed+i*137+42}`
 
 // ── Image component ───────────────────────────────────────────────────────────
@@ -153,14 +124,12 @@ function StoryImage({prompt,index,sharp=false,preloadedSrc,storySeed=0}:{prompt:
 // ── Language Switcher ─────────────────────────────────────────────────────────
 function LangSwitcher() {
   const locale = useLocale()
-  const pathname = usePathname()
-  const router = useRouter()
   const toggle = () => {
-    const next = locale === 'ru' ? 'en' : 'ru'
-    // Strip current locale prefix and add new one
-    const base = pathname.replace(/^\/(en|ru)/, '') || '/'
-    const newPath = next === 'ru' ? (base || '/') : `/en${base === '/' ? '' : base}`
-    router.push(newPath)
+    const path = window.location.pathname
+    const href = locale === 'ru'
+      ? `/en${path === '/' ? '' : path}`
+      : path.replace(/^\/en/, '') || '/'
+    window.location.href = href
   }
   return (
     <button onClick={toggle}
@@ -460,16 +429,6 @@ const cOn   = 'bg-[#1a3a2a] text-white border-[#1a3a2a]'
 const cOff  = 'bg-surface-container-low text-on-surface-variant border-outline-variant/30 hover:border-[#1a3a2a]/50'
 const hintLabel = 'text-[11px] font-medium uppercase tracking-wider mt-1'
 
-function AgeChips({value,onChange}:{value:string;onChange:(v:string)=>void}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {AGE_OPTIONS.map(a=>(
-        <button key={a} type="button" onClick={()=>onChange(a===value?'':a)}
-          className={`${cBase} ${value===a?cOn:cOff}`}>{a}</button>
-      ))}
-    </div>
-  )
-}
 
 function SuggestionChips({options,value,onChange}:{options:string[];value:string;onChange:(v:string)=>void}) {
   return (
@@ -518,12 +477,33 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
   },[])
   const [step,setStep] = useState(1)
 
-  const sitType = SIT_TYPES.find(t=>t.id===form.situationType)!
+  // ── Locale-aware data from messages ──────────────────────────────────────────
+  const tRaw = t.raw as (key: string) => MsgRaw
+  const HERO_CARDS:  {name:string;img:string}[]                         = tRaw('wizard.heroes')
+  const AGE_GROUPS:  string[]                                            = tRaw('wizard.ageGroups')
+  const SIT_TYPES_L: {id:string;label:string;hint:string;img:string}[]  = tRaw('wizard.situationTypes')
+  const SIT_SUGG:    Record<SituationType,string[]>                      = tRaw('wizard.situationSuggestions')
+  const FAVORITES:   string[]                                            = tRaw('wizard.favorites')
+  const R_NAMES:     string[]                                            = tRaw('wizard.randomNames')
+  const R_HEROES:    string[]                                            = tRaw('wizard.randomHeroes').map((h:{name:string})=>h.name??h)
+  const R_FAVS:      string[]                                            = tRaw('wizard.randomFavorites')
+  const R_AGES:      string[]                                            = AGE_GROUPS
+
+  const sitType = SIT_TYPES_L.find(s=>s.id===form.situationType) ?? SIT_TYPES_L[0]
+
+  const R_SITS:{situation:string;situationType:SituationType}[] = [
+    {situation:SIT_SUGG.fear[0],      situationType:'fear'},
+    {situation:SIT_SUGG.fear[2],      situationType:'fear'},
+    {situation:SIT_SUGG.adaptation[0],situationType:'adaptation'},
+    {situation:SIT_SUGG.emotion[0],   situationType:'emotion'},
+    {situation:SIT_SUGG.emotion[1],   situationType:'emotion'},
+    {situation:SIT_SUGG.preparation[0],situationType:'preparation'},
+  ]
 
   const handleRandom = async()=>{
     const r=pick(R_SITS)
     const rf:FormData={childName:pick(R_NAMES),age:pick(R_AGES),hero:pick(R_HEROES),
-      situation:r.situation,situationType:r.situationType,favorites:pick(R_FAVS),lesson:''}
+      situation:r.situation,situationType:r.situationType as SituationType,favorites:pick(R_FAVS),lesson:''}
     setForm(rf); saveLastChild(rf.childName,rf.age); await onGenerate(rf)
   }
 
@@ -538,20 +518,6 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
     const arr=f.favorites?f.favorites.split(',').map(s=>s.trim()).filter(Boolean):[]
     return {...f, favorites: arr.includes(f2)?arr.filter(s=>s!==f2).join(', '):[...arr,f2].join(', ')}
   })
-
-  const HERO_CARDS = [
-    {name:'лисёнок',  img:'/wizard/hero-fox.jpg'},
-    {name:'котёнок',  img:'/wizard/hero-cat.jpg'},
-    {name:'щенок',    img:'/wizard/hero-dog.jpg'},
-    {name:'дракончик',img:'/wizard/hero-dragon.jpg'},
-    {name:'зайчонок', img:'/wizard/hero-bunny.jpg'},
-    {name:'медвежонок',img:'/wizard/hero-bear.jpg'},
-    {name:'принцесса',img:'/wizard/hero-princess.jpg'},
-    {name:'рыцарь',   img:'/wizard/hero-knight.jpg'},
-    {name:'волшебник',img:'/wizard/hero-wizard.jpg'},
-    {name:'фея',      img:'/wizard/hero-fairy.jpg'},
-  ]
-  const AGE_GROUPS = ['3-4 года','5-6 лет','7-8 лет','9-10 лет']
 
   const chip = (active:boolean) => `form-chip${active?' form-chip-active':''}`
   const sub  = (active:boolean) => `form-subchip${active?' form-subchip-active':''}`
@@ -745,20 +711,20 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
               ))}
             </div>
             <p className="text-[11px] font-semibold mb-6" style={{color:'#a46713'}}>
-              Шаг {step} из 4 — {STEP_LABELS[step-1]}{step===4?' (необязательно)':''}
+              {t('wizard.stepLabel', {step, label: STEP_LABELS[step-1]})}{step===4?` ${t('wizard.optional')}`:''}
             </p>
 
             {/* ── STEP 1: Имя + возраст ── */}
             {step===1&&(
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Как зовут малыша?</label>
-                  <input value={form.childName} placeholder="Например, Соня или Миша" autoFocus
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.childNameLabel')}</label>
+                  <input value={form.childName} placeholder={t('wizard.childNamePlaceholder')} autoFocus
                     onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
                     className="form-input-night" />
                 </div>
                 <div className="flex flex-col gap-3">
-                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Сколько лет?</label>
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.ageLabel')}</label>
                   <div className="grid grid-cols-2 gap-3">
                     {AGE_GROUPS.map(a=>(
                       <button key={a} type="button" onClick={()=>setForm(f=>({...f,age:a}))}
@@ -777,7 +743,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {/* ── STEP 2: Герой ── */}
             {step===2&&(
               <div className="flex flex-col gap-4">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Выберите персонажа</label>
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.heroLabel')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {HERO_CARDS.map(h=>(
                     <button key={h.name} type="button" onClick={()=>setForm(f=>({...f,hero:h.name}))}
@@ -794,9 +760,9 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                   ))}
                 </div>
                 <div className="flex flex-col gap-1 mt-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или свой вариант</label>
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>{t('wizard.heroCustomLabel')}</label>
                   <input value={HERO_CARDS.some(h=>h.name===form.hero)?'':form.hero}
-                    placeholder="Маленькая звёздочка, храбрый рыцарь..."
+                    placeholder={t('wizard.heroPlaceholder')}
                     onChange={e=>setForm(f=>({...f,hero:e.target.value}))}
                     className="form-input-night" />
                 </div>
@@ -806,45 +772,34 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {/* ── STEP 3: Ситуация ── */}
             {step===3&&(
               <div className="flex flex-col gap-4">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Тема сказки</label>
+                <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.topicLabel')}</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {([
-                    {id:'fear'        as SituationType, label:'Страх',         img:'/wizard/sit-fear.jpg'},
-                    {id:'emotion'     as SituationType, label:'Эмоции',        img:'/wizard/sit-emotion.jpg'},
-                    {id:'adaptation'  as SituationType, label:'Новое',         img:'/wizard/sit-adaptation.jpg'},
-                    {id:'preparation' as SituationType, label:'Событие',       img:'/wizard/sit-preparation.jpg'},
-                    {id:'behavior'    as SituationType, label:'Поведение',     img:'/wizard/sit-behavior.jpg'},
-                    {id:'fun'         as SituationType, label:'Просто сказка', img:'/wizard/sit-fun.jpg'},
-                  ]).map(t=>(
-                    <button key={t.id} type="button"
-                      onClick={()=>setForm(f=>({...f,situationType:t.id,situation:''}))}
+                  {SIT_TYPES_L.map(sit=>(
+                    <button key={sit.id} type="button"
+                      onClick={()=>setForm(f=>({...f,situationType:sit.id as SituationType,situation:''}))}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
-                      style={form.situationType===t.id
+                      style={form.situationType===sit.id
                         ?{background:'#0d2b1e',color:'#fff',border:'2px solid #0d2b1e'}
                         :{background:'#f7f3ed',color:'#466252',border:'2px solid transparent'}}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={t.img} alt={t.label}
+                      <img src={sit.img} alt={sit.label}
                         style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',flexShrink:0,
-                          boxShadow: form.situationType===t.id ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none'}}/>
+                          boxShadow: form.situationType===sit.id ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none'}}/>
                       <div>
-                        <div>{t.label}</div>
-                        <div className="text-[10px] font-normal opacity-60">{
-                          {fear:'темнота, врач...',emotion:'злость, ревность...',
-                           adaptation:'садик, переезд...',preparation:'завтра к врачу...',
-                           behavior:'не слушается...',fun:'просто приключение'}[t.id]
-                        }</div>
+                        <div>{sit.label}</div>
+                        <div className="text-[10px] font-normal opacity-60">{sit.hint}</div>
                       </div>
                     </button>
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-2 p-3 rounded-xl" style={{background:'#f7f3ed'}}>
-                  {SITUATION_SUGGESTIONS[form.situationType].slice(0,5).map(s=>(
+                  {(SIT_SUGG[form.situationType] ?? []).slice(0,5).map(s=>(
                     <button key={s} type="button" onClick={()=>setForm(f=>({...f,situation:s}))}
                       className={sub(form.situation===s)}>{s}</button>
                   ))}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или опишите точнее</label>
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>{t('wizard.situationCustomLabel')}</label>
                   <input value={form.situation} placeholder={sitType.hint}
                     onChange={e=>setForm(f=>({...f,situation:e.target.value}))}
                     className="form-input-night" />
@@ -856,18 +811,18 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
             {step===4&&(
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>Что любит ребёнок?</label>
-                  <p className="text-xs mt-0.5" style={{color:'rgba(70,98,82,0.6)'}}>делает сказку по-настоящему личной</p>
+                  <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.favoritesLabel')}</label>
+                  <p className="text-xs mt-0.5" style={{color:'rgba(70,98,82,0.6)'}}>{t('wizard.favoritesHint')}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {FAVORITES_OPTIONS.map(f2=>(
+                  {FAVORITES.map(f2=>(
                     <button key={f2} type="button" onClick={()=>toggleFav(f2)}
                       className={chip(form.favorites.includes(f2))}>{f2}</button>
                   ))}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>или напишите своё</label>
-                  <input value={form.favorites} placeholder="Космос, динозавры, рисование..."
+                  <label className="text-[10px] font-semibold uppercase tracking-widest" style={{color:'#727973'}}>{t('wizard.favoritesCustomLabel')}</label>
+                  <input value={form.favorites} placeholder={t('wizard.favoritesPlaceholder')}
                     onChange={e=>setForm(f=>({...f,favorites:e.target.value}))}
                     className="form-input-night" />
                 </div>
@@ -880,21 +835,21 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 <button type="button" onClick={()=>setStep(s=>s-1)}
                   className="px-5 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-all hover:opacity-80"
                   style={{background:'#f7f3ed',color:'#466252'}}>
-                  ← Назад
+                  {t('wizard.back')}
                 </button>
               )}
               {step<4&&(
                 <button type="button" onClick={()=>setStep(s=>s+1)} disabled={!canNext()}
                   className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
                   style={{background:'#0d2b1e'}}>
-                  Далее →
+                  {t('wizard.next')}
                 </button>
               )}
               {step===4&&(
                 <button type="button" onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form)}} disabled={isLoading}
                   className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
                   style={{background:'#a46713'}}>
-                  {isLoading?'Создаём...':'✨ Создать сказку'}
+                  {isLoading ? t('wizard.creating') : t('wizard.create')}
                 </button>
               )}
             </div>
@@ -902,7 +857,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
               <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
                 className="w-full text-center text-xs mt-3 cursor-pointer hover:opacity-70 transition-opacity"
                 style={{color:'rgba(70,98,82,0.5)'}}>
-                Пропустить и создать →
+                {t('wizard.skip')}
               </button>
             )}
           </div>
@@ -922,6 +877,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
   storyRef:React.RefObject<HTMLDivElement|null>;imageCache?:Record<number,string>
 }) {
+  const t = useTranslations('story')
   const serif = "'Lora', Georgia, serif"
   const sans  = "'Plus Jakarta Sans', sans-serif"
 
@@ -935,7 +891,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
           </svg>
         </button>
         <h1 className="text-[15px] font-semibold tracking-wide flex-1 text-center pr-6" style={{fontFamily:sans,color:'#0d2b1e'}}>
-          Волшебная Сказка
+          {t('headerTitle')}
         </h1>
       </header>
 
@@ -946,7 +902,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             {/* Chapter header */}
             <section className="text-center pt-8 pb-5 px-6">
               <p className="text-[11px] uppercase tracking-widest font-bold mb-3" style={{fontFamily:sans,color:'#9ca3af'}}>
-                ГЛАВА {i+1}
+                {t('chapter', {n: i+1})}
               </p>
               {i===0 && (
                 <h2 className="font-bold leading-tight" style={{fontFamily:serif,fontSize:28,color:'#0d2b1e'}}>
@@ -991,11 +947,8 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
                 </svg>
               </div>
               <h3 className="italic mb-2" style={{fontFamily:serif,fontSize:22,color:'#0d2b1e'}}>
-                Поговорите с ребёнком
+                {t('discussTitle')}
               </h3>
-              <p className="uppercase tracking-wide" style={{fontFamily:sans,fontSize:13,color:'#9ca3af'}}>
-                Три вопроса которые помогут закрепить урок
-              </p>
             </div>
             {/* Questions with watermark numbers */}
             <div>
@@ -1030,7 +983,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
                   <path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/>
                 </svg>
                 <span className="uppercase tracking-widest" style={{fontFamily:sans,fontSize:11,color:'#92400e'}}>
-                  ВОЛШЕБНЫЙ ЯКОРЬ
+                  {t('anchorLabel')}
                 </span>
               </div>
               <h3 className="mb-3" style={{fontFamily:serif,fontSize:20,fontWeight:700,color:'#1a1c1b'}}>
@@ -1041,7 +994,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
               </p>
               <hr style={{borderColor:'#f3f4f6',marginBottom:16}}/>
               <p className="text-center italic" style={{fontFamily:serif,fontSize:12,color:'#9ca3af'}}>
-                Повторяйте ритуал перед сном в течение 7 дней
+                {t('anchorNote')}
               </p>
             </div>
           </section>
@@ -1052,18 +1005,18 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
           <button onClick={onBack}
             className="w-full cursor-pointer active:scale-[0.98] transition-transform flex items-center justify-center"
             style={{height:52,background:'#0d2b1e',color:'#fff',borderRadius:4,fontFamily:serif,fontSize:16,fontWeight:700,border:'none'}}>
-            Создать новую сказку →
+            {t('newStory')}
           </button>
           <div className="flex gap-3">
             <button onClick={onSave} disabled={alreadySaved}
               className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
               style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
-              {alreadySaved?'✓ Сохранено':'Сохранить'}
+              {alreadySaved ? t('saved') : t('save')}
             </button>
             <button onClick={onDownloadPDF} disabled={pdfLoading}
               className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
               style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
-              {pdfLoading?'Создаём...':'Скачать PDF'}
+              {pdfLoading ? t('pdfCreating') : t('pdfDownload')}
             </button>
             <button onClick={onShare} aria-label="Поделиться"
               className="flex-1 flex items-center justify-center cursor-pointer active:scale-[0.98] transition-transform"
@@ -1184,6 +1137,7 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
 
 // ── Loading screen ────────────────────────────────────────────────────────────
 function LoadingScreen({ childName }: { childName?: string }) {
+  const t = useTranslations('loading')
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -1200,7 +1154,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
   }, [])
 
   const activeStep = progress < 33 ? 0 : progress < 66 ? 1 : 2
-  const steps = ['Придумываем героя', 'Плетём сюжет', 'Рисуем картинки']
+  const steps = [t('step1'), t('step2'), t('step3')]
   const fireflies = [
     {top:'10%',left:'7%', w:3,delay:'0s',  dur:'9s' },
     {top:'22%',left:'83%',w:4,delay:'1.5s',dur:'11s'},
@@ -1232,7 +1186,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
       {/* UI — absolute bottom */}
       <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center px-6 pb-8 gap-4">
         <h1 style={{fontFamily:'Literata,Georgia,serif',fontSize:28,fontWeight:700,color:'#f9f9f7',lineHeight:1.2}}>
-          Сказка создаётся...
+          {childName ? t('title', {name: childName}) : t('titleGeneric')}
         </h1>
 
         <div className="flex justify-center gap-2 w-full">
@@ -1269,7 +1223,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
         </div>
 
         <p style={{fontFamily:'"Plus Jakarta Sans",sans-serif',fontSize:12,color:'rgba(255,255,255,0.25)',textTransform:'uppercase',letterSpacing:'0.08em'}}>
-          Это занимает около 30 секунд
+          {t('note')}
         </p>
       </div>
     </div>
@@ -1316,6 +1270,7 @@ async function generatePDF(story:Story) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Home() {
+  const locale = useLocale()
   const [status,setStatus] = useState<'idle'|'loading'|'done'|'reading'>('idle')
   const [story,setStory] = useState<Story|null>(null)
   const [currentChildName,setCurrentChildName] = useState('')
@@ -1472,7 +1427,7 @@ export default function Home() {
     setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName)
     setImageCache({})
     try{
-      const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data, locale})})
       const json=await res.json()
       if(!res.ok){setError(json.error||'Ошибка генерации');setStatus('idle');return}
 
@@ -1488,7 +1443,7 @@ export default function Home() {
       const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
         const base=imgUrl(scene.imagePrompt,i,json.storySeed??0)
         // Try up to 4 times — Pollinations can be slow
-        for(let attempt=0;attempt<4;attempt++){
+        for(let attempt=0;attempt<3;attempt++){
           const url=attempt===0?base:`${base}&t=${Date.now()}`
           const blob=await fetchImg(url)
           if(blob){cache[i]=URL.createObjectURL(blob);return}
