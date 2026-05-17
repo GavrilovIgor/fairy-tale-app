@@ -128,7 +128,7 @@ function LangSwitcher() {
     const path = window.location.pathname
     const href = locale === 'ru'
       ? `/en${path === '/' ? '' : path}`
-      : path.replace(/^\/en/, '') || '/'
+      : (path.startsWith('/en') ? path.slice(3) || '/' : path)
     window.location.href = href
   }
   return (
@@ -196,10 +196,11 @@ function MobileTopBar({title}:{title:string}) {
 
 // ── Mobile Tab Bar ────────────────────────────────────────────────────────────
 function MobileTabBar({active,onChange}:{active:MobileTab;onChange:(t:MobileTab)=>void}) {
+  const t = useTranslations('tabs')
   const tabs:[MobileTab,string,string][] = [
-    ['create',  'Создать',    'auto_fix_high'],
-    ['library', 'Библиотека', 'menu_book'],
-    ['profile', 'Профиль',   'person'],
+    ['create',  t('create'),  'auto_fix_high'],
+    ['library', t('library'), 'menu_book'],
+    ['profile', t('profile'), 'person'],
   ]
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around py-3 px-4 print:hidden"
@@ -240,6 +241,7 @@ function SiteFooter() {
 
 // ── Paywall ───────────────────────────────────────────────────────────────────
 function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;userId?:string}) {
+  const tNav = useTranslations('nav')
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'email'|'code'>('choose')
   const [pendingPlan,setPendingPlan] = useState<'monthly_sub'|'yearly_sub'|null>(null)
@@ -315,7 +317,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
           )}
           <div className="absolute bottom-3 left-0 right-0 text-center">
             <span className="italic font-bold text-base" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e',
-              textShadow:'0 0 12px rgba(212,145,42,0.4)'}}>Волшебная Сказка</span>
+              textShadow:'0 0 12px rgba(212,145,42,0.4)'}}>{tNav('logo')}</span>
           </div>
         </div>
         {children}
@@ -1029,7 +1031,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
           </div>
           {pdfError&&<p className="text-sm text-center text-red-500">{pdfError}</p>}
           <p className="text-center italic py-2" style={{fontFamily:serif,fontSize:14,color:'#9ca3af'}}>
-            Волшебная Сказка
+            {t('headerTitle')}
           </p>
         </section>
       </div>
@@ -1039,6 +1041,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
 
 // ── Library screen (mobile) ───────────────────────────────────────────────────
 function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];onOpen:(s:SavedStory)=>void;onDelete:(id:string)=>void;onCreateNew?:()=>void}) {
+  const t = useTranslations('library')
   return (
     <div className="relative min-h-screen overflow-hidden" style={{background:'#0d2b1e'}}>
       {/* Bokeh */}
@@ -1074,10 +1077,10 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
           </div>
           <h1 className="italic font-bold text-2xl mb-2" style={{fontFamily:'Literata,Georgia,serif',color:'#fff',
             textShadow:'0 0 18px rgba(212,145,42,0.45)'}}>
-            Библиотека сказок
+            {t('title')}
           </h1>
           <p className="text-sm leading-relaxed max-w-xs mx-auto" style={{color:'rgba(255,255,255,0.55)'}}>
-            Здесь хранятся все истории, которые вы создали для своих малышей. Каждую можно перечитать в любой вечер.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -1085,23 +1088,23 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
         <button onClick={onCreateNew}
           className="w-full rounded-2xl py-4 font-bold text-sm mb-8 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           style={{background:'#a46713',color:'#fff',boxShadow:'0 0 24px rgba(164,103,19,0.4)'}}>
-          ✨ Создать новую сказку
+          {t('create')}
         </button>
 
         {/* Stories list */}
         {saved.length===0 ? (
           <div className="text-center py-12">
             <p className="text-4xl mb-4">🌙</p>
-            <p className="font-serif text-lg font-bold mb-2" style={{color:'rgba(255,255,255,0.8)'}}>Здесь пока тихо...</p>
+            <p className="font-serif text-lg font-bold mb-2" style={{color:'rgba(255,255,255,0.8)'}}>{t('emptyTitle')}</p>
             <p className="text-sm" style={{color:'rgba(255,255,255,0.4)'}}>
-              Создайте первую сказку, чтобы она<br/>поселилась в этой библиотеке.
+              {t('emptyHint')}
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold uppercase tracking-widest" style={{color:'rgba(255,255,255,0.35)'}}>
-                Ваши истории
+                {t('yourStories')}
               </span>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{background:'rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)'}}>
                 {saved.length}

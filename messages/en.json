@@ -13,40 +13,40 @@
     "ctaHint": "or fill in the form below for a personalized story"
   },
   "why": {
-    "title": "Why does it work?",
-    "quote": "\"Story therapy is a recognized practice used by child psychologists worldwide\"",
-    "card1Title": "Your child sees themselves in the hero",
-    "card1Text": "The character faces the same challenges — a safe way to meet fears and difficult feelings.",
-    "card2Title": "The story is lived, not just heard",
-    "card2Text": "Your child emotionally walks the path from anxiety to resolution.",
-    "card3Title": "The lesson carries into real life",
-    "card3Text": "After reading, you discuss together — what helped the hero and how it can help your child."
+    "title": "How does it actually work?",
+    "quote": "\"Story therapy is a clinically recognised tool used by child psychologists around the world\"",
+    "card1Title": "Your child steps into the hero's shoes",
+    "card1Text": "When a character faces the same challenge, children feel safe enough to explore it — without pressure or advice.",
+    "card2Title": "The story is felt, not just followed",
+    "card2Text": "A well-crafted therapeutic tale guides children emotionally from tension to resolution — at their own pace.",
+    "card3Title": "Real life gets a little easier",
+    "card3Text": "A short conversation after the story helps the lesson land — and gives your child a tool they can actually use."
   },
   "wizard": {
-    "title": "Let's build a story together",
-    "subtitle": "4 steps — and your personalized story is ready",
+    "title": "Let's create your story together",
+    "subtitle": "Four quick steps — and a personalised tale is ready",
     "stepLabel": "Step {step} of 4 — {label}",
     "optional": "(optional)",
     "next": "Next →",
     "back": "← Back",
-    "create": "✨ Create story",
+    "create": "✨ Create my story",
     "creating": "Creating...",
     "skip": "Skip and create →",
-    "step1Label": "About the child",
-    "step2Label": "Main hero",
-    "step3Label": "What's happening?",
-    "step4Label": "Final touch",
-    "childNameLabel": "Child's name",
-    "childNamePlaceholder": "What is the child's name?",
-    "ageLabel": "How old?",
-    "heroLabel": "Choose a character",
-    "heroCustomLabel": "Or type your own",
-    "heroPlaceholder": "Little star, brave knight...",
-    "topicLabel": "Story theme",
-    "situationCustomLabel": "Or describe it yourself",
+    "step1Label": "About your child",
+    "step2Label": "Choose a hero",
+    "step3Label": "What's going on?",
+    "step4Label": "Personal touches",
+    "childNameLabel": "Your child's name",
+    "childNamePlaceholder": "e.g. Emma or Liam",
+    "ageLabel": "How old are they?",
+    "heroLabel": "Pick your hero",
+    "heroCustomLabel": "Or invent your own",
+    "heroPlaceholder": "A tiny star, a brave little knight...",
+    "topicLabel": "What does your child need help with?",
+    "situationCustomLabel": "Or describe it in your own words",
     "favoritesLabel": "What does your child love?",
-    "favoritesHint": "makes the story truly personal",
-    "favoritesCustomLabel": "Or write your own",
+    "favoritesHint": "weaves their personality into the story",
+    "favoritesCustomLabel": "Or add something else",
     "favoritesPlaceholder": "Space, dinosaurs, painting...",
     "ageGroups": ["3–4 years", "5–6 years", "7–8 years", "9–10 years"],
     "heroes": [
@@ -62,12 +62,12 @@
       {"name": "fairy", "img": "/wizard/hero-fairy.jpg"}
     ],
     "situationTypes": [
-      {"id": "fear", "label": "Fear", "hint": "darkness, doctor...", "img": "/wizard/sit-fear.jpg"},
-      {"id": "emotion", "label": "Emotions", "hint": "anger, jealousy...", "img": "/wizard/sit-emotion.jpg"},
-      {"id": "adaptation", "label": "Something new", "hint": "new school, moving...", "img": "/wizard/sit-adaptation.jpg"},
-      {"id": "preparation", "label": "Upcoming event", "hint": "doctor tomorrow...", "img": "/wizard/sit-preparation.jpg"},
-      {"id": "behavior", "label": "Behavior", "hint": "not listening...", "img": "/wizard/sit-behavior.jpg"},
-      {"id": "fun", "label": "Just a story", "hint": "a fun adventure", "img": "/wizard/sit-fun.jpg"}
+      {"id": "fear", "label": "Fears", "hint": "dark, dogs, doctors...", "img": "/wizard/sit-fear.jpg"},
+      {"id": "emotion", "label": "Big feelings", "hint": "anger, jealousy, sadness...", "img": "/wizard/sit-emotion.jpg"},
+      {"id": "adaptation", "label": "Big changes", "hint": "new school, new sibling...", "img": "/wizard/sit-adaptation.jpg"},
+      {"id": "preparation", "label": "Something coming up", "hint": "dentist, first flight...", "img": "/wizard/sit-preparation.jpg"},
+      {"id": "behavior", "label": "Tricky behaviour", "hint": "not listening, won't sleep...", "img": "/wizard/sit-behavior.jpg"},
+      {"id": "fun", "label": "Just for fun", "hint": "a magical adventure", "img": "/wizard/sit-fun.jpg"}
     ],
     "situationSuggestions": {
       "fear": ["afraid of the dark", "scared of dogs", "afraid of the doctor", "scared of thunderstorms", "afraid of bad dreams", "scared to be alone"],
@@ -83,36 +83,44 @@
     "randomFavorites": ["dinosaurs and space", "ice cream and painting", "toy cars and building blocks", "princesses and unicorns"]
   },
   "loading": {
-    "title": "Creating a story for {name}",
-    "titleGeneric": "Creating your story...",
-    "step1": "Designing the hero",
-    "step2": "Weaving the plot",
-    "step3": "Drawing illustrations",
-    "note": "THIS TAKES ABOUT 30 SECONDS"
+    "title": "Crafting a story for {name}",
+    "titleGeneric": "Your story is being written...",
+    "step1": "Bringing the hero to life",
+    "step2": "Shaping the journey",
+    "step3": "Painting the illustrations",
+    "note": "THIS USUALLY TAKES ABOUT 30 SECONDS"
   },
   "story": {
     "headerTitle": "Magic Fairy Tales",
     "chapter": "CHAPTER {n}",
-    "discussTitle": "✦ Questions to discuss",
-    "anchorLabel": "MAGIC ANCHOR",
-    "anchorNote": "Use this anchor for 7 days — whenever you need support",
-    "newStory": "Create a new story →",
+    "discussTitle": "✦ Talk it over together",
+    "anchorLabel": "YOUR MAGIC ANCHOR",
+    "anchorNote": "Return to this anchor over the next 7 days — whenever your child needs a little support",
+    "newStory": "Write a new story →",
     "save": "Save",
     "saved": "✓ Saved",
-    "pdfCreating": "Creating...",
+    "pdfCreating": "Preparing...",
     "pdfDownload": "Download PDF",
     "share": "Share"
   },
   "library": {
     "title": "Story Library",
-    "empty": "Your stories will appear here",
-    "create": "✨ Create a new story"
+    "subtitle": "All the stories you've created for your little ones live here — ready to revisit any evening.",
+    "create": "✨ Write a new story",
+    "emptyTitle": "Nothing here yet...",
+    "emptyHint": "Create your first story and it will appear here.",
+    "yourStories": "Your stories"
   },
   "footer": {
     "logo": "Magic Fairy Tales",
     "privacy": "Privacy Policy",
     "contact": "Contact us",
     "copy": "© 2026 Magic Fairy Tales"
+  },
+  "tabs": {
+    "create": "Create",
+    "library": "Library",
+    "profile": "Profile"
   },
   "auth": {
     "loginTitle": "Log in",
