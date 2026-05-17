@@ -719,7 +719,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-semibold uppercase tracking-widest" style={{color:'#466252'}}>{t('wizard.childNameLabel')}</label>
-                  <input value={form.childName} placeholder={t('wizard.childNamePlaceholder')} autoFocus
+                  <input value={form.childName} placeholder={t('wizard.childNamePlaceholder')}
                     onChange={e=>setForm(f=>({...f,childName:e.target.value}))}
                     className="form-input-night" />
                 </div>
