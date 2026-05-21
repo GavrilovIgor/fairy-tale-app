@@ -1,14 +1,42 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+const BASE = 'https://skazka-ai.vercel.app'
+
 export const metadata: Metadata = {
   title: 'Ребёнок боится врача — персональная сказка для помощи',
   description: 'Если ребёнок боится врачей и больниц — сказкотерапия помогает. Создайте персональную историю с именем ребёнка за 1 минуту. Герой преодолевает страх доктора. 3 сказки бесплатно.',
+  alternates: { canonical: `${BASE}/straxi/vrach` },
 }
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Ребёнок боится врача: как подготовить через сказку',
+    description: 'Страх медицинских процедур у детей и метод сказкотерапии для подготовки к врачу',
+    inLanguage: 'ru',
+    author: { '@type': 'Organization', name: 'Волшебная Сказка', url: BASE },
+    publisher: { '@type': 'Organization', name: 'Волшебная Сказка', url: BASE },
+    mainEntityOfPage: `${BASE}/straxi/vrach`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: BASE },
+      { '@type': 'ListItem', position: 2, name: 'Страхи', item: `${BASE}/straxi` },
+      { '@type': 'ListItem', position: 3, name: 'Страх врачей' },
+    ],
+  },
+]
 
 export default function Page() {
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '40px 20px', fontFamily: 'Georgia, serif', lineHeight: 1.7, color: '#333' }}>
+      {jsonLd.map((schema, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      ))}
       <h1 style={{ fontSize: 28, color: '#4a1d96', marginBottom: 8 }}>Ребёнок боится врача: как подготовить через сказку</h1>
       <p style={{ color: '#888', marginBottom: 32 }}>Страх медицинских процедур у детей — и как сказка помогает</p>
 
