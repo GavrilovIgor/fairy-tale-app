@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-const BASE = 'https://skazka-ai.vercel.app'
+const BASE = 'https://magicfairytale.ru'
 
 export const metadata: Metadata = {
   title: 'Ребёнок боится оставаться один — сказка для помощи | Волшебная Сказка',

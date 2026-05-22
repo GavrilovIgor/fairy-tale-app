@@ -7,7 +7,7 @@ const OWNER_CHAT_ID = process.env.OWNER_CHAT_ID!
 const API = `https://api.telegram.org/bot${BOT_TOKEN}`
 
 const OPEN_APP_KB = {
-  inline_keyboard: [[{ text: '✨ Открыть приложение', web_app: { url: 'https://skazka-ai.vercel.app/' } }]],
+  inline_keyboard: [[{ text: '✨ Открыть приложение', web_app: { url: 'https://magicfairytale.ru/' } }]],
 }
 
 async function sendMessage(chatId: string | number, text: string, keyboard?: object) {

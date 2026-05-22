@@ -17,7 +17,7 @@ function getSubscriptionInfo() {
 
 function getReferralLink(userId: string) {
   const code = userId.slice(0, 8)
-  return `https://skazka-ai.vercel.app/?ref=${code}`
+  return `https://magicfairytale.ru/?ref=${code}`
 }
 
 export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {

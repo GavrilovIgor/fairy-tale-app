@@ -17,7 +17,7 @@ const CONTENT = {
     title: 'Политика конфиденциальности',
     updated: 'Последнее обновление: 16 мая 2026 г.',
     sections: [
-      { title: '1. Кто мы', text: '«Волшебная Сказка» — сервис для создания персональных терапевтических сказок для детей. Сайт: skazka-ai.vercel.app. Вопросы: gigor92@gmail.com' },
+      { title: '1. Кто мы', text: '«Волшебная Сказка» — сервис для создания персональных терапевтических сказок для детей. Сайт: magicfairytale.ru. Вопросы: gigor92@gmail.com' },
       { title: '2. Какие данные мы собираем', text: `При регистрации через Google: имя, email, фото профиля.\nПри регистрации по email: только email.\nПри использовании: имя и возраст ребёнка, тема сказки, сохранённые истории.\nТехнические данные: сессионные cookies.` },
       { title: '3. Зачем мы используем данные', text: `— Для работы сервиса и синхронизации сказок между устройствами\n— Для персонализации историй\n— Для обработки платежей через ЮKassa (данные карт не хранятся)\n— Данные не продаются третьим лицам` },
       { title: '4. Хранение', text: 'Серверы Supabase (ЕС, Франкфурт). Удаление данных — по запросу на gigor92@gmail.com в течение 7 рабочих дней.' },
@@ -35,7 +35,7 @@ const CONTENT = {
     title: 'Privacy Policy',
     updated: 'Last updated: 16 May 2026',
     sections: [
-      { title: '1. Who we are', text: 'Magic Fairy Tales is a service for creating personalised therapeutic stories for children. Website: skazka-ai.vercel.app. Contact: gigor92@gmail.com' },
+      { title: '1. Who we are', text: 'Magic Fairy Tales is a service for creating personalised therapeutic stories for children. Website: magicfairytale.ru. Contact: gigor92@gmail.com' },
       { title: '2. What we collect', text: `When signing in with Google: name, email address, profile photo.\nWhen signing in with email: email address only.\nWhen using the service: your child's name and age, story theme, saved stories.\nTechnical data: session cookies required for login.` },
       { title: '3. How we use your data', text: `— To provide the service and sync your stories across devices\n— To personalise the generated stories\n— To process payments (we do not store card details)\n— We never sell your data to third parties` },
       { title: '4. Data storage', text: 'Data is stored on Supabase servers (EU, Frankfurt). You can request deletion at any time by emailing gigor92@gmail.com — we will action this within 7 business days.' },

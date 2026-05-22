@@ -6,7 +6,7 @@ import { routing } from '@/i18n/routing';
 
 type Locale = 'ru' | 'en'
 
-const BASE = 'https://skazka-ai.vercel.app'
+const BASE = 'https://magicfairytale.ru'
 
 const META: Record<Locale, Metadata> = {
   ru: {

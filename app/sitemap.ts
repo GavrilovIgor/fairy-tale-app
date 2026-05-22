@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const BASE = 'https://skazka-ai.vercel.app'
+const BASE = 'https://magicfairytale.ru'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()

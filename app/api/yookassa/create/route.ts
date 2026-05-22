@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 
 const SHOP_ID = process.env.YOOKASSA_SHOP_ID!
 const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
-const BASE_URL = 'https://skazka-ai.vercel.app'
+const BASE_URL = 'https://magicfairytale.ru'
 
 const PLANS = {
   monthly_sub: { amount: '299.00', description: 'Волшебная Сказка — подписка на 1 месяц' },

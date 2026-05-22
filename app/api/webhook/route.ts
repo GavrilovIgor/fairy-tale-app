@@ -36,7 +36,7 @@ function getNextCode(): string | null {
 const OPEN_APP_KEYBOARD = {
   inline_keyboard: [[{
     text: '✨ Открыть приложение',
-    web_app: { url: 'https://skazka-ai.vercel.app/' },
+    web_app: { url: 'https://magicfairytale.ru/' },
   }]],
 }
 
