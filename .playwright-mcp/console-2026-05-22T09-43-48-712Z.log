@@ -1,0 +1,2 @@
+[    1687ms] [WARNING] An error occurred! For more details, see the full error text at https://go.apollo.dev/c/err#%7B%22version%22%3A%223.14.1%22%2C%22message%22%3A103%2C%22args%22%3A%5B%22ApolloClient%22%2C%22connectToDevTools%22%2C%22Please%20use%20%60devtools.enabled%60%20instead.%22%5D%7D @ https://www.reg.ru/user/account/5760.974ee9bbaed984f725b9.js:1
+[    2273ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.reg.ru/user/account/card/119461309/nss/:0
