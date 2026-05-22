@@ -1,0 +1,463 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e11]:
+      - banner [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - link [ref=e17] [cursor=pointer]:
+              - /url: https://reg.ru
+              - img [ref=e18]
+            - list [ref=e27]:
+              - listitem [ref=e28]:
+                - button "Продукты и решения" [ref=e29] [cursor=pointer]:
+                  - text: Продукты и решения
+                  - img [ref=e30]
+              - listitem [ref=e32]:
+                - link "Облако и ИТ-инфраструктура" [ref=e33] [cursor=pointer]:
+                  - /url: https://reg.cloud
+                  - text: Облако и ИТ-инфраструктура
+                  - img [ref=e34]
+          - generic [ref=e38]:
+            - button "Помощь" [ref=e40] [cursor=pointer]:
+              - generic [ref=e41]: Помощь
+              - img [ref=e42]
+            - button "Войти" [ref=e44] [cursor=pointer]:
+              - generic [ref=e46]: Войти
+    - article [ref=e47]:
+      - generic [ref=e48]:
+        - heading "Зарегистрировать домен" [level=1] [ref=e49]
+        - generic [ref=e51]:
+          - searchbox "Введите домены или слово" [ref=e53]
+          - button "Подобрать" [ref=e54] [cursor=pointer]
+        - generic [ref=e55]:
+          - link "Домены от 0₽ в составе Рег.решений" [ref=e56] [cursor=pointer]:
+            - /url: /solutions/catalog?offerwall=1&back_to_url=1&offerwall_place=landing_domain
+            - img [ref=e57]
+            - generic [ref=e59]: Домены от 0₽ в составе Рег.решений
+            - img [ref=e60]
+          - link "Перенести ваш домен в Рег.ру" [ref=e62] [cursor=pointer]:
+            - /url: /domain/service/transfer/
+          - link "Регистрация доменов списком" [ref=e63] [cursor=pointer]:
+            - /url: /domain/new/bulk
+      - article [ref=e65]:
+        - tablist [ref=e66]:
+          - listitem [ref=e67]:
+            - tab "Популярные доменные зоны" [selected] [ref=e68]
+          - listitem [ref=e69]:
+            - tab "Со скидкой" [ref=e70]
+        - tabpanel "Популярные доменные зоны" [ref=e72]:
+          - list [ref=e73]:
+            - listitem [ref=e74]:
+              - link ".ru Самая популярная доменная зона в России 169 ₽" [ref=e75] [cursor=pointer]:
+                - /url: /domain/new/RU
+                - generic [ref=e76]:
+                  - paragraph [ref=e77]: .ru
+                  - paragraph [ref=e78]:
+                    - text: Самая популярная
+                    - text: доменная зона в России
+                - generic [ref=e81]: 169 ₽
+            - listitem [ref=e82]:
+              - link ".com Для успешного взлёта бизнеса 1 792 ₽ 2 819 ₽" [ref=e83] [cursor=pointer]:
+                - /url: /domain/new/COM
+                - generic [ref=e84]:
+                  - paragraph [ref=e85]: .com
+                  - paragraph [ref=e86]: Для успешного взлёта бизнеса
+                - generic [ref=e88]:
+                  - generic [ref=e89]: 1 792 ₽
+                  - generic [ref=e90]: 2 819 ₽
+            - listitem [ref=e91]:
+              - link ".рф Идеальное место для онлайн-бизнеса 169 ₽ 1 199 ₽" [ref=e92] [cursor=pointer]:
+                - /url: /domain/new/РФ
+                - generic [ref=e93]:
+                  - paragraph [ref=e94]: .рф
+                  - paragraph [ref=e95]: Идеальное место для онлайн-бизнеса
+                - generic [ref=e97]:
+                  - generic [ref=e98]: 169 ₽
+                  - generic [ref=e99]: 1 199 ₽
+            - listitem [ref=e100]:
+              - link ".su 669 ₽ 730 ₽" [ref=e101] [cursor=pointer]:
+                - /url: /domain/new/SU
+                - paragraph [ref=e103]: .su
+                - generic [ref=e105]:
+                  - generic [ref=e106]: 669 ₽
+                  - generic [ref=e107]: 730 ₽
+            - listitem [ref=e108]:
+              - link ".site 249 ₽ 3 749 ₽" [ref=e109] [cursor=pointer]:
+                - /url: /domain/new/SITE
+                - paragraph [ref=e111]: .site
+                - generic [ref=e113]:
+                  - generic [ref=e114]: 249 ₽
+                  - generic [ref=e115]: 3 749 ₽
+            - listitem [ref=e116]:
+              - link ".online 249 ₽ 4 689 ₽" [ref=e117] [cursor=pointer]:
+                - /url: /domain/new/ONLINE
+                - paragraph [ref=e119]: .online
+                - generic [ref=e121]:
+                  - generic [ref=e122]: 249 ₽
+                  - generic [ref=e123]: 4 689 ₽
+            - listitem [ref=e124]:
+              - link ".shop 249 ₽ 7 720 ₽" [ref=e125] [cursor=pointer]:
+                - /url: /domain/new/SHOP
+                - paragraph [ref=e127]: .shop
+                - generic [ref=e129]:
+                  - generic [ref=e130]: 249 ₽
+                  - generic [ref=e131]: 7 720 ₽
+            - listitem [ref=e132]:
+              - link ".fun 199 ₽ 3 689 ₽" [ref=e133] [cursor=pointer]:
+                - /url: /domain/new/FUN
+                - paragraph [ref=e135]: .fun
+                - generic [ref=e137]:
+                  - generic [ref=e138]: 199 ₽
+                  - generic [ref=e139]: 3 689 ₽
+            - listitem [ref=e140]:
+              - link ".space 199 ₽ 2 859 ₽" [ref=e141] [cursor=pointer]:
+                - /url: /domain/new/SPACE
+                - paragraph [ref=e143]: .space
+                - generic [ref=e145]:
+                  - generic [ref=e146]: 199 ₽
+                  - generic [ref=e147]: 2 859 ₽
+            - listitem [ref=e148]:
+              - link ".tech 299 ₽ 5 259 ₽" [ref=e149] [cursor=pointer]:
+                - /url: /domain/new/TECH
+                - paragraph [ref=e151]: .tech
+                - generic [ref=e153]:
+                  - generic [ref=e154]: 299 ₽
+                  - generic [ref=e155]: 5 259 ₽
+            - listitem [ref=e156]:
+              - link ".pro 249 ₽ 5 338 ₽" [ref=e157] [cursor=pointer]:
+                - /url: /domain/new/PRO
+                - paragraph [ref=e159]: .pro
+                - generic [ref=e161]:
+                  - generic [ref=e162]: 249 ₽
+                  - generic [ref=e163]: 5 338 ₽
+      - generic [ref=e164]:
+        - link "Изучить все доменные зоны" [ref=e165] [cursor=pointer]:
+          - /url: /domain/new/zonepedia
+        - link "Все категории доменов" [ref=e166] [cursor=pointer]:
+          - /url: /domain/new/category/
+      - list [ref=e168]:
+        - listitem [ref=e169]:
+          - article [ref=e170]:
+            - heading "Магазин доменов" [level=3] [ref=e171]:
+              - text: Магазин
+              - text: доменов
+            - paragraph [ref=e172]: Подберите красивый домен с историей для бизнеса
+            - link "Подобрать домен" [ref=e173] [cursor=pointer]:
+              - /url: /domain/shop/
+        - listitem [ref=e174]:
+          - article [ref=e175]:
+            - heading "Доменный брокер" [level=3] [ref=e176]:
+              - text: Доменный
+              - text: брокер
+            - paragraph [ref=e177]: Понравился занятый домен? Закажите услугу брокера у нас
+            - link "Оставить заявку" [ref=e178] [cursor=pointer]:
+              - /url: /domain/service/domain-broker
+        - listitem [ref=e179]:
+          - article [ref=e180]:
+            - heading "Скоро освободятся" [level=3] [ref=e181]:
+              - text: Скоро
+              - text: освободятся
+            - paragraph [ref=e182]: Вы можете сделать заявку на домен, который освободится
+            - link "Отслеживать домены" [ref=e183] [cursor=pointer]:
+              - /url: /domain/new/rereg
+      - generic [ref=e185]:
+        - heading "Почему выбирают Рег.ру" [level=2] [ref=e186]
+        - article [ref=e187]:
+          - list [ref=e189]:
+            - listitem [ref=e190]:
+              - article [ref=e192]:
+                - img [ref=e193]
+                - heading "Крупнейший регистратор в России*" [level=3] [ref=e197]
+                - paragraph [ref=e198]:
+                  - text: 3,1 миллиона доменов на обслуживании
+                  - text: "*по данным statonline.ru"
+            - listitem [ref=e199]:
+              - article [ref=e201]:
+                - heading "Пространство для нового опыта" [level=3] [ref=e202]
+                - paragraph [ref=e203]: Тестируйте бизнес-идеи, запускайте новые продукты в любой из 700+ доменных зон и ни о чем не беспокойтесь.
+            - listitem [ref=e204]:
+              - article [ref=e206]:
+                - heading "Простая настройка" [level=3] [ref=e207]
+                - paragraph [ref=e208]: Домен легко настроить и подключить сайт — не нужно никаких специальных навыков
+            - listitem [ref=e209]:
+              - article [ref=e211]:
+                - img [ref=e212]
+                - heading "Круглосуточная поддержка" [level=3] [ref=e216]
+                - paragraph [ref=e217]: Наши специалисты на связи круглосуточно каждый день без выходных
+      - link "Реклама • reg.ru" [ref=e220] [cursor=pointer]:
+        - /url: https://yandex.ru/adfox/699999/clickURL?ad-session-id=8713781779431828414&adfox-version=1&duid=1779431746935564318&efc=1&erid=Kra23m89d&esc=0&hash=5019889dbd8c4af9&initial-engine-id=gmg&p1=cxozj&p2=ibnu&p5=bbrwbf&pr=lkwgwke&rand=ccffavx&rqs=Q5UMRXpbsB-V-Q9qUdmSY6mDqDLAWcMJ&sj=_-O57jCyn6LTei-QGh-OMPjjuOIx3Rbw3ZL1rZB5_1dU_kt1VDLck9lVXC31K_YrmGWY4yhBxX9gVt1boEQIZCnJSrHe35CSYA5kjUGfnSbukPCjto6XWE531D2X9txk3kKmqoX9iz-BAaQVsczQNS1_uo_Plm1Gp6DXJpSCa8ib&ybv=0.1305066&ylv=0.1305066&ytt=269380348805125&pf=https%3A%2F%2Fwww.reg.ru%2Fhosting%2Fmail%3Frtm_campaign%3Dbanner_domains_mail
+        - img [ref=e223]
+        - generic:
+          - generic: Реклама • reg.ru
+      - article [ref=e228]:
+        - heading "Частые вопросы" [level=2] [ref=e231]
+        - generic [ref=e232]:
+          - list [ref=e233]:
+            - listitem [ref=e234]:
+              - group [ref=e235]:
+                - generic "Что такое домен?" [ref=e236]:
+                  - heading "Что такое домен?" [level=3] [ref=e239]
+            - listitem [ref=e241]:
+              - group [ref=e242]:
+                - generic "Какую доменную зону выбрать?" [ref=e243]:
+                  - heading "Какую доменную зону выбрать?" [level=3] [ref=e246]
+            - listitem [ref=e248]:
+              - group [ref=e249]:
+                - generic "Что делать, если домен уже занят?" [ref=e250]:
+                  - heading "Что делать, если домен уже занят?" [level=3] [ref=e253]
+            - listitem [ref=e255]:
+              - group [ref=e256]:
+                - generic "Как купить доменное имя в Рег.ру?" [ref=e257]:
+                  - heading "Как купить доменное имя в Рег.ру?" [level=3] [ref=e260]
+            - listitem [ref=e262]:
+              - group [ref=e263]:
+                - generic "Я зарегистрировал домен. Что дальше?" [ref=e264]:
+                  - heading "Я зарегистрировал домен. Что дальше?" [level=3] [ref=e267]
+            - listitem [ref=e269]:
+              - group [ref=e270]:
+                - generic "Сколько стоит домен?" [ref=e271]:
+                  - heading "Сколько стоит домен?" [level=3] [ref=e274]
+          - link "Подробнее в Базе знаний" [ref=e276] [cursor=pointer]:
+            - /url: https://help.reg.ru/support/
+  - generic [ref=e277]:
+    - navigation "breadcrumbs" [ref=e282]:
+      - list [ref=e283]:
+        - listitem [ref=e284]:
+          - link "Главная" [ref=e285] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e286]: Главная
+        - listitem [ref=e287]:
+          - generic [ref=e288]: Домены
+    - contentinfo [ref=e290]:
+      - generic [ref=e291]:
+        - generic [ref=e292]:
+          - generic [ref=e293]:
+            - img [ref=e294]
+            - generic [ref=e301]:
+              - list [ref=e302]:
+                - listitem [ref=e303]:
+                  - link "+7 (495) 580-11-11" [ref=e304] [cursor=pointer]:
+                    - /url: tel:+74955801111
+                  - generic [ref=e305]: Телефон в Москве
+              - list [ref=e306]:
+                - listitem [ref=e307]:
+                  - link [ref=e308] [cursor=pointer]:
+                    - /url: https://vk.com/regru
+                    - img [ref=e309]
+                - listitem [ref=e311]:
+                  - link [ref=e312] [cursor=pointer]:
+                    - /url: https://t.me/regru
+                    - img [ref=e313]
+                - listitem [ref=e315]:
+                  - link [ref=e316] [cursor=pointer]:
+                    - /url: https://ok.ru/regru
+                    - img [ref=e317]
+                - listitem [ref=e319]:
+                  - link [ref=e320] [cursor=pointer]:
+                    - /url: https://vc.ru/reg-ru
+                    - img [ref=e321]
+                - listitem [ref=e323]:
+                  - link [ref=e324] [cursor=pointer]:
+                    - /url: https://dzen.ru/regru
+                    - img [ref=e325]
+                - listitem [ref=e327]:
+                  - link [ref=e328] [cursor=pointer]:
+                    - /url: https://companies.rbc.ru/id/1067746613494-regru
+                    - img [ref=e329]
+          - navigation [ref=e331]:
+            - listitem [ref=e332]:
+              - strong [ref=e333]: Продукты
+              - list [ref=e334]:
+                - listitem [ref=e335]:
+                  - link "Домены" [ref=e336] [cursor=pointer]:
+                    - /url: /domain/new/
+                - listitem [ref=e337]:
+                  - link "Хостинг" [ref=e338] [cursor=pointer]:
+                    - /url: /hosting/
+                - listitem [ref=e339]:
+                  - link "Почта" [ref=e340] [cursor=pointer]:
+                    - /url: /hosting/mail
+                - listitem [ref=e341]:
+                  - link "SSL-сертификаты" [ref=e342] [cursor=pointer]:
+                    - /url: /ssl-certificate/
+                - listitem [ref=e343]:
+                  - link "Конструктор сайтов" [ref=e344] [cursor=pointer]:
+                    - /url: /sozdanie-saita/
+                - listitem [ref=e345]:
+                  - link "VPS и VDS серверы" [ref=e346] [cursor=pointer]:
+                    - /url: /vps/
+                - listitem [ref=e347]:
+                  - link "Магазин доменов" [ref=e348] [cursor=pointer]:
+                    - /url: /domain/shop/
+                - listitem [ref=e349]:
+                  - link "Облако для бизнеса" [ref=e350] [cursor=pointer]:
+                    - /url: https://reg.cloud/
+            - listitem [ref=e351]:
+              - strong [ref=e352]: Решения по сфере бизнеса
+              - list [ref=e353]:
+                - listitem [ref=e354]:
+                  - link "Подойдут всем" [ref=e355] [cursor=pointer]:
+                    - /url: /solutions/catalog/group/universalnye-resheniya
+                - listitem [ref=e356]:
+                  - link "Маркетплейсы" [ref=e357] [cursor=pointer]:
+                    - /url: /solutions/catalog/marketplaces
+                - listitem [ref=e358]:
+                  - link "Образование" [ref=e359] [cursor=pointer]:
+                    - /url: /solutions/catalog/education
+                - listitem [ref=e360]:
+                  - link "Бьюти" [ref=e361] [cursor=pointer]:
+                    - /url: /solutions/catalog/beauty
+                - listitem [ref=e362]:
+                  - link "Медицина" [ref=e363] [cursor=pointer]:
+                    - /url: /solutions/catalog/health
+                - listitem [ref=e364]:
+                  - link "Автосервисы" [ref=e365] [cursor=pointer]:
+                    - /url: /solutions/catalog/car
+                - listitem [ref=e366]:
+                  - link "Бытовые услуги" [ref=e367] [cursor=pointer]:
+                    - /url: /solutions/catalog/household
+                - listitem [ref=e368]:
+                  - link "Досуг" [ref=e369] [cursor=pointer]:
+                    - /url: /solutions/catalog/leisure
+                - listitem [ref=e370]:
+                  - link "Спорт" [ref=e371] [cursor=pointer]:
+                    - /url: /solutions/catalog/sport
+                - listitem [ref=e372]:
+                  - link "Все решения" [ref=e373] [cursor=pointer]:
+                    - /url: /solutions/catalog
+            - listitem [ref=e374]:
+              - strong [ref=e375]: Сервисы
+              - list [ref=e376]:
+                - listitem [ref=e377]:
+                  - link "Whois – проверить данные домена" [ref=e378] [cursor=pointer]:
+                    - /url: /whois/
+                - listitem [ref=e379]:
+                  - link "Определить IP адрес" [ref=e380] [cursor=pointer]:
+                    - /url: /web-tools/myip
+                - listitem [ref=e381]:
+                  - link "Проверить порт на доступность" [ref=e382] [cursor=pointer]:
+                    - /url: /web-tools/port-checker
+                - listitem [ref=e383]:
+                  - link "Проверить IP адрес сайта" [ref=e384] [cursor=pointer]:
+                    - /url: /web-tools/checkip
+                - listitem [ref=e385]:
+                  - link "Перевести домен в Punycode" [ref=e386] [cursor=pointer]:
+                    - /url: /web-tools/punycode
+                - listitem [ref=e387]:
+                  - link "Проверить скорость интернета" [ref=e388] [cursor=pointer]:
+                    - /url: /web-tools/speedtest
+            - listitem [ref=e389]:
+              - strong [ref=e390]: Компания
+              - list [ref=e391]:
+                - listitem [ref=e392]:
+                  - link "О компании" [ref=e393] [cursor=pointer]:
+                    - /url: /company
+                - listitem [ref=e394]:
+                  - link "Контакты" [ref=e395] [cursor=pointer]:
+                    - /url: /company/contacts
+                - listitem [ref=e396]:
+                  - link "Офисы" [ref=e397] [cursor=pointer]:
+                    - /url: /company/office/moscow
+                - listitem [ref=e398]:
+                  - link "Новости" [ref=e399] [cursor=pointer]:
+                    - /url: /company/news/
+                - listitem [ref=e400]:
+                  - link "Акции и скидки" [ref=e401] [cursor=pointer]:
+                    - /url: /company/promotions/
+                - listitem [ref=e402]:
+                  - link "Блог" [ref=e403] [cursor=pointer]:
+                    - /url: https://www.reg.ru/blog/
+                - listitem [ref=e404]:
+                  - link "Отзывы клиентов" [ref=e405] [cursor=pointer]:
+                    - /url: /company/feedback
+            - listitem [ref=e406]:
+              - strong [ref=e407]: Полезное
+              - list [ref=e408]:
+                - listitem [ref=e409]:
+                  - link "Стоимость услуг" [ref=e410] [cursor=pointer]:
+                    - /url: /company/prices/
+                - listitem [ref=e411]:
+                  - link "Способы оплаты" [ref=e412] [cursor=pointer]:
+                    - /url: https://help.reg.ru/support/finansovyye-voprosy/oplata-schetov-i-uslug/sposoby-oplaty-kak-vystavit-i-oplatit-schet#0
+                - listitem [ref=e413]:
+                  - link "Бонусная программа" [ref=e414] [cursor=pointer]:
+                    - /url: /reseller/referral-program
+                - listitem [ref=e415]:
+                  - link "Документы" [ref=e416] [cursor=pointer]:
+                    - /url: https://help.reg.ru/support/dokymenty/
+                - listitem [ref=e417]:
+                  - link "База знаний" [ref=e418] [cursor=pointer]:
+                    - /url: https://help.reg.ru/support/
+                - listitem [ref=e419]:
+                  - link "ЭДО" [ref=e420] [cursor=pointer]:
+                    - /url: /edo
+                - listitem [ref=e421]:
+                  - link "Партнерам" [ref=e422] [cursor=pointer]:
+                    - /url: /reseller/referral-program
+            - listitem [ref=e423]:
+              - strong [ref=e424]: Другое
+              - list [ref=e425]:
+                - listitem [ref=e426]:
+                  - 'link "РБК: новости России и мира сегодня" [ref=e427] [cursor=pointer]':
+                    - /url: https://www.rbc.ru/
+                - listitem [ref=e428]:
+                  - link "Новости компаний РФ" [ref=e429] [cursor=pointer]:
+                    - /url: https://companies.rbc.ru/
+                - listitem [ref=e430]:
+                  - 'link "РБК Инвестиции: курсы валют" [ref=e431] [cursor=pointer]':
+                    - /url: https://www.rbc.ru/quote
+                - listitem [ref=e432]:
+                  - link "Спецпроект с Онлайн Патентом" [ref=e433] [cursor=pointer]:
+                    - /url: https://onlinepatent.ru/frequentwords/?utm_source=partner_regru&utm_medium=main_footer&utm_campaign=frequentwords_251110&erid=2VSb5yfdPNh
+        - generic [ref=e434]:
+          - paragraph [ref=e435]: Облачная платформа Рег.ру включена в реестр российского ПО Запись № 23682 от 29.08.2024
+          - list [ref=e436]:
+            - listitem [ref=e437]:
+              - link "mintsifry" [ref=e438] [cursor=pointer]:
+                - /url: https://reestr.digital.gov.ru/reestr/2623382/
+                - img "mintsifry" [ref=e439]
+            - listitem [ref=e440]:
+              - link "icann" [ref=e441] [cursor=pointer]:
+                - /url: http://www.icann.org/
+                - img "icann" [ref=e442]
+            - listitem [ref=e443]:
+              - link "cctld" [ref=e444] [cursor=pointer]:
+                - /url: http://www.cctld.ru/ru/
+                - img "cctld" [ref=e445]
+        - generic [ref=e446]:
+          - generic [ref=e447]: © ООО «РЕГ.РУ»
+          - list [ref=e448]:
+            - listitem [ref=e449]:
+              - link "Политика конфиденциальности" [ref=e450] [cursor=pointer]:
+                - /url: https://img.reg.ru/faq/politika_konfidencyalnosti_221025.pdf
+            - listitem [ref=e451]:
+              - link "Политика обработки персональных данных" [ref=e452] [cursor=pointer]:
+                - /url: https://img.reg.ru/faq/politika_obrabotki_personalnyh_dannyh_010425.pdf
+            - listitem [ref=e453]:
+              - link "Правила применения рекомендательных технологий" [ref=e454] [cursor=pointer]:
+                - /url: https://help.reg.ru/support/dokymenty/pravila-i-politiki/pravila-primeneniya-rekomendatelnykh-tekhnologiy
+            - listitem [ref=e455]:
+              - link "Правила пользования" [ref=e456] [cursor=pointer]:
+                - /url: https://www.reg.ru/company/rules
+              - text: и другие
+              - link "правила и политики" [ref=e457] [cursor=pointer]:
+                - /url: https://help.reg.ru/support/dokymenty/pravila-i-politiki/
+            - listitem [ref=e458]:
+              - link "Сообщить о нарушении" [ref=e459] [cursor=pointer]:
+                - /url: /legal/abuse/
+  - list:
+    - listitem:
+      - article [ref=e460]:
+        - generic [ref=e461]:
+          - paragraph [ref=e462]:
+            - text: Используем
+            - link "куки" [ref=e463] [cursor=pointer]:
+              - /url: https://img.reg.ru/faq/politika_obrabotki_fajlov_cookie_010425.pdf
+            - text: ", это делает удобнее вашу работу с сайтом"
+          - button "Хорошо" [ref=e464] [cursor=pointer]
+    - listitem:
+      - button "Помощь" [ref=e466] [cursor=pointer]:
+        - img [ref=e467]
+        - generic [ref=e469]: Помощь
+  - iframe
+  - img [ref=e470]

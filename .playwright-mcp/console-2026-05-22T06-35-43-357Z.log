@@ -1,0 +1,5 @@
+[    2560ms] [LOG] JQMIGRATE: Migrate is installed with logging active, version 1.4.1 @ https://www.reg.ru/dist/head-scripts.cc63df69cf71e7401e3c.js:69
+[    2744ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
+[    3620ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
+[   22075ms] [ERROR] Access to fetch at 'https://sentry.reg.ru/api/30/envelope/?sentry_key=c3c5a9e0867f4e1e94055b371550d5cd&sentry_version=7&sentry_client=sentry.javascript.vue%2F7.120.4' from origin 'https://www.reg.ru' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.reg.ru/buy/domains/?query=magic+fairy+tale&place_of_order=domain-new&_csrf=e2199f2540c626522ae71c663f8f947b:0
+[   22076ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://sentry.reg.ru/api/30/envelope/?sentry_key=c3c5a9e0867f4e1e94055b371550d5cd&sentry_version=7&sentry_client=sentry.javascript.vue%2F7.120.4:0

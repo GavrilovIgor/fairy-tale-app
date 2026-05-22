@@ -1,0 +1,3 @@
+[     367ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
+[     453ms] [LOG] JQMIGRATE: Migrate is installed with logging active, version 1.4.1 @ https://www.reg.ru/dist/head-scripts.cc63df69cf71e7401e3c.js:69
+[     862ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
