@@ -18,6 +18,9 @@ export const metadata: Metadata = {
     icon: [{ url: "/favicon.png", type: "image/png" }],
     apple: "/favicon.png",
   },
+  verification: {
+    yandex: "e28593387255d84e",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
