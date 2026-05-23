@@ -126,7 +126,7 @@ def card_01():
     hline(draw, 110)
 
     draw_centered(draw, "ЛЁГ В", 140, big(130), WHITE)
-    draw_centered(draw, "БОЛЬНИЦУ 🏥", 282, big(130), YELLOW)
+    draw_centered_emoji(img, draw, "БОЛЬНИЦУ 🏥", 282, big(130), YELLOW)
 
     hline(draw, 448, color=(50, 50, 50))
 
@@ -136,7 +136,7 @@ def card_01():
 
     fo_b = body(29)
     draw_centered(draw, "Нет, это не бред после наркоза.", 628, fo_b, GREY)
-    draw_centered(draw, "(хотя было кайфово 😂)", 672, fo_b, DIM)
+    draw_centered_emoji(img, draw, "(хотя было кайфово 😂)", 672, fo_b, DIM)
 
     fo_hint = bold(24)
     draw_centered(draw, "листай →", 742, fo_hint, YELLOW)
