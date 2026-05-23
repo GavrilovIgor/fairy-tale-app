@@ -241,25 +241,25 @@ def card_06():
     hline(draw, 110)
 
     top_lines = [
-        ("Тая теперь сама подходит",        body(32), WHITE),
-        ("знакомиться с детьми",            body(32), WHITE),
-        ("",                                body(14), GREY),
-        ("Теперь говорит себе:",            body(30), WHITE),
-        ("(кстати, без мамы \U0001f609)",   body(27), GREY),
+        ("Тая теперь сама идёт",        body(32), WHITE),
+        ("знакомиться с детьми",        body(32), WHITE),
+        ("",                            body(14), GREY),
+        ("Теперь говорит себе:",        body(30), GREY),
     ]
-    draw_block(img, draw, top_lines, 140, line_gap=10, use_emoji=True)
+    draw_block(img, draw, top_lines, 148, line_gap=12)
 
-    hline(draw, 380)
+    hline(draw, 308)
 
-    draw_centered(draw, "«МНЕ НЕ",   412, big(118), YELLOW)
-    draw_centered(draw, "СТРАШНО»",  536, big(118), YELLOW)
+    draw_centered(draw, "«МНЕ НЕ",   338, big(118), YELLOW)
+    draw_centered(draw, "СТРАШНО»",  462, big(118), YELLOW)
+
+    hline(draw, 608)
 
     lines = [
-        ("",                             body(20), GREY),
-        ("ОДНА. САМА.",                  med(54),  WHITE),
-        ("Сказкотерапия работает.",      body(30), GREY),
+        ("Это якорь из сказки.",        body(30), WHITE),
+        ("Сработало за 3 вечера.",      med(44),  YELLOW),
     ]
-    draw_block(img, draw, lines, 680, line_gap=16)
+    draw_block(img, draw, lines, 638, line_gap=20)
 
     counter(draw, 6)
     save(img, "card_06_result.png")
