@@ -173,28 +173,31 @@ def card_03_discovery():
     draw_text_centered(draw, "ИДЕЯ", 92, f_label, DIM, letter_spacing=8)
 
     f_body = font(FONT_ARIAL, 32)
-    y = 190
+    y = 172
     draw_text_centered(draw, "Читаю Тае книгу. Она успокаивается.", y, f_body, WHITE)
-    y += 54
+    y += 50
     draw_text_centered(draw, "И тут думаю...", y, f_body, DIM)
 
-    y += 80
+    y += 56
     thin_line(draw, y)
-    y += 36
+    y += 32
 
-    f_big = font(FONT_IMPACT, 96)
+    f_big = font(FONT_IMPACT, 86)
     draw_text_centered(draw, "А ЕСЛИ БЫ СКАЗКА", y, f_big, YELLOW, letter_spacing=-2)
-    y += 112
-    draw_text_centered(draw, "БЫЛА ПРО", y, f_big, YELLOW, letter_spacing=-2)
-    y += 112
-    draw_text_centered(draw, "ЕЁ СТРАХ?", y, f_big, WHITE, letter_spacing=-2)
+    y += 102
+    draw_text_centered(draw, "БЫЛА ПРО ЕЁ СТРАХ?", y, f_big, WHITE, letter_spacing=-2)
 
-    y += 92
-    f_sub = font(FONT_ARIAL, 28)
+    y += 86
+    thin_line(draw, y, color=WHITE)
+    y += 32
+
+    f_sub = font(FONT_ARIAL, 30)
     draw_text_centered(draw, "Прямо её. С её именем.", y, f_sub, DIM)
-    y += 44
-    f_example = font(FONT_DIN, 38)
-    draw_text_centered(draw, "Не Колобок. А «Тая и первый день в садике».", y, f_example, WHITE)
+    y += 52
+    f_example = font(FONT_DIN, 40)
+    draw_text_centered(draw, "Не Колобок.", y, f_example, WHITE)
+    y += 54
+    draw_text_centered(draw, "А «Тая и первый день в садике».", y, f_example, YELLOW)
 
     f_counter = font(FONT_ARIAL_B, 20)
     draw_text_centered(draw, "3 / 7", H - 64, f_counter, DIM)
@@ -222,7 +225,7 @@ def card_04_hospital():
 
     f_body = font(FONT_ARIAL, 30)
     y = 566
-    draw_text_centered(draw, "Продакт без задач — это опасно. 😅", y, f_body, DIM)
+    draw_text_centered(draw, "Продакт без задач — это опасно.", y, f_body, DIM)
     y += 50
     draw_text_centered(draw, "Давно смотрел рилсы про Claude Code —", y, f_body, WHITE)
     y += 46
@@ -230,7 +233,7 @@ def card_04_hospital():
 
     y += 64
     f_accent = font(FONT_DIN, 44)
-    draw_text_centered(draw, "MVP → фича → дизайн → нейронка. 🚀", y, f_accent, YELLOW)
+    draw_text_centered(draw, "MVP -> фича -> дизайн -> нейронка.", y, f_accent, YELLOW)
 
     f_counter = font(FONT_ARIAL_B, 20)
     draw_text_centered(draw, "4 / 7", H - 64, f_counter, DIM)
@@ -256,19 +259,16 @@ def card_05_how():
 
     thin_line(draw, 530)
 
+    f_din = font(FONT_DIN, 44)
     f_body = font(FONT_ARIAL, 29)
-    features = [
-        "С его именем. Его страхом. Его героем.",
-        "По методу сказкотерапии 🪄",
-        "(детских психологов, на минуточку)",
-        "За 30 секунд.",
-    ]
-    y = 564
-    for i, feat in enumerate(features):
-        color = YELLOW if i in (0, 3) else (WHITE if i == 1 else DIM)
-        f_use = font(FONT_DIN, 42) if i in (0, 3) else f_body
-        draw_text_centered(draw, feat, y, f_use, color)
-        y += 52
+    y = 566
+    draw_text_centered(draw, "С его именем. Его страхом. Его героем.", y, f_din, YELLOW)
+    y += 58
+    draw_text_centered(draw, "По методу сказкотерапии", y, f_body, WHITE)
+    y += 44
+    draw_text_centered(draw, "(детских психологов, на минуточку)", y, f_body, DIM)
+    y += 60
+    draw_text_centered(draw, "За 30 секунд.", f_din, YELLOW)
 
     f_counter = font(FONT_ARIAL_B, 20)
     draw_text_centered(draw, "5 / 7", H - 64, f_counter, DIM)
