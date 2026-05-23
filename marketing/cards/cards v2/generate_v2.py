@@ -198,8 +198,8 @@ def card_04():
     lines = [
         ("Продакт без задач — не умеет.",          body(30), WHITE),
         ("",                                        body(16), GREY),
-        ("MVP → фича раз → фича два →",            med(42),  YELLOW),
-        ("дизайн → монетизация",                   med(42),  YELLOW),
+        ("MVP → фича раз → фича два →",            bold(36),  YELLOW),
+        ("дизайн → монетизация",                   bold(36),  YELLOW),
     ]
     draw_block(img, draw, lines, 634, line_gap=12)
 
