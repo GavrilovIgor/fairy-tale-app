@@ -66,14 +66,14 @@ export default function Page() {
 
       <h2 style={{ fontSize: 20, color: '#4a1d96', marginTop: 32 }}>Другие страхи</h2>
       <ul>
-        <li><Link href="/straxi/temnota">Боится темноты</Link></li>
-        <li><Link href="/straxi/odinochestvo">Боится оставаться один</Link></li>
-        <li><Link href="/straxi/sadik">Не хочет идти в садик</Link></li>
-        <li><Link href="/straxi/vrach">Боится врачей</Link></li>
-        <li><Link href="/straxi/shkola">Боится идти в школу</Link></li>
-        <li><Link href="/straxi/son">Не может заснуть</Link></li>
-        <li><Link href="/straxi/brat-sestra">Ревнует к братику или сестрёнке</Link></li>
-        <li><Link href="/straxi/pereezd">Переезд в новый дом</Link></li>
+        <li><Link href="/straxi/temnota" style={{ color: "#7c3aed" }}>Боится темноты</Link></li>
+        <li><Link href="/straxi/odinochestvo" style={{ color: "#7c3aed" }}>Боится оставаться один</Link></li>
+        <li><Link href="/straxi/sadik" style={{ color: "#7c3aed" }}>Не хочет идти в садик</Link></li>
+        <li><Link href="/straxi/vrach" style={{ color: "#7c3aed" }}>Боится врачей</Link></li>
+        <li><Link href="/straxi/shkola" style={{ color: "#7c3aed" }}>Боится идти в школу</Link></li>
+        <li><Link href="/straxi/son" style={{ color: "#7c3aed" }}>Не может заснуть</Link></li>
+        <li><Link href="/straxi/brat-sestra" style={{ color: "#7c3aed" }}>Ревнует к братику или сестрёнке</Link></li>
+        <li><Link href="/straxi/pereezd" style={{ color: "#7c3aed" }}>Переезд в новый дом</Link></li>
       </ul>
     </div>
   )

@@ -67,9 +67,9 @@ export default function Page() {
 
       <h2 style={{ fontSize: 20, color: '#4a1d96', marginTop: 32 }}>Другие страхи</h2>
       <ul>
-        <li><Link href="/straxi/odinochestvo">Боится оставаться один</Link></li>
-        <li><Link href="/straxi/sadik">Не хочет идти в садик</Link></li>
-        <li><Link href="/straxi/vrach">Боится врачей</Link></li>
+        <li><Link href="/straxi/odinochestvo" style={{ color: "#7c3aed" }}>Боится оставаться один</Link></li>
+        <li><Link href="/straxi/sadik" style={{ color: "#7c3aed" }}>Не хочет идти в садик</Link></li>
+        <li><Link href="/straxi/vrach" style={{ color: "#7c3aed" }}>Боится врачей</Link></li>
       </ul>
     </div>
   )
