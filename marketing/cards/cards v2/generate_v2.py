@@ -119,27 +119,30 @@ def bold(size=30): return f(FONT_BOLD, size)
 # ── Cards ──────────────────────────────────────────────────────────────────────
 
 def card_01():
-    """Cover: ЛЁГ В БОЛЬНИЦУ"""
+    """Cover: НАВАЙБКОДИЛ ДОЧКЕ ТЕРАПИЮ — главный хук, юмор и лёгкость"""
     img, draw = new_card()
 
     label_left(draw, "ПОСТ-БОЛЬНИЧКА")
     hline(draw, 110)
 
-    draw_centered(draw, "ЛЁГ В", 140, big(130), WHITE)
-    draw_centered_emoji(img, draw, "БОЛЬНИЦУ 🏥", 282, big(130), YELLOW)
+    # Главный хук
+    draw_centered(draw, "НАВАЙБКОДИЛ", 152, big(108), YELLOW)
+    draw_centered(draw, "ДОЧКЕ",       268, big(108), WHITE)
+    draw_centered(draw, "ТЕРАПИЮ",     384, big(108), WHITE)
 
-    hline(draw, 448, color=(50, 50, 50))
+    hline(draw, 514)
 
-    fo_med = med(52)
-    draw_centered(draw, "ВСТАЛ С AI-ПРИЛОЖЕНИЕМ", 476, fo_med, WHITE)
-    draw_centered(draw, "ДЛЯ ДОЧКИ", 538, fo_med, WHITE)
+    # Юмор и лёгкость — больничка вскользь
+    lines = [
+        ("Нет, это не бред после наркоза.",     body(30), WHITE),
+        ("(Хотя был повод полежать и подумать 😂)", body(28), GREY),
+        ("",                                    body(16), GREY),
+        ("Продакт нашёл время на Claude Code.", body(30), WHITE),
+        ("Дочка теперь не боится.",             body(30), YELLOW),
+    ]
+    draw_block(img, draw, lines, 546, line_gap=18, use_emoji=True)
 
-    fo_b = body(29)
-    draw_centered(draw, "Нет, это не бред после наркоза.", 628, fo_b, GREY)
-    draw_centered_emoji(img, draw, "(хотя было кайфово 😂)", 672, fo_b, DIM)
-
-    fo_hint = bold(24)
-    draw_centered(draw, "листай →", 742, fo_hint, YELLOW)
+    draw_centered(draw, "листай →", 870, bold(24), YELLOW)
 
     counter(draw, 1)
     save(img, "card_01_cover.png")
@@ -151,22 +154,20 @@ def card_02():
     label_left(draw, "ИСТОРИЯ")
     hline(draw, 110)
 
-    draw_centered(draw, "ТАЕ 5 ЛЕТ", 152, big(140), YELLOW)
+    draw_centered(draw, "ТАЕ 5 ЛЕТ", 172, big(140), YELLOW)
 
-    hline(draw, 330)
+    hline(draw, 360)
 
-    fo_d = med(48)
-    fo_b = body(30)
-
-    # Alternating: yellow → white → grey — no adjacent repeats
     lines = [
-        ("Боялась знакомиться с детьми.", fo_d, WHITE),
-        ("«Мама, не уходи!»",             med(56), YELLOW),
-        ("каждый вечер. 🫠",              fo_b, GREY),
-        ("",                               fo_b, GREY),
-        ("Знакомо? 👇",                   bold(26), DIM),
+        ("Боялась знакомиться с детьми.",  med(48),  WHITE),
+        ("",                               body(16), GREY),
+        ("«Мама, не уходи!»",              med(58),  YELLOW),
+        ("каждый вечер. 🫠",               body(32), GREY),
+        ("",                               body(28), GREY),
+        ("",                               body(28), GREY),
+        ("Знакомо? →",                     bold(28), DIM),
     ]
-    draw_block(img, draw, lines, 368, line_gap=18, use_emoji=True)
+    draw_block(img, draw, lines, 400, line_gap=16, use_emoji=True)
 
     counter(draw, 2)
     save(img, "card_02_taya.png")
@@ -200,29 +201,33 @@ def card_03():
     save(img, "card_03_idea.png")
 
 def card_04():
-    """4 дня. Больница. Ноутбук."""
+    """Claude Code + свободное время = опасная смесь"""
     img, draw = new_card()
 
     label_left(draw, "КАК ЭТО СЛУЧИЛОСЬ")
     hline(draw, 110)
 
-    draw_centered(draw, "4 ДНЯ",     152, big(128), YELLOW)
-    draw_centered(draw, "БОЛЬНИЦА",  288, big(128), WHITE)
-    draw_centered(draw, "НОУТБУК",   424, big(128), WHITE)
+    # Акцент — не больница, а Claude Code и время
+    draw_centered(draw, "CLAUDE CODE",  152, big(108), YELLOW)
+    draw_centered(draw, "+",            268, big(80),  WHITE)
+    draw_centered(draw, "СВОБОДНОЕ",    348, big(108), WHITE)
+    draw_centered(draw, "ВРЕМЯ",        462, big(108), WHITE)
 
-    hline(draw, 562)
+    hline(draw, 584)
 
     lines = [
-        ("Продакт без задач — это опасно 😅",             body(29), GREY),
-        ("Давно смотрел рилсы про Claude Code —",         body(29), WHITE),
-        ("вот наконец нашлось время.",                    body(29), WHITE),
-        ("",                                              body(20), GREY),
-        ("MVP → фича → дизайн → нейронка 🚀",            med(44),  YELLOW),
+        ("Продакт без задач — опасная смесь 😅",      body(29), GREY),
+        ("(особенно если лежишь в больнице)",          body(27), DIM),
+        ("",                                           body(16), GREY),
+        ("Давно хотел попробовать Claude Code —",      body(29), WHITE),
+        ("вот наконец нашлось время.",                 body(29), WHITE),
+        ("",                                           body(16), GREY),
+        ("MVP → фича → дизайн → нейронка 🚀",         med(44),  YELLOW),
     ]
-    draw_block(img, draw, lines, 592, line_gap=14, use_emoji=True)
+    draw_block(img, draw, lines, 612, line_gap=12, use_emoji=True)
 
     counter(draw, 4)
-    save(img, "card_04_hospital.png")
+    save(img, "card_04_vibecode.png")
 
 def card_05():
     """Персонально для твоего ребёнка"""
@@ -289,20 +294,23 @@ def card_07():
     label_left(draw, "ПОПРОБУЙ")
     hline(draw, 110)
 
-    draw_centered(draw, "3 СКАЗКИ —",  148, big(122), WHITE)
-    draw_centered(draw, "БЕСПЛАТНО",   276, big(122), YELLOW)
+    draw_centered(draw, "3 СКАЗКИ —",  160, big(122), WHITE)
+    draw_centered(draw, "БЕСПЛАТНО",   292, big(122), YELLOW)
 
-    hline(draw, 424)
+    hline(draw, 448)
 
     lines = [
-        ("Дальше подписки и вот это всё.",          body(29), GREY),
-        ("НО — если штука зашла, пиши.",            body(29), WHITE),
-        ("Месяцок-другой накину бесплатно 😄",      med(42),  YELLOW),
-        ("Любой отзыв = золото ❤️",                 body(29), WHITE),
-        ("P.S. Скоро: озвучка голосом мамы 🎙️",   body(27), GREY),
-        ("(чтобы папа мог уйти смотреть сериал)",  body(25), DIM),
+        ("Дальше подписки и вот это всё.",          body(30), GREY),
+        ("",                                        body(10), GREY),
+        ("НО — если штука зашла, пиши.",            body(30), WHITE),
+        ("Месяцок-другой накину бесплатно 😄",      med(44),  YELLOW),
+        ("",                                        body(10), GREY),
+        ("Любой отзыв = золото ❤️",                 body(30), WHITE),
+        ("",                                        body(10), GREY),
+        ("P.S. Скоро: озвучка голосом мамы 🎙️",   body(28), GREY),
+        ("(чтобы папа мог уйти смотреть сериал)",  body(26), DIM),
     ]
-    draw_block(img, draw, lines, 454, line_gap=16, use_emoji=True)
+    draw_block(img, draw, lines, 476, line_gap=18, use_emoji=True)
 
     counter(draw, 7)
     save(img, "card_07_cta.png")
