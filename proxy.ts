@@ -9,6 +9,7 @@ export async function proxy(request: NextRequest) {
   // Skip i18n routing for API and static files
   const { pathname } = request.nextUrl
   const isApiOrStatic = pathname.startsWith('/api') ||
+    pathname.startsWith('/auth') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/_vercel') ||
     /\.\w+$/.test(pathname)
