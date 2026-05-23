@@ -13,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/straxi/odinochestvo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/straxi/sadik`,        lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/straxi/vrach`,        lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/sobaki`,       lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/shkola`,       lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/son`,          lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/brat-sestra`,  lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/eda`,          lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/straxi/pereezd`,      lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     // Privacy
     { url: `${BASE}/privacy`,    lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE}/en/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
