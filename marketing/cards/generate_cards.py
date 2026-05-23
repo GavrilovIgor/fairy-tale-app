@@ -145,13 +145,13 @@ def card_02_problem():
     f_body = font(FONT_ARIAL, 33)
     y = 392
     draw_text_centered(draw, "Боялась знакомиться с детьми.", y, f_body, WHITE)
-    y += 54
+    y += 58
     f_quote = font(FONT_DIN, 50)
     draw_text_centered(draw, "«Мама, не уходи!»", y, f_quote, YELLOW)
-    y += 64
-    draw_text_centered(draw, "каждый вечер. 🫠", y, f_body, WHITE)
+    y += 66
+    draw_text_centered(draw, "каждый вечер.", y, f_body, WHITE)
 
-    y += 72
+    y += 78
     f_ask = font(FONT_ARIAL, 30)
     draw_text_centered(draw, "Знакомо?", y, f_ask, DIM)
 
@@ -308,7 +308,7 @@ def card_06_result():
     y += 122
     draw_text_centered(draw, "БОЛЬШАЯ.»", y, f_quote, YELLOW, letter_spacing=-2)
 
-    y += 110
+    y += 128
     f_note = font(FONT_ARIAL, 26)
     draw_text_centered(draw, "Якорь из сказкотерапии. Работает.", y, f_note, (90, 90, 90))
 
