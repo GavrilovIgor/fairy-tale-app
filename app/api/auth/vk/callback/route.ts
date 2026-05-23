@@ -66,9 +66,8 @@ export async function GET(request: NextRequest) {
       provider: 'vk',
     })
 
-    // 4. Редирект через magic-link
-    const authUrl = await generateAuthRedirect(email, SITE_URL)
-    const response = NextResponse.redirect(authUrl)
+    // 4. Создаём сессию на сервере → редирект с куками
+    const response = await generateAuthRedirect(email, SITE_URL)
     response.cookies.delete('vk_oauth_state')
     response.cookies.delete('vk_code_verifier')
     return response

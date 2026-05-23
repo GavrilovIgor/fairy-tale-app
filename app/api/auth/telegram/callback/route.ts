@@ -54,8 +54,7 @@ export async function GET(request: NextRequest) {
       provider: 'telegram',
     })
 
-    const authUrl = await generateAuthRedirect(email, SITE_URL)
-    return NextResponse.redirect(authUrl)
+    return await generateAuthRedirect(email, SITE_URL)
   } catch (err) {
     console.error('Telegram auth error:', err)
     return NextResponse.redirect(`${SITE_URL}?auth_error=telegram_failed`)

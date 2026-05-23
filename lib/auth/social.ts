@@ -1,3 +1,6 @@
+import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
 import { supabaseAdmin, writeRegistrationBonus } from '@/lib/supabase/admin'
 
 export interface SocialUser {
@@ -43,15 +46,63 @@ export async function upsertSocialUser(user: SocialUser): Promise<string> {
   return existing.id
 }
 
-/** Сгенерировать одноразовую magic-link для входа и вернуть URL редиректа */
-export async function generateAuthRedirect(email: string, finalRedirect: string): Promise<string> {
-  const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+/**
+ * Создать сессию на сервере и вернуть редирект с куками.
+ * Пользователь придёт на главную уже авторизованным (без клиентской обработки хэша).
+ *
+ * Алгоритм:
+ * 1. Admin генерирует magic-link → получаем email_otp (OTP-код)
+ * 2. Верифицируем OTP через публичный клиент → получаем access_token + refresh_token
+ * 3. Записываем токены в куки NextResponse через @supabase/ssr
+ * 4. Возвращаем редирект на главную с уже установленными куками
+ */
+export async function generateAuthRedirect(email: string, finalRedirect: string): Promise<NextResponse> {
+  // 1. Генерируем OTP через admin API
+  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
     type: 'magiclink',
     email,
-    options: { redirectTo: finalRedirect },
   })
-  if (error || !data.properties?.action_link) {
-    throw new Error(error?.message ?? 'Failed to generate magic link')
+  if (linkError || !linkData.properties?.email_otp) {
+    throw new Error(linkError?.message ?? 'generateLink: no email_otp returned')
   }
-  return data.properties.action_link
+
+  const otp = linkData.properties.email_otp
+
+  // 2. Верифицируем OTP через публичный клиент (без persistSession — мы в server context)
+  const supabasePublic = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  )
+  const { data: sessionData, error: sessionError } = await supabasePublic.auth.verifyOtp({
+    email,
+    token: otp,
+    type: 'magiclink',
+  })
+  if (sessionError || !sessionData.session) {
+    throw new Error(sessionError?.message ?? 'verifyOtp: no session returned')
+  }
+
+  const { access_token, refresh_token } = sessionData.session
+
+  // 3. Создаём редирект и записываем куки
+  const response = NextResponse.redirect(finalRedirect)
+
+  const supabaseSSR = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+  await supabaseSSR.auth.setSession({ access_token, refresh_token })
+
+  return response
 }

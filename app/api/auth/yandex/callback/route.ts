@@ -50,10 +50,8 @@ export async function GET(request: NextRequest) {
       provider: 'yandex',
     })
 
-    // 4. Генерируем magic-link → редирект на главную
-    const authUrl = await generateAuthRedirect(yUser.default_email, SITE_URL)
-
-    const response = NextResponse.redirect(authUrl)
+    // 4. Создаём сессию на сервере → редирект с куками
+    const response = await generateAuthRedirect(yUser.default_email, SITE_URL)
     response.cookies.delete('yandex_oauth_state')
     return response
   } catch (err) {
