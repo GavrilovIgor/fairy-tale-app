@@ -268,7 +268,7 @@ def card_05_how():
     y += 44
     draw_text_centered(draw, "(детских психологов, на минуточку)", y, f_body, DIM)
     y += 60
-    draw_text_centered(draw, "За 30 секунд.", f_din, YELLOW)
+    draw_text_centered(draw, "За 30 секунд.", y, f_din, YELLOW)
 
     f_counter = font(FONT_ARIAL_B, 20)
     draw_text_centered(draw, "5 / 7", H - 64, f_counter, DIM)
@@ -288,27 +288,27 @@ def card_06_result():
     draw_text_centered(draw, "РЕЗУЛЬТАТ", 92, f_label, DIM, letter_spacing=8)
 
     f_body = font(FONT_ARIAL, 31)
-    y = 188
+    y = 180
     draw_text_centered(draw, "Тая теперь сама подходит", y, f_body, WHITE)
-    y += 48
-    draw_text_centered(draw, "знакомиться с детьми. 🥹", y, f_body, WHITE)
+    y += 46
+    draw_text_centered(draw, "знакомиться с детьми.", y, f_body, WHITE)
 
-    y += 72
-    f_mini = font(FONT_ARIAL, 28)
-    draw_text_centered(draw, "А ещё у неё была привычка ковырять в носу. 👃", y, f_mini, DIM)
-    y += 48
+    y += 60
+    f_mini = font(FONT_ARIAL, 27)
+    draw_text_centered(draw, "А ещё у неё была привычка ковырять в носу.", y, f_mini, DIM)
+    y += 42
     draw_text_centered(draw, "Теперь когда хочется — говорит себе:", y, f_mini, DIM)
 
-    y += 68
+    y += 52
     thin_line(draw, y)
-    y += 36
+    y += 34
 
-    f_quote = font(FONT_IMPACT, 100)
+    f_quote = font(FONT_IMPACT, 108)
     draw_text_centered(draw, "«Я УЖЕ", y, f_quote, YELLOW, letter_spacing=-2)
-    y += 116
+    y += 122
     draw_text_centered(draw, "БОЛЬШАЯ.»", y, f_quote, YELLOW, letter_spacing=-2)
 
-    y += 96
+    y += 110
     f_note = font(FONT_ARIAL, 26)
     draw_text_centered(draw, "Якорь из сказкотерапии. Работает.", y, f_note, (90, 90, 90))
 
@@ -339,13 +339,13 @@ def card_07_cta():
     f_offer = font(FONT_DIN, 40)
     draw_text_centered(draw, "Сделаем тебя ерли адоптером,", y, f_offer, WHITE)
     y += 52
-    draw_text_centered(draw, "месяцок-другой накину бесплатно 😄", y, f_offer, YELLOW)
+    draw_text_centered(draw, "месяцок-другой накину бесплатно", y, f_offer, YELLOW)
 
     y += 60
     f_ps = font(FONT_ARIAL, 26)
-    draw_text_centered(draw, "Любой отзыв = золото ❤️", y, f_ps, DIM)
+    draw_text_centered(draw, "Любой отзыв = золото", y, f_ps, DIM)
     y += 42
-    draw_text_centered(draw, "P.S. Скоро: озвучка голосом мамы 🎙️", y, f_ps, DIM)
+    draw_text_centered(draw, "P.S. Скоро: озвучка голосом мамы", y, f_ps, DIM)
     y += 36
     draw_text_centered(draw, "(чтобы папа мог уйти смотреть сериал)", y, f_ps, (70, 70, 70))
 
