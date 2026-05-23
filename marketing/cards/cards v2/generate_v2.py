@@ -187,7 +187,7 @@ def card_04():
 
     fo_b = body(31)
     draw_centered(draw, "Давно смотрел рилсы про Claude Code.", 148, fo_b, WHITE)
-    draw_centered(draw, "Наконец нашлось время: 4 дня. Больница.", 192, fo_b, GREY)
+    draw_centered(draw, "Вот нашлось время.",                   192, fo_b, GREY)
 
     draw_centered(draw, "4 ДНЯ",     252, big(108), YELLOW)
     draw_centered(draw, "БОЛЬНИЦА",  368, big(108), WHITE)
