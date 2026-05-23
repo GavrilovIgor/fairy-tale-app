@@ -18,20 +18,28 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // VK ID OAuth 2.1: device_id и state приходят обратно в callback
+    const deviceId = searchParams.get('device_id') ?? ''
+
     // 1. Обмениваем code на access_token (VK ID OAuth 2.1)
+    const tokenBody = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: process.env.VK_CLIENT_ID!,
+      client_secret: process.env.VK_CLIENT_SECRET!,
+      code,
+      redirect_uri: `${SITE_URL}/api/auth/vk/callback`,
+      code_verifier: codeVerifier,
+      state,
+    })
+    if (deviceId) tokenBody.set('device_id', deviceId)
+
     const tokenRes = await fetch('https://id.vk.com/oauth2/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: process.env.VK_CLIENT_ID!,
-        client_secret: process.env.VK_CLIENT_SECRET!,
-        code,
-        redirect_uri: `${SITE_URL}/api/auth/vk/callback`,
-        code_verifier: codeVerifier,
-      }),
+      body: tokenBody,
     })
     const tokenData = await tokenRes.json()
+    console.log('VK token response:', JSON.stringify(tokenData))
     if (!tokenData.access_token) throw new Error(`No token: ${JSON.stringify(tokenData)}`)
 
     // 2. Получаем данные пользователя
