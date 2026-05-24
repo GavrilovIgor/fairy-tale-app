@@ -20,11 +20,12 @@ function getReferralLink(userId: string) {
   return `https://magicfairytale.ru/?ref=${code}`
 }
 
-export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
+export function ProfileModal({ user, onClose, onUpdated, onShowPaywall, onSignOut }: {
   user: User
   onClose: () => void
   onUpdated: (name: string) => void
   onShowPaywall?: () => void
+  onSignOut?: () => void
 }) {
   const name: string = user.user_metadata?.full_name || user.user_metadata?.name || ''
   const [newName, setNewName] = useState(name)
@@ -186,6 +187,16 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
             </button>
           </div>
         </div>
+
+        {/* Sign out */}
+        {onSignOut && (
+          <button
+            onClick={() => { onClose(); onSignOut() }}
+            className="w-full text-center text-sm mt-4 cursor-pointer hover:opacity-70 transition-opacity"
+            style={{ color: '#9ca3af' }}>
+            Выйти из аккаунта
+          </button>
+        )}
       </div>
     </div>
   )

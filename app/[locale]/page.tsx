@@ -1564,7 +1564,8 @@ export default function Home() {
       {/* Profile modal */}
       {showProfile&&user&&<ProfileModal user={user} onClose={()=>setShowProfile(false)}
         onUpdated={name=>{setUser(u=>u?{...u,user_metadata:{...u.user_metadata,full_name:name}}:u)}}
-        onShowPaywall={()=>{setShowProfile(false);setShowPaywall(true)}}/>}
+        onShowPaywall={()=>{setShowProfile(false);setShowPaywall(true)}}
+        onSignOut={handleSignOut}/>}
 
       {/* Desktop nav */}
       {(status==='idle'||status==='loading')&&(
