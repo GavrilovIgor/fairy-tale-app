@@ -246,7 +246,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   const tCommonPaywall = useTranslations('common')
   const [loading,setLoading] = useState<string|null>(null)
   const [screen,setScreen] = useState<'choose'|'email'|'code'>('choose')
-  const [pendingPlan,setPendingPlan] = useState<'monthly_sub'|'yearly_sub'|null>(null)
+  const [pendingPlan,setPendingPlan] = useState<'monthly_sub'|'story_pack'|null>(null)
   const [email,setEmail] = useState('')
   const [emailErr,setEmailErr] = useState('')
   const [emailLoading,setEmailLoading] = useState(false)
@@ -254,7 +254,10 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   const [codeErr,setCodeErr] = useState('')
   const [codeLoading,setCodeLoading] = useState(false)
 
-  const buyYookassa = async(plan:'monthly_sub'|'yearly_sub', resolvedUserId?:string)=>{
+  const freeLimit = userId ? 6 : 3
+  const freeUsed = Math.min(getAnonUsed(), freeLimit)
+
+  const buyYookassa = async(plan:'monthly_sub'|'story_pack', resolvedUserId?:string)=>{
     const uid = resolvedUserId ?? userId
     setLoading(plan)
     try {
@@ -269,7 +272,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   }
 
   // Если не залогинен — сначала создаём аккаунт по email
-  const handlePlanClick = (plan:'monthly_sub'|'yearly_sub')=>{
+  const handlePlanClick = (plan:'monthly_sub'|'story_pack')=>{
     if(userId){ buyYookassa(plan); return }
     setPendingPlan(plan); setScreen('email')
   }
@@ -337,7 +340,7 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
           Ваш email для аккаунта
         </h3>
         <p className="text-xs text-center mb-5" style={{color:'#9ca3af'}}>
-          Подписка привяжется к этому адресу. Войти сможете по ссылке из письма.
+          Покупка привяжется к этому адресу. Войти сможете по ссылке из письма.
         </p>
         <form onSubmit={submitEmail} className="flex flex-col gap-3">
           <input value={email} onChange={e=>{setEmail(e.target.value);setEmailErr('')}}
@@ -383,36 +386,37 @@ function Paywall({onPaid,onClose,userId}:{onPaid:()=>void;onClose?:()=>void;user
   return (
     <CardWrapper>
       <div className="p-6">
-        <h2 className="italic font-bold text-xl text-center mb-1" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
+        {/* Progress */}
+        <div className="mb-5">
+          <div className="flex justify-between items-center mb-1.5">
+            <span className="text-xs" style={{color:'#9ca3af'}}>Бесплатные сказки</span>
+            <span className="text-xs font-semibold" style={{color:'#0d2b1e'}}>{freeUsed} / {freeLimit}</span>
+          </div>
+          <div className="h-1.5 rounded-full" style={{background:'rgba(13,43,30,0.1)'}}>
+            <div className="h-1.5 rounded-full" style={{background:'#c4812a',width:'100%'}}/>
+          </div>
+        </div>
+
+        <h2 className="italic font-bold text-xl text-center mb-5" style={{fontFamily:'Literata,Georgia,serif',color:'#0d2b1e'}}>
           Продолжить волшебство
         </h2>
-        <p className="text-center text-sm mb-5" style={{color:'#9ca3af'}}>
-          Бесплатная сказка закончилась — создайте ещё
-        </p>
 
         <div className="flex flex-col gap-3 mb-4">
-          {/* Plan: yearly — выгоднее, показываем первым */}
-          <button onClick={()=>handlePlanClick('yearly_sub')} disabled={!!loading}
-            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5 relative overflow-hidden"
-            style={{background:'#0d2b1e',boxShadow:'0 4px 20px rgba(13,43,30,0.3)'}}>
-            <div className="text-left">
-              <div className="flex items-center gap-2">
-                <span>{loading==='yearly_sub'?'Переходим...':'1 год безлимит'}</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background:'#c4812a'}}>−58%</span>
-              </div>
-              <div className="text-[11px] font-normal opacity-60">124 ₽/мес · 3 месяца в подарок</div>
-            </div>
-            <span className="text-xl font-black">1490 ₽</span>
+          {/* Plan: story_pack */}
+          <button onClick={()=>handlePlanClick('story_pack')} disabled={!!loading}
+            className="w-full rounded-2xl py-4 font-bold cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
+            style={{background:'rgba(196,129,42,0.1)',border:'1.5px solid rgba(196,129,42,0.35)',color:'#7a4e0a'}}>
+            <span style={{fontSize:16}}>{loading==='story_pack'?'Переходим...':'3 сказки'}</span>
+            <span style={{fontSize:22,fontWeight:900,color:'#a46713'}}>49 ₽</span>
           </button>
-          {/* Plan: monthly */}
+          {/* Plan: monthly — preferred */}
           <button onClick={()=>handlePlanClick('monthly_sub')} disabled={!!loading}
-            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5"
-            style={{background:'linear-gradient(135deg,#c4812a,#a46713)',boxShadow:'0 4px 20px rgba(164,103,19,0.35)'}}>
-            <div className="text-left">
-              <div>{loading==='monthly_sub'?'Переходим...':'1 месяц безлимит'}</div>
-              <div className="text-[11px] font-normal opacity-70">Отменить в любой момент</div>
-            </div>
-            <span className="text-xl font-black">299 ₽</span>
+            className="w-full rounded-2xl py-4 font-bold text-white cursor-pointer disabled:opacity-60 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-between px-5 relative"
+            style={{background:'#0d2b1e',boxShadow:'0 4px 20px rgba(13,43,30,0.3)'}}>
+            <span className="absolute -top-2.5 right-4 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide"
+              style={{background:'#3a9e5f'}}>Лучший выбор</span>
+            <span style={{fontSize:16}}>{loading==='monthly_sub'?'Переходим...':'Безлимит на месяц'}</span>
+            <span style={{fontSize:22,fontWeight:900}}>99 ₽</span>
           </button>
         </div>
 
@@ -1324,7 +1328,7 @@ export default function Home() {
       return
     }
     const extra = data
-      .filter(p=>['registration_bonus','three_stories'].includes(p.plan)&&(p.stories_remaining??0)>0)
+      .filter(p=>['registration_bonus','three_stories','story_pack'].includes(p.plan)&&(p.stories_remaining??0)>0)
       .reduce((s,p)=>s+(p.stories_remaining??0),0)
     if(extra>0){ setExtraState(extra); try{localStorage.setItem('ft-extra',String(extra))}catch{} }
   },[supabase])

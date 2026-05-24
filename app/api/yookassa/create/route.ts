@@ -6,7 +6,8 @@ const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
 const BASE_URL = 'https://magicfairytale.ru'
 
 const PLANS = {
-  monthly_sub: { amount: '299.00', description: 'Волшебная Сказка — подписка на 1 месяц' },
+  story_pack:  { amount: '49.00',  description: 'Волшебная Сказка — 3 сказки' },
+  monthly_sub: { amount: '99.00',  description: 'Волшебная Сказка — безлимит на 1 месяц' },
   yearly_sub:  { amount: '1490.00', description: 'Волшебная Сказка — подписка на 1 год' },
 }
 

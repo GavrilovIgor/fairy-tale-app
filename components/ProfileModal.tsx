@@ -155,7 +155,7 @@ export function ProfileModal({ user, onClose, onUpdated, onShowPaywall }: {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold mb-0.5" style={{ color: '#0d2b1e' }}>Бесплатный</p>
-                <p className="text-xs" style={{ color: '#9ca3af' }}>299 ₽/мес · 1490 ₽/год</p>
+                <p className="text-xs" style={{ color: '#9ca3af' }}>49 ₽/3 сказки · 99 ₽/мес</p>
               </div>
               <button onClick={() => { onClose(); onShowPaywall?.() }}
                 className="text-xs font-bold px-3 py-1.5 rounded-full cursor-pointer hover:opacity-90 transition-all"

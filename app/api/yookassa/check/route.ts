@@ -4,7 +4,8 @@ import { writePurchase, awardReferrer } from '@/lib/supabase/admin'
 const SHOP_ID = process.env.YOOKASSA_SHOP_ID!
 const SECRET_KEY = process.env.YOOKASSA_SECRET_KEY!
 
-function planExpires(plan: string) {
+function planExpires(plan: string): string | null {
+  if (plan === 'story_pack') return null
   if (plan === 'yearly_sub') return new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 }
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
       user_id: userId,
       plan,
       payment_id: data.id,
-      stories_remaining: null,
+      stories_remaining: plan === 'story_pack' ? 3 : null,
       expires_at: planExpires(plan),
     })
 
