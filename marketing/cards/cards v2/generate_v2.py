@@ -248,8 +248,8 @@ def card_06():
 
     hline(draw, 308)
 
-    draw_centered(draw, "«МНЕ НЕ",   338, big(118), YELLOW)
-    draw_centered(draw, "СТРАШНО»",  462, big(118), YELLOW)
+    draw_centered(draw, "«Я МОГУ",   338, big(118), YELLOW)
+    draw_centered(draw, "САМА»",     462, big(118), YELLOW)
 
     hline(draw, 608)
 
