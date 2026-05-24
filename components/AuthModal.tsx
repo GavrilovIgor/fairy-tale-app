@@ -135,13 +135,26 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
               </IconButton>
             </div>
 
-            {/* ── Telegram — отдельной строкой (виджет не масштабируется) ── */}
-            {BOT_USERNAME && (
-              <div className="flex justify-center overflow-hidden rounded-xl"
-                style={{ border: '1.5px solid #e0e0e0', minHeight: 44 }}>
-                <div ref={telegramRef} />
-              </div>
-            )}
+              {/* Telegram — иконка с невидимым виджетом поверх */}
+              {BOT_USERNAME && (
+                <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0 }}>
+                  {/* Видимая иконка */}
+                  <div className="flex items-center justify-center rounded-xl"
+                    style={{ width: 48, height: 48, border: '1.5px solid #e0e0e0' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="12" fill="#29a0d8"/>
+                      <path d="M17.93 6.89L15.25 18.82c-.19.88-.7 1.1-1.42.68l-3.93-2.9-1.9 1.83c-.21.21-.39.39-.8.39l.29-4.04 7.39-6.68c.32-.29-.07-.45-.5-.16L5.9 13.63 2.03 12.42c-.86-.27-.88-.86.18-1.27L16.77 5.65c.72-.27 1.35.16 1.16 1.24z" fill="white"/>
+                    </svg>
+                  </div>
+                  {/* Невидимый iframe виджета поверх — клик проходит насквозь */}
+                  <div ref={telegramRef}
+                    style={{
+                      position: 'absolute', top: 0, left: 0,
+                      width: 48, height: 48,
+                      overflow: 'hidden', opacity: 0.001,
+                    }} />
+                </div>
+              )}
           </>
         )}
 
