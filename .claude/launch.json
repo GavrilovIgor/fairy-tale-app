@@ -7,5 +7,12 @@
       "runtimeArgs": ["serve", "-p", "4999", "-s", ".claude/mockups"],
       "port": 4999
     }
+  ,
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    }
   ]
 }
