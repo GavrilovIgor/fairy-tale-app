@@ -1,1 +1,2 @@
 {"type":"server-started","port":50588,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50588","screen_dir":"/Users/igor/Projects/fairy-tale-app/.superpowers/brainstorm/42708-1779597776/content","state_dir":"/Users/igor/Projects/fairy-tale-app/.superpowers/brainstorm/42708-1779597776/state"}
+{"type":"screen-added","file":"/Users/igor/Projects/fairy-tale-app/.superpowers/brainstorm/42708-1779597776/content/auth-layouts.html"}
