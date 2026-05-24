@@ -105,8 +105,8 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
               <div className="flex-1 h-px bg-gray-200"/>
             </div>
 
-            {/* ── Соц. иконки в ряд ── */}
-            <div className="flex justify-center gap-3">
+            {/* ── Соц. иконки в ряд: G / Я / VK ── */}
+            <div className="flex justify-center gap-3 mb-3">
 
               {/* Google */}
               <IconButton onClick={signInWithGoogle} label="Google" disabled={!!loading} loading={loading === 'google'}>
@@ -133,17 +133,15 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
                   <path d="M12.773 17c-4.77 0-7.49-3.27-7.6-8.71h2.38c.08 3.99 1.84 5.68 3.23 6.03V8.29h2.24v3.44c1.37-.15 2.81-1.72 3.3-3.44h2.2c-.37 2.12-1.93 3.69-3.04 4.34 1.11.52 2.88 1.9 3.56 4.37h-2.43c-.53-1.64-1.85-2.9-3.59-3.06V17h-.25z" fill="white"/>
                 </svg>
               </IconButton>
-
-              {/* Telegram */}
-              {BOT_USERNAME && (
-                <div
-                  ref={telegramRef}
-                  title="Telegram"
-                  className="flex items-center justify-center rounded-xl overflow-hidden"
-                  style={{ width: 48, height: 48, border: '1.5px solid #e0e0e0', flexShrink: 0 }}
-                />
-              )}
             </div>
+
+            {/* ── Telegram — отдельной строкой (виджет не масштабируется) ── */}
+            {BOT_USERNAME && (
+              <div className="flex justify-center overflow-hidden rounded-xl"
+                style={{ border: '1.5px solid #e0e0e0', minHeight: 44 }}>
+                <div ref={telegramRef} />
+              </div>
+            )}
           </>
         )}
 
