@@ -142,10 +142,10 @@ def card_02():
         ("",                               body(16), GREY),
         ("«Мама, не уходи!»",              med(58),  YELLOW),
         ("каждый вечер.",                  body(32), GREY),
-        ("",                               body(28), GREY),
-        ("Знакомо? →",                     bold(28), DIM),
     ]
     draw_block(img, draw, lines, 400, line_gap=16)
+
+    draw_centered(draw, "Знакомо? →", 850, bold(24), YELLOW)
 
     counter(draw, 2)
     save(img, "card_02_taya.png")
@@ -244,7 +244,7 @@ def card_06():
         ("Тая теперь сама идёт",        body(32), WHITE),
         ("знакомиться с детьми",        body(32), WHITE),
         ("",                            body(14), GREY),
-        ("Теперь говорит себе:",        body(30), GREY),
+        ("И говорит себе:",             body(30), GREY),
     ]
     draw_block(img, draw, top_lines, 148, line_gap=12)
 
@@ -298,24 +298,29 @@ def card_07():
     text_y = max(new_h - 60, 550)
 
     hline(draw, text_y, color=YELLOW)
-    text_y += 28
+    text_y += 22
 
-    draw_centered(draw, "ВОЛШЕБНАЯ СКАЗКА", text_y, med(64), WHITE)
-    text_y += 80
+    draw_centered(draw, "ВОЛШЕБНАЯ СКАЗКА", text_y, med(58), WHITE)
+    text_y += 70
 
-    draw_centered(draw, "Персональные сказки для детей", text_y, body(30), GREY)
-    text_y += 42
-    draw_centered(draw, "с иллюстрациями — за 30 секунд", text_y, body(30), GREY)
-    text_y += 58
+    draw_centered(draw, "Персональные сказки для детей", text_y, body(27), GREY)
+    text_y += 36
+    draw_centered(draw, "с иллюстрациями — за 30 секунд", text_y, body(27), GREY)
+    text_y += 36
+
+    draw_centered(draw, "Кажется, получилось красиво — надеюсь, полезно!", text_y, body(24), GREY)
+    text_y += 34
+    draw_centered_emoji(img, draw, "Пишите — буду очень рад ❤️", text_y, body(24), WHITE)
+    text_y += 44
 
     hline(draw, text_y, color=(40, 40, 40))
-    text_y += 28
+    text_y += 24
 
-    fo_url = f(FONT_HEAD, 64)
+    fo_url = f(FONT_HEAD, 60)
     draw_centered(draw, "MagicFairyTale.ru", text_y, fo_url, YELLOW)
-    text_y += 74
+    text_y += 68
 
-    fo_bot = f(FONT_BOLD, 32)
+    fo_bot = f(FONT_BOLD, 30)
     draw_centered(draw, "@volshebnaya_skazka_bot", text_y, fo_bot, WHITE)
 
     counter(draw, 7)
