@@ -33,14 +33,14 @@ export default async function AdminPage() {
   const newThisWeek = allUsers.filter(u => new Date(u.created_at).getTime() > weekMs).length
   const newToday    = allUsers.filter(u => new Date(u.created_at).getTime() >= todayMs).length
 
-  // ── 2. Сказки (таблица stories) ───────────────────────────────────────────
-  // Источник: Supabase stories — не зависит от adblockers, в отличие от PostHog
-  const { data: stories } = await supabaseAdmin
-    .from('stories')
+  // ── 2. Сказки (таблица story_generations) ────────────────────────────────
+  // Источник: server-side запись на каждую генерацию, не зависит от клиента
+  const { data: generations } = await supabaseAdmin
+    .from('story_generations')
     .select('created_at')
 
-  const totalStories  = stories?.length ?? 0
-  const storiesToday  = stories?.filter(s =>
+  const totalStories  = generations?.length ?? 0
+  const storiesToday  = generations?.filter(s =>
     new Date(s.created_at).getTime() >= todayMs
   ).length ?? 0
 
@@ -52,8 +52,11 @@ export default async function AdminPage() {
 
   const allPurchases  = purchases ?? []
   const paidPurchases = allPurchases.filter(p => PAID_PLANS.includes(p.plan as typeof PAID_PLANS[number]))
-  const totalRevenue  = paidPurchases.reduce((sum, p) => sum + (PLAN_PRICE[p.plan] ?? 0), 0)
   const totalPaid     = paidPurchases.length
+  // Считаем из реальных сумм ЮКассы; fallback на прайс-лист если amount ещё не записан
+  const totalRevenue  = paidPurchases.reduce(
+    (sum, p) => sum + (p.amount ?? PLAN_PRICE[p.plan] ?? 0), 0
+  )
 
   // Активные подписчики: monthly/yearly с активным expires_at
   const activeSubs = new Set(

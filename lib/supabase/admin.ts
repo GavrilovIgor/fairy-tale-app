@@ -13,6 +13,7 @@ export type PurchaseRow = {
   payment_id?: string
   stories_remaining: number | null
   expires_at: string | null
+  amount?: number
   created_at?: string
 }
 

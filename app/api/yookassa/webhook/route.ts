@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       payment_id: payment.id,
       stories_remaining: plan === 'story_pack' ? 3 : null,
       expires_at: planExpires(plan),
+      amount: amount ? parseFloat(amount) : undefined,
     }).catch(e => console.error('Supabase write error:', e))
 
     // Награда реферера если это первая оплата реферала

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { prefetchImages } from '@/lib/imageCache'
 import { getPostHog } from '@/lib/posthog-server'
+import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export const maxDuration = 120
 
@@ -174,6 +176,10 @@ Return ONLY valid JSON, no markdown, no \`\`\`json wrapper:
 export async function POST(req: NextRequest) {
   const { childName, age, hero, situation, situationType, favorites, lesson, locale = 'ru' } = await req.json()
 
+  // Получаем user_id из сессии (null для анонимных)
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -212,6 +218,12 @@ export async function POST(req: NextRequest) {
           imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
         }))
         prefetchImages(story.scenes, story.storySeed)
+
+        // Записываем каждую генерацию — server-side, достоверно
+        void supabaseAdmin.from('story_generations').insert({
+          user_id: user?.id ?? null,
+          locale,
+        })
 
         const ph = getPostHog()
         ph.capture({
