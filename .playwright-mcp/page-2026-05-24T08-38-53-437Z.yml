@@ -1,0 +1,98 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Волшебная Сказка Метод сказкотерапии · для детей от 3 лет" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e7]:
+            - generic [ref=e8]: Волшебная Сказка
+            - generic [ref=e9]: Метод сказкотерапии · для детей от 3 лет
+        - generic [ref=e10]:
+          - button "🇺🇸 EN" [ref=e11] [cursor=pointer]
+          - button "Войти" [ref=e12] [cursor=pointer]
+    - generic [ref=e13]:
+      - generic [ref=e14]:
+        - img "Волшебный лес с лисёнком" [ref=e15]
+        - generic [ref=e16]:
+          - heading "Сказка, которая помогает" [level=1] [ref=e17]
+          - paragraph [ref=e18]: Персональная история под ситуацию и чувства именно вашего ребёнка
+          - button "✨ Попробуй волшебство" [ref=e19] [cursor=pointer]
+          - paragraph [ref=e20]:
+            - text: или заполните форму ниже для персональной сказки
+            - generic [ref=e21]: arrow_downward
+      - generic [ref=e23]:
+        - heading "Почему это работает?" [level=2] [ref=e25]
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - img [ref=e30]
+            - generic [ref=e32]:
+              - heading "Ребёнок видит себя в герое" [level=3] [ref=e33]
+              - paragraph [ref=e34]: Персонаж переживает то же, что и ваш малыш — это безопасный способ встретиться со страхом.
+          - generic [ref=e35]:
+            - img [ref=e37]
+            - generic [ref=e39]:
+              - heading "История проживается, а не рассказывается" [level=3] [ref=e40]
+              - paragraph [ref=e41]: В сказке ребёнок эмоционально проходит путь от тревоги к решению.
+          - generic [ref=e42]:
+            - img [ref=e44]
+            - generic [ref=e46]:
+              - heading "Опыт переносится в реальную жизнь" [level=3] [ref=e47]
+              - paragraph [ref=e48]: После чтения вы вместе обсудите — что герой сделал и как это поможет малышу.
+        - paragraph [ref=e49]: «Метод сказкотерапии — признанная практика детских психологов»
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - heading "Составим сказку вместе" [level=2] [ref=e53]
+          - paragraph [ref=e54]: 4 шага — и ваша персональная история готова
+        - generic [ref=e55]:
+          - paragraph [ref=e61]: Шаг 2 из 4 — Главный герой
+          - generic [ref=e84]:
+            - generic [ref=e85]: ВЫБЕРИТЕ ПЕРСОНАЖА
+            - generic [ref=e86]:
+              - button "лисёнок лисёнок" [ref=e87] [cursor=pointer]:
+                - img "лисёнок" [ref=e88]
+                - generic [ref=e89]: лисёнок
+              - button "котёнок котёнок" [ref=e90] [cursor=pointer]:
+                - img "котёнок" [ref=e91]
+                - generic [ref=e92]: котёнок
+              - button "щенок щенок" [ref=e93] [cursor=pointer]:
+                - img "щенок" [ref=e94]
+                - generic [ref=e95]: щенок
+              - button "дракончик дракончик" [ref=e96] [cursor=pointer]:
+                - img "дракончик" [ref=e97]
+                - generic [ref=e98]: дракончик
+              - button "зайчонок зайчонок" [ref=e99] [cursor=pointer]:
+                - img "зайчонок" [ref=e100]
+                - generic [ref=e101]: зайчонок
+              - button "медвежонок медвежонок" [ref=e102] [cursor=pointer]:
+                - img "медвежонок" [ref=e103]
+                - generic [ref=e104]: медвежонок
+              - button "принцесса принцесса" [ref=e105] [cursor=pointer]:
+                - img "принцесса" [ref=e106]
+                - generic [ref=e107]: принцесса
+              - button "рыцарь рыцарь" [ref=e108] [cursor=pointer]:
+                - img "рыцарь" [ref=e109]
+                - generic [ref=e110]: рыцарь
+              - button "волшебник волшебник" [ref=e111] [cursor=pointer]:
+                - img "волшебник" [ref=e112]
+                - generic [ref=e113]: волшебник
+              - button "фея фея" [ref=e114] [cursor=pointer]:
+                - img "фея" [ref=e115]
+                - generic [ref=e116]: фея
+            - generic [ref=e117]:
+              - generic [ref=e118]: ИЛИ СВОЙ ВАРИАНТ
+              - textbox "Маленькая звёздочка, храбрый рыцарь..." [ref=e119]
+          - generic [ref=e73]:
+            - button "← Назад" [ref=e120] [cursor=pointer]
+            - button "Далее →" [disabled] [ref=e74] [cursor=pointer]
+      - contentinfo [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]: Волшебная Сказка
+          - generic [ref=e78]:
+            - link "Политика конфиденциальности" [ref=e79] [cursor=pointer]:
+              - /url: /privacy
+            - link "Написать нам" [ref=e80] [cursor=pointer]:
+              - /url: mailto:gigor92@gmail.com
+            - button "🇺🇸 EN" [ref=e81] [cursor=pointer]
+          - paragraph [ref=e82]: © 2026 Волшебная Сказка
+  - alert [ref=e83]

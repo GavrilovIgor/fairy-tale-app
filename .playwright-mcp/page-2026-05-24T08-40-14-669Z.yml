@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Волшебная Сказка Метод сказкотерапии · для детей от 3 лет" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - generic [ref=e7]:
+            - generic [ref=e8]: Волшебная Сказка
+            - generic [ref=e9]: Метод сказкотерапии · для детей от 3 лет
+        - generic [ref=e10]:
+          - button "🇺🇸 EN" [ref=e11] [cursor=pointer]
+          - button "Войти" [ref=e12] [cursor=pointer]
+    - generic [ref=e184]:
+      - img [ref=e185]
+      - generic [ref=e187]:
+        - heading "Ваша сказка создаётся..." [level=1] [ref=e188]
+        - generic [ref=e189]:
+          - generic [ref=e191]: Придумываем героя
+          - generic [ref=e193]: Плетём сюжет
+          - generic [ref=e195]: Рисуем картинки
+        - paragraph [ref=e200]: ЭТО ЗАНИМАЕТ ОКОЛО 30 СЕКУНД
+  - alert [ref=e83]
