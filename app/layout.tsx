@@ -24,7 +24,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale()
+  let locale = 'ru'
+  try { locale = await getLocale() } catch { /* outside [locale] segment, e.g. /admin */ }
   return (
     <html lang={locale} className={`${jakarta.variable} h-full antialiased`}>
       <head>
