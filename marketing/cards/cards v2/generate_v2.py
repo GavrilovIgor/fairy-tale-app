@@ -303,16 +303,16 @@ def card_07():
 
     draw_centered(draw, "Персональные сказки для детей", text_y, body(27), GREY)
     text_y += 36
-    draw_centered(draw, "с иллюстрациями — за 30 секунд", text_y, body(27), GREY)
+    draw_centered(draw, "с иллюстрациями", text_y, body(27), GREY)
     text_y += 36
 
-    draw_centered(draw, "Кажется, получилось красиво — надеюсь, полезно!", text_y, body(24), GREY)
+    draw_centered(draw, "Кажется, получилось красиво - надеюсь, полезно!", text_y, body(24), GREY)
     text_y += 34
-    draw_centered_emoji(img, draw, "Пишите — буду очень рад ❤️", text_y, body(24), WHITE)
-    text_y += 44
+    draw_centered_emoji(img, draw, "Пишите, буду очень рад ❤️", text_y, body(24), WHITE)
+    text_y += 64
 
-    hline(draw, text_y, color=(40, 40, 40))
-    text_y += 24
+    hline(draw, text_y, color=(60, 60, 60))
+    text_y += 28
 
     fo_url = f(FONT_HEAD, 60)
     draw_centered(draw, "MagicFairyTale.ru", text_y, fo_url, YELLOW)
