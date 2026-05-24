@@ -196,8 +196,6 @@ def card_04():
     hline(draw, 606)
 
     lines = [
-        ("Продакт без задач — не умеет.",          body(30), WHITE),
-        ("",                                        body(16), GREY),
         ("MVP → фича раз → фича два →",            bold(36),  YELLOW),
         ("дизайн → монетизация",                   bold(36),  YELLOW),
     ]
