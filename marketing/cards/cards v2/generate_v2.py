@@ -132,7 +132,7 @@ def card_02():
     label_left(draw, "ИСТОРИЯ")
     hline(draw, 110)
 
-    draw_centered(draw, "ТАЕ 5 ЛЕТ", 172, big(140), YELLOW)
+    draw_centered(draw, "ТАЕ 4 ГОДА", 172, big(140), YELLOW)
 
     hline(draw, 360)
 
