@@ -105,8 +105,8 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
               <div className="flex-1 h-px bg-gray-200"/>
             </div>
 
-            {/* ── Соц. иконки в ряд: G / Я / VK ── */}
-            <div className="flex justify-center gap-3 mb-3">
+            {/* ── Соц. иконки в ряд: G / Я / VK / Telegram ── */}
+            <div className="flex justify-center gap-3">
 
               {/* Google */}
               <IconButton onClick={signInWithGoogle} label="Google" disabled={!!loading} loading={loading === 'google'}>
@@ -133,28 +133,30 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
                   <path d="M12.773 17c-4.77 0-7.49-3.27-7.6-8.71h2.38c.08 3.99 1.84 5.68 3.23 6.03V8.29h2.24v3.44c1.37-.15 2.81-1.72 3.3-3.44h2.2c-.37 2.12-1.93 3.69-3.04 4.34 1.11.52 2.88 1.9 3.56 4.37h-2.43c-.53-1.64-1.85-2.9-3.59-3.06V17h-.25z" fill="white"/>
                 </svg>
               </IconButton>
-            </div>
 
-              {/* Telegram — иконка с невидимым виджетом поверх */}
+              {/* Telegram: иконка + поверх opacity:0 виджет (прозрачный, но кликабельный) */}
               {BOT_USERNAME && (
-                <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0 }}>
-                  {/* Видимая иконка */}
-                  <div className="flex items-center justify-center rounded-xl"
-                    style={{ width: 48, height: 48, border: '1.5px solid #e0e0e0' }}>
+                <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, cursor: 'pointer' }}>
+                  {/* Видимая иконка (некликабельна — клики уходят в виджет) */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: 12, border: '1.5px solid #e0e0e0',
+                    pointerEvents: 'none',
+                  }}>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                       <circle cx="12" cy="12" r="12" fill="#29a0d8"/>
                       <path d="M17.93 6.89L15.25 18.82c-.19.88-.7 1.1-1.42.68l-3.93-2.9-1.9 1.83c-.21.21-.39.39-.8.39l.29-4.04 7.39-6.68c.32-.29-.07-.45-.5-.16L5.9 13.63 2.03 12.42c-.86-.27-.88-.86.18-1.27L16.77 5.65c.72-.27 1.35.16 1.16 1.24z" fill="white"/>
                     </svg>
                   </div>
-                  {/* Невидимый iframe виджета поверх — клик проходит насквозь */}
-                  <div ref={telegramRef}
-                    style={{
-                      position: 'absolute', top: 0, left: 0,
-                      width: 48, height: 48,
-                      overflow: 'hidden', opacity: 0.001,
-                    }} />
+                  {/* opacity:0 — невидим, но кликабелен (стандарт CSS) */}
+                  <div ref={telegramRef} style={{
+                    position: 'absolute', inset: 0,
+                    overflow: 'hidden', opacity: 0, zIndex: 1,
+                  }} />
                 </div>
               )}
+            </div>
           </>
         )}
 
