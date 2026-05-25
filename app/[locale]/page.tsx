@@ -39,7 +39,8 @@ interface Scene { text:string; imagePrompt:string }
 interface Story { title:string; scenes:Scene[]; discussion?:string[]; anchor?:{title:string;description:string}; storySeed?:number }
 interface SavedStory { id:string; savedAt:string; childName:string; story:Story; images?:Record<number,string> }
 type SituationType = 'fear'|'emotion'|'adaptation'|'behavior'|'preparation'|'fun'
-interface FormData { childName:string; age:string; hero:string; situation:string; situationType:SituationType; favorites:string; lesson:string }
+interface VoiceCharacter { id:string; openaiVoice:string; emoji:string; name:string; ages:string; hint?:string }
+interface FormData { childName:string; age:string; hero:string; situation:string; situationType:SituationType; favorites:string; lesson:string; voice?:VoiceCharacter }
 type MobileTab = 'create'|'library'|'profile'
 
 // ── Situation config ──────────────────────────────────────────────────────────
@@ -475,7 +476,7 @@ function getLastChild():{name:string;age:string}{
 }
 function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CHILD_KEY,JSON.stringify({name,age}))}catch{} }
 
-function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
+function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,onShowPaywall,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;onShowPaywall?:()=>void;user?:User|null}) {
   const t = useTranslations()
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const wizardRef = useRef<HTMLElement>(null)
@@ -493,6 +494,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
   const SIT_TYPES_L: {id:string;label:string;hint:string;img:string}[]  = tRaw('wizard.situationTypes')
   const SIT_SUGG:    Record<SituationType,string[]>                      = tRaw('wizard.situationSuggestions')
   const FAVORITES:   string[]                                            = tRaw('wizard.favorites')
+  const VOICES:      VoiceCharacter[]                                    = tRaw('wizard.voices')
   const R_NAMES:     string[]                                            = tRaw('wizard.randomNames')
   const R_HEROES:    string[]                                            = tRaw('wizard.randomHeroes').map((h:{name:string})=>h.name??h)
   const R_FAVS:      string[]                                            = tRaw('wizard.randomFavorites')
@@ -531,7 +533,8 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
   const chip = (active:boolean) => `form-chip${active?' form-chip-active':''}`
   const sub  = (active:boolean) => `form-subchip${active?' form-subchip-active':''}`
 
-  const STEP_LABELS = [t('wizard.step1Label'),t('wizard.step2Label'),t('wizard.step3Label'),t('wizard.step4Label')]
+  const TOTAL_STEPS = 5
+  const STEP_LABELS = [t('wizard.step1Label'),t('wizard.step2Label'),t('wizard.step3Label'),t('wizard.step4Label'),t('wizard.step5Label')]
 
   return (
     <>
@@ -708,7 +711,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
 
             {/* Progress bar */}
             <div className="flex items-center gap-2 mb-1">
-              {[1,2,3,4].map(s=>(
+              {[1,2,3,4,5].map(s=>(
                 <div key={s} style={{
                   flex:1,height:5,borderRadius:999,transition:'all 0.35s',
                   background:s<step?'#0d2b1e':s===step?'#a46713':'rgba(0,0,0,0.1)'
@@ -716,7 +719,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
               ))}
             </div>
             <p className="text-[11px] font-semibold mb-6" style={{color:'#a46713'}}>
-              {t('wizard.stepLabel', {step, label: STEP_LABELS[step-1]})}{step===4?` ${t('wizard.optional')}`:''}
+              {t('wizard.stepLabel', {step, total: TOTAL_STEPS, label: STEP_LABELS[step-1]})}{step===4?` ${t('wizard.optional')}`:''}
             </p>
 
             {/* ── STEP 1: Имя + возраст ── */}
@@ -834,6 +837,75 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
               </div>
             )}
 
+            {/* ── STEP 5: Выбор голоса ── */}
+            {step===5&&(
+              isPremium() ? (
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest mb-0.5" style={{color:'#466252'}}>{t('wizard.voiceTitle')}</p>
+                    <p className="text-xs" style={{color:'rgba(70,98,82,0.6)'}}>{t('wizard.voiceSubtitle')}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {VOICES.map(v=>(
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={()=>setForm(f=>({...f, voice:v}))}
+                        className="relative rounded-2xl p-3 text-left transition-all cursor-pointer"
+                        style={{
+                          background: form.voice?.id===v.id ? 'rgba(164,103,19,0.18)' : 'rgba(255,255,255,0.04)',
+                          border: form.voice?.id===v.id ? '2px solid #a46713' : '2px solid rgba(255,255,255,0.08)',
+                        }}
+                      >
+                        {form.voice?.id===v.id&&(
+                          <span className="absolute top-2 right-2 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                            style={{background:'#a46713',color:'#fff'}}>✓</span>
+                        )}
+                        <div className="text-2xl mb-2">{v.emoji}</div>
+                        <div className="font-bold text-sm leading-tight mb-0.5" style={{color:'#e8d9b5'}}>{v.name}</div>
+                        <div className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full inline-block mb-1"
+                          style={{background:'rgba(164,103,19,0.3)',color:'#d4a85a'}}>{v.ages}</div>
+                        {v.hint&&<p className="text-[10px] leading-tight" style={{color:'rgba(232,217,181,0.45)'}}>{v.hint}</p>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center text-center gap-4 py-4">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
+                    style={{background:'rgba(164,103,19,0.15)',border:'2px solid rgba(164,103,19,0.3)'}}>
+                    🎙
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{color:'#a46713'}}>{t('wizard.voicePremiumBadge')}</p>
+                    <h3 className="font-bold text-lg mb-1" style={{color:'#e8d9b5'}}>{t('wizard.voicePremiumTitle')}</h3>
+                    <p className="text-sm leading-relaxed max-w-xs mx-auto" style={{color:'rgba(232,217,181,0.6)'}}>{t('wizard.voicePremiumText')}</p>
+                  </div>
+                  <div className="relative w-full">
+                    <div className="grid grid-cols-2 gap-3 blur-sm opacity-50 pointer-events-none">
+                      {VOICES.slice(0,4).map(v=>(
+                        <div key={v.id} className="rounded-2xl p-3"
+                          style={{background:'rgba(255,255,255,0.04)',border:'2px solid rgba(255,255,255,0.08)'}}>
+                          <div className="text-2xl mb-2">{v.emoji}</div>
+                          <div className="font-bold text-sm" style={{color:'#e8d9b5'}}>{v.name}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-5xl opacity-60">🔒</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={()=>onShowPaywall?.()}
+                    className="w-full py-3 rounded-xl font-bold text-sm cursor-pointer transition-all hover:opacity-90"
+                    style={{background:'#a46713',color:'#fff'}}>
+                    {t('wizard.voicePremiumCta')}
+                  </button>
+                </div>
+              )
+            )}
+
             {/* Navigation */}
             <div className="flex gap-3 mt-7">
               {step>1&&(
@@ -843,14 +915,14 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                   {t('wizard.back')}
                 </button>
               )}
-              {step<4&&(
+              {step<5&&(
                 <button type="button" onClick={()=>setStep(s=>s+1)} disabled={!canNext()}
                   className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
                   style={{background:'#0d2b1e'}}>
                   {t('wizard.next')}
                 </button>
               )}
-              {step===4&&(
+              {step===5&&(
                 <button type="button" onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form)}} disabled={isLoading}
                   className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
                   style={{background:'#a46713'}}>
@@ -858,7 +930,7 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 </button>
               )}
             </div>
-            {step===4&&(
+            {step===5&&(
               <button type="button" onClick={()=>onGenerate(form)} disabled={isLoading}
                 className="w-full text-center text-xs mt-3 cursor-pointer hover:opacity-70 transition-opacity"
                 style={{color:'rgba(70,98,82,0.5)'}}>
@@ -877,10 +949,11 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
 
 
 // ── Story Reading — издательский стиль (Stitch 9314fcfa / 403e6050 / 7ca8e409) ─
-function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef,imageCache}:{
+function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDownloadPDF,pdfLoading,pdfError,storyRef,imageCache,voice}:{
   story:Story;onBack:()=>void;onSave:()=>void;alreadySaved:boolean
   onShare:()=>void;shareStatus:string;onDownloadPDF:()=>void;pdfLoading:boolean;pdfError:string
   storyRef:React.RefObject<HTMLDivElement|null>;imageCache?:Record<number,string>
+  voice?:VoiceCharacter|null
 }) {
   const t = useTranslations('story')
   const serif = "'Lora', Georgia, serif"
@@ -1279,6 +1352,7 @@ export default function Home() {
   const locale = useLocale()
   const tCommon = useTranslations('common')
   const [status,setStatus] = useState<'idle'|'loading'|'done'|'reading'>('idle')
+  const [selectedVoice, setSelectedVoice] = useState<VoiceCharacter | null>(null)
   const [story,setStory] = useState<Story|null>(null)
   const [currentChildName,setCurrentChildName] = useState('')
   const [imageCache,setImageCache] = useState<Record<number,string>>({})
@@ -1466,6 +1540,7 @@ export default function Home() {
       setStory(json); setCurrentChildName(data.childName); setAlreadySaved(false)
       setImageCache(cache)
       setStatus('done')
+      setSelectedVoice(data.voice ?? null)
       setMobileTab('create')
     }catch{setError('Не удалось подключиться к серверу.');setStatus('idle')}
   }
@@ -1524,6 +1599,7 @@ export default function Home() {
   }
 
   const openSaved=(s:SavedStory)=>{
+    setSelectedVoice(null)
     setStory(s.story); setCurrentChildName(s.childName); setAlreadySaved(true)
     // Загружаем сохранённые картинки сразу — без запросов к Pollinations
     setImageCache(s.images||{})
@@ -1579,7 +1655,7 @@ export default function Home() {
         <>
           {/* Mobile: no tab bar — nav via header icon */}
           <div className="md:hidden">
-            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} user={user}/>}
+            {mobileTab==='create'&&<CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={()=>setMobileTab('library')} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} onShowPaywall={()=>setShowPaywall(true)} user={user}/>}
             {mobileTab==='library'&&(
               <>
                 <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
@@ -1599,7 +1675,7 @@ export default function Home() {
           <div className="hidden md:block">
             {desktopTab==='library'
               ? <LibraryScreen saved={saved} onOpen={openSaved} onDelete={handleDelete} onCreateNew={()=>{setMobileTab('create');setDesktopTab('create')}}/>
-              : <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} user={user}/>
+              : <CreateForm onGenerate={generate} isLoading={false} onOpenLibrary={undefined} onShowAuth={()=>setShowAuth(true)} onShowProfile={()=>setShowProfile(true)} onShowPaywall={()=>setShowPaywall(true)} user={user}/>
             }
           </div>
         </>
@@ -1614,6 +1690,7 @@ export default function Home() {
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
+            voice={selectedVoice}
             onBack={()=>{
               Object.values(imageCache).forEach(u=>URL.revokeObjectURL(u))
               setImageCache({})
