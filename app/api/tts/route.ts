@@ -35,8 +35,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid voice' }, { status: 400 })
   }
 
-  // Truncate to ~4000 chars to avoid huge bills on abuse
-  const truncatedText = text.slice(0, 4000)
+  // OpenAI TTS limit is 4096 chars. Cut at sentence boundary to avoid mid-word cuts.
+  const MAX_CHARS = 4096
+  let truncatedText = text
+  if (text.length > MAX_CHARS) {
+    const cutAt = text.lastIndexOf('. ', MAX_CHARS)
+    truncatedText = cutAt > 0 ? text.slice(0, cutAt + 1) : text.slice(0, MAX_CHARS)
+  }
 
   const client = new OpenAI({ apiKey })
 

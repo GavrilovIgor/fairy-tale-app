@@ -39,9 +39,13 @@ export function AudioPlayer({ storyText, voice, labels }: AudioPlayerProps) {
   const idleLabel = labels?.idle ?? 'Нажми ▶ чтобы слушать'
   const replayLabel = labels?.replay ?? 'Нажми ▶ чтобы повторить'
 
-  // Cleanup blob URL on unmount
+  // Cleanup audio element and blob URL on unmount
   useEffect(() => {
     return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ''   // releases internal resource reference
+      }
       if (audioBlobUrl.current) URL.revokeObjectURL(audioBlobUrl.current)
     }
   }, [])
