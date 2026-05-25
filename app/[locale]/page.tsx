@@ -984,7 +984,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
         </h1>
       </header>
 
-      <div ref={storyRef} className={`max-w-[680px] mx-auto ${voice ? 'pb-28' : 'pb-10'}`}>
+      <div ref={storyRef} className={`max-w-[680px] mx-auto ${voice ? 'pb-28 print:pb-10' : 'pb-10'}`}>
         {/* ── Scenes ── */}
         {story.scenes.map((scene, i) => (
           <div key={i}>
