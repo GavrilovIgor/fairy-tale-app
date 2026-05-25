@@ -25,7 +25,7 @@
   "wizard": {
     "title": "Let's create your story together",
     "subtitle": "Four quick steps — and a personalised tale is ready",
-    "stepLabel": "Step {step} of 4 — {label}",
+    "stepLabel": "Step {step} of {total} — {label}",
     "optional": "(optional)",
     "next": "Next →",
     "back": "← Back",
@@ -36,6 +36,24 @@
     "step2Label": "Choose a hero",
     "step3Label": "What's going on?",
     "step4Label": "Personal touches",
+    "step5Label": "Story Voice",
+    "voiceTitle": "Choose a story voice",
+    "voiceSubtitle": "Your child will hear the story in this voice",
+    "voiceSkip": "No narration",
+    "voiceNext": "Next →",
+    "voicePremiumTitle": "Voice for the story",
+    "voicePremiumBadge": "Available in Premium",
+    "voicePremiumText": "Your child will hear the story in the voice of their favourite character",
+    "voicePremiumCta": "Try Premium",
+    "voicePremiumSkip": "Create without narration →",
+    "voices": [
+      { "id": "skazochnik", "openaiVoice": "fable",   "emoji": "🧙", "name": "Storyteller",    "ages": "5–10 y",  "hint": "Warm, calm narrator" },
+      { "id": "podrugza",   "openaiVoice": "nova",    "emoji": "🌸", "name": "Cheerful Pal",   "ages": "3–5 y",   "hint": "Bright, playful voice" },
+      { "id": "velikan",    "openaiVoice": "onyx",    "emoji": "🐻", "name": "Kind Giant",     "ages": "3–5 y",   "hint": "Deep, cosy voice" },
+      { "id": "umnik",      "openaiVoice": "echo",    "emoji": "🦊", "name": "Little Smarty",  "ages": "5–7 y",   "hint": "Clear, curious voice" },
+      { "id": "hrabrost",   "openaiVoice": "shimmer", "emoji": "⚔️", "name": "Lady Brave",     "ages": "6–9 y",   "hint": "Confident, noble voice" },
+      { "id": "superhero",  "openaiVoice": "alloy",   "emoji": "🦸", "name": "Superhero",      "ages": "7–10 y",  "hint": "Energetic, bold voice" }
+    ]
     "childNameLabel": "Your child's name",
     "childNamePlaceholder": "e.g. Emma or Liam",
     "ageLabel": "How old are they?",

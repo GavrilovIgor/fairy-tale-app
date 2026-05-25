@@ -25,7 +25,7 @@
   "wizard": {
     "title": "Составим сказку вместе",
     "subtitle": "4 шага — и ваша персональная история готова",
-    "stepLabel": "Шаг {step} из 4 — {label}",
+    "stepLabel": "Шаг {step} из {total} — {label}",
     "optional": "(необязательно)",
     "next": "Далее →",
     "back": "← Назад",
@@ -36,6 +36,24 @@
     "step2Label": "Главный герой",
     "step3Label": "Что происходит?",
     "step4Label": "Последний штрих",
+    "step5Label": "Голос сказки",
+    "voiceTitle": "Выбери голос сказки",
+    "voiceSubtitle": "Ребёнок услышит историю этим голосом",
+    "voiceSkip": "Без озвучки",
+    "voiceNext": "Далее →",
+    "voicePremiumTitle": "Голос для сказки",
+    "voicePremiumBadge": "Доступно в Premium",
+    "voicePremiumText": "Ребёнок услышит сказку голосом любимого персонажа",
+    "voicePremiumCta": "Попробовать Premium",
+    "voicePremiumSkip": "Создать без озвучки →",
+    "voices": [
+      { "id": "skazochnik", "openaiVoice": "fable",   "emoji": "🧙", "name": "Сказочник",       "ages": "5–10 лет", "hint": "Добрый, спокойный голос" },
+      { "id": "podrugza",   "openaiVoice": "nova",    "emoji": "🌸", "name": "Весёлая Подружка","ages": "3–5 лет",  "hint": "Звонкий, весёлый голос" },
+      { "id": "velikan",    "openaiVoice": "onyx",    "emoji": "🐻", "name": "Добрый Великан",  "ages": "3–5 лет",  "hint": "Глубокий, уютный голос" },
+      { "id": "umnik",      "openaiVoice": "echo",    "emoji": "🦊", "name": "Нолик-Умник",     "ages": "5–7 лет",  "hint": "Чёткий, любознательный" },
+      { "id": "hrabrost",   "openaiVoice": "shimmer", "emoji": "⚔️", "name": "Леди-Храбрость",  "ages": "6–9 лет",  "hint": "Уверенный, благородный" },
+      { "id": "superhero",  "openaiVoice": "alloy",   "emoji": "🦸", "name": "Супергерой",      "ages": "7–10 лет", "hint": "Энергичный, бодрый голос" }
+    ]
     "childNameLabel": "КАК ЗОВУТ РЕБЁНКА?",
     "childNamePlaceholder": "Как зовут ребёнка?",
     "ageLabel": "СКОЛЬКО ЛЕТ?",
