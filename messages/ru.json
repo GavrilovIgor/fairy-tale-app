@@ -40,7 +40,6 @@
     "voiceTitle": "Выбери голос сказки",
     "voiceSubtitle": "Ребёнок услышит историю этим голосом",
     "voiceSkip": "Без озвучки",
-    "voiceNext": "Далее →",
     "voicePremiumTitle": "Голос для сказки",
     "voicePremiumBadge": "Доступно в Premium",
     "voicePremiumText": "Ребёнок услышит сказку голосом любимого персонажа",
@@ -48,7 +47,7 @@
     "voicePremiumSkip": "Создать без озвучки →",
     "voices": [
       { "id": "skazochnik", "openaiVoice": "fable",   "emoji": "🧙", "name": "Сказочник",       "ages": "5–10 лет", "hint": "Добрый, спокойный голос" },
-      { "id": "podrugza",   "openaiVoice": "nova",    "emoji": "🌸", "name": "Весёлая Подружка","ages": "3–5 лет",  "hint": "Звонкий, весёлый голос" },
+      { "id": "podruga",   "openaiVoice": "nova",    "emoji": "🌸", "name": "Весёлая Подружка","ages": "3–5 лет",  "hint": "Звонкий, весёлый голос" },
       { "id": "velikan",    "openaiVoice": "onyx",    "emoji": "🐻", "name": "Добрый Великан",  "ages": "3–5 лет",  "hint": "Глубокий, уютный голос" },
       { "id": "umnik",      "openaiVoice": "echo",    "emoji": "🦊", "name": "Нолик-Умник",     "ages": "5–7 лет",  "hint": "Чёткий, любознательный" },
       { "id": "hrabrost",   "openaiVoice": "shimmer", "emoji": "⚔️", "name": "Леди-Храбрость",  "ages": "6–9 лет",  "hint": "Уверенный, благородный" },
