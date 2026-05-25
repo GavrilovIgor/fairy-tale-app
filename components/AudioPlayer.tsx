@@ -4,157 +4,144 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 
 interface VoiceCharacter {
   id: string
-  openaiVoice: string
+  openaiVoice: string  // kept for interface compat, unused in Web Speech API
   emoji: string
   name: string
   ages: string
-  hint?: string  // m1: added optional hint field
+  hint?: string
 }
 
 interface AudioPlayerProps {
-  storyText: string          // Full concatenated story text
+  storyText: string
   voice: VoiceCharacter
-  // m2: optional i18n labels with Russian defaults
   labels?: {
-    loading?: string
     idle?: string
     replay?: string
     error?: string
+    unsupported?: string
   }
 }
 
-type PlayerState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error'
+type PlayerState = 'idle' | 'speaking' | 'paused' | 'done' | 'error'
+
+// Chrome has a bug where speechSynthesis freezes on long texts.
+// Periodic pause+resume keeps it alive.
+const CHROME_KEEPALIVE_MS = 10_000
+
+function findRussianVoice(): SpeechSynthesisVoice | null {
+  const voices = window.speechSynthesis.getVoices()
+  const ruVoices = voices.filter(v => v.lang.startsWith('ru'))
+  // Prefer on-device (local) voice for better quality
+  return ruVoices.find(v => v.localService) ?? ruVoices[0] ?? null
+}
 
 export function AudioPlayer({ storyText, voice, labels }: AudioPlayerProps) {
   const [state, setState] = useState<PlayerState>('idle')
-  const [progress, setProgress] = useState(0)          // 0–1
-  const [duration, setDuration] = useState(0)
+  const [progress, setProgress] = useState(0)   // 0–1, from onboundary
   const [errorMsg, setErrorMsg] = useState('')
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const audioBlobUrl = useRef<string | null>(null)
-  const loadingRef = useRef(false)  // C2: in-flight guard
+  const keepAliveRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const stateRef = useRef<PlayerState>('idle')   // mirror for keepalive closure
 
-  // m2: labels with fallback defaults
-  const loadingLabel = labels?.loading ?? 'Готовим озвучку...'
+  // Keep stateRef in sync
+  useEffect(() => { stateRef.current = state }, [state])
+
+  const isSupported =
+    typeof window !== 'undefined' && 'speechSynthesis' in window
+
   const idleLabel = labels?.idle ?? 'Нажми ▶ чтобы слушать'
   const replayLabel = labels?.replay ?? 'Нажми ▶ чтобы повторить'
+  const unsupportedLabel = labels?.unsupported ?? 'Браузер не поддерживает озвучку'
 
-  // Cleanup audio element and blob URL on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.src = ''   // releases internal resource reference
-      }
-      if (audioBlobUrl.current) URL.revokeObjectURL(audioBlobUrl.current)
+  const stopKeepalive = useCallback(() => {
+    if (keepAliveRef.current !== null) {
+      clearInterval(keepAliveRef.current)
+      keepAliveRef.current = null
     }
   }, [])
 
-  // C1+C2: loadAudio returns boolean success; guarded against concurrent calls
-  const loadAudio = useCallback(async (): Promise<boolean> => {
-    if (audioBlobUrl.current) return true   // Already loaded
-
-    if (loadingRef.current) return false    // C2: in-flight guard
-    loadingRef.current = true
-
-    setState('loading')
-    setErrorMsg('')
-
-    try {
-      const res = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: storyText, voice: voice.openaiVoice }),
-      })
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Ошибка озвучки' }))
-        throw new Error(err.error || `HTTP ${res.status}`)
-      }
-
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      audioBlobUrl.current = url
-
-      const audio = new Audio(url)
-      audioRef.current = audio
-
-      audio.addEventListener('loadedmetadata', () => {
-        setDuration(audio.duration)
-      })
-      audio.addEventListener('timeupdate', () => {
-        if (audio.duration > 0) setProgress(audio.currentTime / audio.duration)
-      })
-      audio.addEventListener('ended', () => {
-        setState('paused')
-        setProgress(0)
-        audio.currentTime = 0
-      })
-      audio.addEventListener('error', () => {
-        setState('error')
-        setErrorMsg('Ошибка воспроизведения')
-      })
-
-      // I2: removed audio.load() — new Audio(url) already starts loading;
-      // calling load() again after attaching canplaythrough can reset the element
-      await new Promise<void>((resolve, reject) => {
-        audio.addEventListener('canplaythrough', () => resolve(), { once: true })
-        audio.addEventListener('error', () => reject(new Error('Audio load failed')), { once: true })
-      })
-
-      setState('ready')
-      return true
-    } catch (err) {
-      setState('error')
-      setErrorMsg(err instanceof Error ? err.message : 'Ошибка озвучки')
-      return false
-    } finally {
-      loadingRef.current = false
+  // Cancel speech and clear timers on unmount
+  useEffect(() => {
+    return () => {
+      stopKeepalive()
+      if (isSupported) window.speechSynthesis.cancel()
     }
-  }, [storyText, voice.openaiVoice])
+  }, [isSupported, stopKeepalive])
 
-  // C1: handlePlay uses boolean return from loadAudio — no stale closure on state
-  const handlePlay = async () => {
-    if (state === 'idle' || state === 'error') {
-      const ok = await loadAudio()
-      if (ok && audioRef.current) {
-        await audioRef.current.play().catch(() => {})
-        setState('playing')
-      }
+  const startSpeaking = useCallback(() => {
+    if (!isSupported) {
+      setState('error')
+      setErrorMsg(unsupportedLabel)
       return
     }
-    if (state === 'loading') return
-    if (!audioRef.current) return
 
-    if (state === 'ready' || state === 'paused') {
-      await audioRef.current.play().catch(() => {})
-      setState('playing')
-    } else if (state === 'playing') {
-      audioRef.current.pause()
+    window.speechSynthesis.cancel()
+    stopKeepalive()
+
+    const utterance = new SpeechSynthesisUtterance(storyText)
+    utterance.lang = 'ru-RU'
+    utterance.rate = 0.88   // slightly slower — easier for kids to follow
+
+    const ruVoice = findRussianVoice()
+    if (ruVoice) utterance.voice = ruVoice
+
+    utterance.onboundary = (e: SpeechSynthesisEvent) => {
+      if (storyText.length > 0) {
+        setProgress(e.charIndex / storyText.length)
+      }
+    }
+    utterance.onend = () => {
+      stopKeepalive()
+      setState('done')
+      setProgress(1)
+    }
+    utterance.onerror = (e: SpeechSynthesisErrorEvent) => {
+      // 'interrupted' fires when we call cancel() intentionally — not an error
+      if (e.error === 'interrupted') return
+      stopKeepalive()
+      setState('error')
+      setErrorMsg('Ошибка озвучки')
+    }
+
+    window.speechSynthesis.speak(utterance)
+    setState('speaking')
+
+    // Chrome keep-alive: prevents freeze on long texts
+    keepAliveRef.current = setInterval(() => {
+      if (stateRef.current === 'speaking' && window.speechSynthesis.speaking) {
+        window.speechSynthesis.pause()
+        window.speechSynthesis.resume()
+      }
+    }, CHROME_KEEPALIVE_MS)
+  }, [storyText, isSupported, unsupportedLabel, stopKeepalive])
+
+  const handlePlay = () => {
+    if (state === 'idle' || state === 'done' || state === 'error') {
+      setProgress(0)
+      startSpeaking()
+    } else if (state === 'speaking') {
+      window.speechSynthesis.pause()
       setState('paused')
+    } else if (state === 'paused') {
+      window.speechSynthesis.resume()
+      setState('speaking')
     }
   }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || duration === 0) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-    audioRef.current.currentTime = ratio * duration
-    setProgress(ratio)
-  }
-
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60)
-    const s = Math.floor(secs % 60)
-    return `${m}:${s.toString().padStart(2, '0')}`
-  }
-
-  // I1: derive currentTime from progress state (consistent with timeupdate events)
-  const currentTime = progress * duration
-  const isLoading = state === 'loading'
-  const isPlaying = state === 'playing'
+  const isPlaying = state === 'speaking'
   const hasError = state === 'error'
-  const showProgress = state === 'ready' || state === 'playing' || state === 'paused'
+
+  let statusText: string
+  if (hasError) {
+    statusText = errorMsg
+  } else if (state === 'done') {
+    statusText = replayLabel
+  } else if (state === 'idle') {
+    statusText = idleLabel
+  } else if (state === 'speaking') {
+    statusText = 'Читаю сказку...'
+  } else {
+    statusText = 'Пауза'
+  }
 
   return (
     <div
@@ -167,15 +154,14 @@ export function AudioPlayer({ storyText, voice, labels }: AudioPlayerProps) {
       }}
     >
       <div className="max-w-[680px] mx-auto px-4 py-3">
-        {/* Progress bar */}
-        {showProgress && (
+        {/* Progress bar — visible once speaking has started */}
+        {progress > 0 && progress < 1 && (
           <div
-            className="w-full h-1 rounded-full mb-3 cursor-pointer"
+            className="w-full h-1 rounded-full mb-3"
             style={{ background: 'rgba(255,255,255,0.12)' }}
-            onClick={handleSeek}
           >
             <div
-              className="h-full rounded-full transition-all duration-100"
+              className="h-full rounded-full transition-all duration-300"
               style={{ width: `${progress * 100}%`, background: '#a46713' }}
             />
           </div>
@@ -185,55 +171,42 @@ export function AudioPlayer({ storyText, voice, labels }: AudioPlayerProps) {
           {/* Character avatar */}
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.15)' }}
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: '1.5px solid rgba(255,255,255,0.15)',
+            }}
           >
             {voice.emoji}
           </div>
 
-          {/* Info */}
+          {/* Character name + status */}
           <div className="flex-1 min-w-0">
             <div className="text-xs font-semibold truncate" style={{ color: '#d4a85a' }}>
               {voice.name}
             </div>
-            {hasError ? (
-              <div className="text-xs" style={{ color: '#ef4444' }}>{errorMsg}</div>
-            ) : showProgress ? (
-              // I3: show replay hint when ended (paused + progress=0)
-              progress === 0 && state === 'paused' ? (
-                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{replayLabel}</div>
-              ) : (
-                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </div>
-              )
-            ) : (
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {isLoading ? loadingLabel : idleLabel}
-              </div>
-            )}
+            <div
+              className="text-xs truncate"
+              style={{ color: hasError ? '#ef4444' : 'rgba(255,255,255,0.40)' }}
+            >
+              {statusText}
+            </div>
           </div>
 
-          {/* Play/Pause button */}
+          {/* Play / Pause button */}
           <button
             onClick={handlePlay}
-            disabled={isLoading}
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all cursor-pointer disabled:opacity-50"
-            style={{ background: isLoading ? 'rgba(255,255,255,0.1)' : '#a46713' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-opacity cursor-pointer active:opacity-70"
+            style={{ background: '#a46713' }}
             aria-label={isPlaying ? 'Пауза' : 'Играть'}
           >
-            {isLoading ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="animate-spin">
-                <circle cx="12" cy="12" r="10" strokeOpacity="0.3"/>
-                <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round"/>
-              </svg>
-            ) : isPlaying ? (
+            {isPlaying ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                <rect x="6" y="4" width="4" height="16" rx="1"/>
-                <rect x="14" y="4" width="4" height="16" rx="1"/>
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
               </svg>
             ) : (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                <polygon points="5,3 19,12 5,21"/>
+                <polygon points="5,3 19,12 5,21" />
               </svg>
             )}
           </button>
