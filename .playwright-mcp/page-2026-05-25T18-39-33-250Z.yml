@@ -1,0 +1,495 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e5]:
+      - navigation [ref=e8]:
+        - generic [ref=e11]:
+          - link "Recraft — Go to homepage" [ref=e13] [cursor=pointer]:
+            - /url: https://www.recraft.ai/
+          - generic [ref=e15]:
+            - generic [ref=e16]:
+              - paragraph [ref=e18]: Recraft Studio
+              - img [ref=e24]
+            - generic [ref=e26]:
+              - paragraph [ref=e28]: AI models
+              - img [ref=e34]
+            - generic [ref=e36]:
+              - paragraph [ref=e38]: Use сases
+              - img [ref=e44]
+            - generic [ref=e46]:
+              - paragraph [ref=e48]: API
+              - img [ref=e54]
+            - generic [ref=e56]:
+              - paragraph [ref=e58]: Resources
+              - img [ref=e64]
+            - link "Pricing" [ref=e66] [cursor=pointer]:
+              - /url: https://www.recraft.ai/pricing
+              - paragraph [ref=e68]: Pricing
+            - link "Enterprise" [ref=e69] [cursor=pointer]:
+              - /url: https://www.recraft.ai/enterprise
+              - paragraph [ref=e71]: Enterprise
+          - generic [ref=e72]:
+            - link "Sign in" [ref=e74] [cursor=pointer]:
+              - /url: /auth/login?callbackUrl=%2F
+              - paragraph [ref=e76]: Sign in
+            - link "Try Recraft Studio" [ref=e78] [cursor=pointer]:
+              - /url: /auth/login?callbackUrl=%2F
+              - paragraph [ref=e80]: Try Recraft Studio
+    - main [ref=e81]:
+      - region "Announcement banner" [ref=e82]:
+        - generic [ref=e86]:
+          - img [ref=e90]
+          - paragraph [ref=e93]: "Meet Recraft V4.1: Our most advanced model. Beautiful by nature."
+          - paragraph [ref=e95]:
+            - link "Learn more" [ref=e96] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog/recraft-v4-1-more-beautiful-by-nature
+      - generic [ref=e97]:
+        - generic [ref=e100]:
+          - list [ref=e102]:
+            - listitem [ref=e103]:
+              - img [ref=e108]
+            - listitem [ref=e113]:
+              - img "Portrait of a person in a red-and-white jacket surrounded by long braids against a dark background" [ref=e118]
+            - listitem [ref=e123]:
+              - img [ref=e128]
+            - listitem [ref=e133]:
+              - img [ref=e138]
+            - listitem [ref=e143]:
+              - img [ref=e148]
+          - group "Slideshow pagination controls":
+            - generic:
+              - button "Previous" [ref=e153] [cursor=pointer]:
+                - img "Back Arrow" [ref=e154]
+              - button "Next" [ref=e155] [cursor=pointer]:
+                - img "Next Arrow" [ref=e156]
+            - generic [ref=e157]:
+              - button "Scroll to page 1" [ref=e158] [cursor=pointer]
+              - button "Scroll to page 2" [ref=e160] [cursor=pointer]
+              - button "Scroll to page 3" [ref=e162] [cursor=pointer]
+        - generic [ref=e166]:
+          - heading "tastefully crafted AI image models" [level=1] [ref=e170]
+          - paragraph [ref=e174]: Recraft models bring visual taste to AI. Beyond prompt accuracy, they deliver real design vision in every generation
+          - generic [ref=e176]:
+            - link "Start creating" [ref=e179] [cursor=pointer]:
+              - /url: /auth/login?callbackUrl=%2F
+              - paragraph [ref=e181]: Start creating
+            - link "Get API" [ref=e184] [cursor=pointer]:
+              - /url: https://www.recraft.ai/docs/api-reference/getting-started
+              - paragraph [ref=e186]: Get API
+      - region "Clients logos" [ref=e187]:
+        - paragraph [ref=e190]: TRUSTED BY PROFESSIONAL DESIGNERS AT THE MOST INNOVATIVE COMPANIES
+        - list [ref=e195]:
+          - listitem [ref=e196]
+          - listitem [ref=e199]
+          - listitem [ref=e202]
+          - listitem [ref=e205]
+          - listitem [ref=e208]
+          - listitem [ref=e211]
+          - listitem [ref=e214]
+          - listitem [ref=e217]
+          - listitem [ref=e220]
+          - listitem [ref=e223]
+          - listitem [ref=e226]
+          - listitem [ref=e229]
+          - listitem [ref=e232]
+          - listitem [ref=e235]
+          - listitem [ref=e238]
+          - listitem [ref=e241]
+          - listitem [ref=e244]
+          - listitem [ref=e247]
+          - listitem [ref=e250]
+          - listitem [ref=e253]
+      - region "Prompt understanding" [ref=e256]:
+        - generic [ref=e259]:
+          - img "Five young people in puffer jackets taking a selfie in a volcanic landscape under a dramatic sky" [ref=e261]
+          - heading "exceptional prompt understanding" [level=2] [ref=e263]:
+            - text: exceptional
+            - text: prompt understanding
+          - img [ref=e270]
+          - img [ref=e280]
+          - img [ref=e290]
+          - img [ref=e300]
+      - region "Design assets — gallery" [ref=e304]:
+        - heading "design assets with taste built in" [level=2] [ref=e307]:
+          - text: design assets
+          - text: with taste built in
+        - generic [ref=e310]:
+          - list [ref=e312]:
+            - listitem [ref=e313]:
+              - generic [ref=e314]:
+                - img [ref=e317]
+                - paragraph [ref=e319]: Tasteful composition and rich colors
+            - listitem [ref=e320]:
+              - generic [ref=e321]:
+                - img "Street-side billboard featuring a fashion portrait with bold yellow-purple text at dusk" [ref=e324]
+                - paragraph [ref=e326]: Quality text generation
+            - listitem [ref=e327]:
+              - generic [ref=e328]:
+                - img [ref=e331]
+                - paragraph [ref=e333]: Production-ready shots
+            - listitem [ref=e334]:
+              - generic [ref=e335]:
+                - img [ref=e338]
+                - paragraph [ref=e340]: Tasteful composition and rich colors
+            - listitem [ref=e341]:
+              - generic [ref=e342]:
+                - img [ref=e345]
+                - paragraph [ref=e347]: Quality text generation
+          - group "Slideshow pagination controls":
+            - generic:
+              - button "Previous" [ref=e348] [cursor=pointer]:
+                - img "Back Arrow" [ref=e349]
+              - button "Next" [ref=e350] [cursor=pointer]:
+                - img "Next Arrow" [ref=e351]
+            - generic [ref=e352]:
+              - button "Scroll to page 1" [ref=e353] [cursor=pointer]
+              - button "Scroll to page 2" [ref=e355] [cursor=pointer]
+              - button "Scroll to page 3" [ref=e357] [cursor=pointer]
+      - region "Vector generation — gallery" [ref=e359]:
+        - heading "unmatched vector generation" [level=2] [ref=e362]:
+          - text: unmatched
+          - text: vector generation
+        - generic [ref=e365]:
+          - list [ref=e367]:
+            - listitem [ref=e368]:
+              - generic [ref=e369]:
+                - img [ref=e372]
+                - paragraph [ref=e374]: Consistent styles
+            - listitem [ref=e375]:
+              - generic [ref=e376]:
+                - img "Stylized red lettering spelling “ABCDEF” on a light background" [ref=e379]
+                - paragraph [ref=e381]: Design-ready typography
+            - listitem [ref=e382]:
+              - generic [ref=e383]:
+                - img [ref=e386]
+                - paragraph [ref=e388]: Complex editable vector graphics
+            - listitem [ref=e389]:
+              - generic [ref=e390]:
+                - img [ref=e393]
+                - paragraph [ref=e395]: Consistent styles
+            - listitem [ref=e396]:
+              - generic [ref=e397]:
+                - img [ref=e400]
+                - paragraph [ref=e402]: Design-ready typography
+          - group "Slideshow pagination controls":
+            - generic:
+              - button "Previous" [ref=e403] [cursor=pointer]:
+                - img "Back Arrow" [ref=e404]
+              - button "Next" [ref=e405] [cursor=pointer]:
+                - img "Next Arrow" [ref=e406]
+            - generic [ref=e407]:
+              - button "Scroll to page 1" [ref=e408] [cursor=pointer]
+              - button "Scroll to page 2" [ref=e410] [cursor=pointer]
+              - button "Scroll to page 3" [ref=e412] [cursor=pointer]
+      - region "Photorealism — gallery" [ref=e414]:
+        - heading "lifelike photoreal images" [level=2] [ref=e417]:
+          - text: lifelike
+          - text: photoreal images
+        - generic [ref=e420]:
+          - list [ref=e422]:
+            - listitem [ref=e423]:
+              - generic [ref=e424]:
+                - img [ref=e427]
+                - paragraph [ref=e429]: Complex multi-character scenes
+            - listitem [ref=e430]:
+              - generic [ref=e431]:
+                - img "Motion-blurred image of a motorcyclist in a red-and-white racing suit riding at night" [ref=e434]
+                - paragraph [ref=e436]: Perfect lighting and lens distortions
+            - listitem [ref=e437]:
+              - generic [ref=e438]:
+                - img [ref=e441]
+                - paragraph [ref=e443]: Natural shots with human feel
+            - listitem [ref=e444]:
+              - generic [ref=e445]:
+                - img [ref=e448]
+                - paragraph [ref=e450]: Complex multi-character scenes
+            - listitem [ref=e451]:
+              - generic [ref=e452]:
+                - img [ref=e455]
+                - paragraph [ref=e457]: Perfect lighting and lens distortions
+          - group "Slideshow pagination controls":
+            - generic:
+              - button "Previous" [ref=e458] [cursor=pointer]:
+                - img "Back Arrow" [ref=e459]
+              - button "Next" [ref=e460] [cursor=pointer]:
+                - img "Next Arrow" [ref=e461]
+            - generic [ref=e462]:
+              - button "Scroll to page 1" [ref=e463] [cursor=pointer]
+              - button "Scroll to page 2" [ref=e465] [cursor=pointer]
+              - button "Scroll to page 3" [ref=e467] [cursor=pointer]
+      - region "Custom styles" [ref=e469]:
+        - generic [ref=e471]:
+          - heading "consistent styles without training" [level=2] [ref=e474]:
+            - text: consistent styles
+            - text: without training
+          - paragraph [ref=e477]: Creating a custom style is as easy as dropping in your images. Recraft instantly turns them into a reusable, editable style.
+        - generic [ref=e482]:
+          - generic [ref=e483]:
+            - img "Close-up portrait of a person wearing pink sports glasses and a white cap" [ref=e486] [cursor=pointer]
+            - img "Macro silhouette of a dragonfly against a warm beige background" [ref=e489] [cursor=pointer]
+            - img "3D illustration of a white-and-blue flower with a bright orange center" [ref=e492] [cursor=pointer]
+          - generic [ref=e493]:
+            - generic [ref=e494]:
+              - generic [ref=e495]:
+                - img "Person wrapped in a large pink blanket-like garment against a pink background" [ref=e499]
+                - img "Tennis player in a pink outfit holding a racket under dramatic pink lighting" [ref=e505]
+                - img "Off-road truck on a pink-toned surface against a dark gradient background" [ref=e511]
+              - generic [ref=e512]:
+                - img "Person in dark clothing running with a briefcase in a pink-lit setting" [ref=e516]
+                - generic [ref=e517]:
+                  - img "Person in pale clothing suspended sideways against a striped architectural wall" [ref=e521]
+                  - img "Pink suitcase beside a person’s legs with a small white cat nearby" [ref=e526]
+                - img "Cyclist riding toward the camera under pink and purple lighting" [ref=e532]
+            - img "Close-up portrait of a person wearing pink sports glasses and a white cap" [ref=e537]
+            - generic [ref=e538]:
+              - generic [ref=e539]:
+                - img "White “INCROCO” wordmark on a dark purple background" [ref=e545]
+                - img "Hand holding a smartphone with a blank screen against a pink-purple background" [ref=e550]
+              - generic [ref=e552]:
+                - generic [ref=e553]:
+                  - img "Portrait of a man holding a basketball under pink studio lighting" [ref=e559]
+                  - generic [ref=e560]:
+                    - img "Pink-tinted city street scene framed by tall buildings" [ref=e564]
+                    - img "Macro image of a small insect on a pink flower petal" [ref=e568]
+                - generic [ref=e569]:
+                  - img "Close-up of a pink car headlight and front fender" [ref=e574]
+                  - img "Race car speeding along a track in a pink-toned scene" [ref=e579]
+      - region "Articles about Recraft" [ref=e580]:
+        - generic [ref=e581]:
+          - link "Techcrunch article" [ref=e582] [cursor=pointer]:
+            - /url: https://techcrunch.com/2024/01/17/can-recrafts-foundational-model-for-graphic-design-swerve-the-ai-controversy/
+          - link "The Times article" [ref=e584] [cursor=pointer]:
+            - /url: https://www.thetimes.com/article/london-startup-recraft-khosla-ventures-yandex-dorogush-times-enterprise-network-62brwkd8s
+            - img "The Times logo" [ref=e588]
+          - link "Business insider article" [ref=e589] [cursor=pointer]:
+            - /url: https://www.businessinsider.com/recraft-generative-ai-startup-raises-12-million-from-khosla-ventures-2024-1
+      - region "Testimonials" [ref=e591]:
+        - list [ref=e595]:
+          - listitem [ref=e596]:
+            - generic [ref=e598]:
+              - paragraph [ref=e600]: Unlike some other image generators like Midjourney, Recraft is highly customizable.
+              - generic [ref=e601]:
+                - paragraph [ref=e603]: Ivan Korzun
+                - paragraph [ref=e605]: DESIGN DIRECTOR AT PLAYGAMA
+          - listitem [ref=e606]:
+            - generic [ref=e608]:
+              - paragraph [ref=e610]: It can generate images directly in vector format. Other AI tools don’t offer this option.
+              - generic [ref=e611]:
+                - paragraph [ref=e613]: Vincent
+                - paragraph [ref=e615]: EMBROIDERY DESIGNER
+          - listitem [ref=e616]:
+            - generic [ref=e618]:
+              - paragraph [ref=e620]: What Recraft was able to generate, I said, ‘Wow' — I think it's one of the reasons I decided to subscribe.
+              - generic [ref=e621]:
+                - paragraph [ref=e623]: Sebastien T.
+                - paragraph [ref=e625]: GRAPHIC DESIGNER
+          - listitem [ref=e626]:
+            - generic [ref=e628]:
+              - paragraph [ref=e630]: Unlike some other image generators like Midjourney, Recraft is highly customizable.
+              - generic [ref=e631]:
+                - paragraph [ref=e633]: Ivan Korzun
+                - paragraph [ref=e635]: DESIGN DIRECTOR AT PLAYGAMA
+          - listitem [ref=e636]:
+            - generic [ref=e638]:
+              - paragraph [ref=e640]: It can generate images directly in vector format. Other AI tools don’t offer this option.
+              - generic [ref=e641]:
+                - paragraph [ref=e643]: Vincent
+                - paragraph [ref=e645]: EMBROIDERY DESIGNER
+          - listitem [ref=e646]:
+            - generic [ref=e648]:
+              - paragraph [ref=e650]: What Recraft was able to generate, I said, ‘Wow' — I think it's one of the reasons I decided to subscribe.
+              - generic [ref=e651]:
+                - paragraph [ref=e653]: Sebastien T.
+                - paragraph [ref=e655]: GRAPHIC DESIGNER
+          - listitem [ref=e656]:
+            - generic [ref=e658]:
+              - paragraph [ref=e660]: Unlike some other image generators like Midjourney, Recraft is highly customizable.
+              - generic [ref=e661]:
+                - paragraph [ref=e663]: Ivan Korzun
+                - paragraph [ref=e665]: DESIGN DIRECTOR AT PLAYGAMA
+          - listitem [ref=e666]:
+            - generic [ref=e668]:
+              - paragraph [ref=e670]: It can generate images directly in vector format. Other AI tools don’t offer this option.
+              - generic [ref=e671]:
+                - paragraph [ref=e673]: Vincent
+                - paragraph [ref=e675]: EMBROIDERY DESIGNER
+          - listitem [ref=e676]:
+            - generic [ref=e678]:
+              - paragraph [ref=e680]: What Recraft was able to generate, I said, ‘Wow' — I think it's one of the reasons I decided to subscribe.
+              - generic [ref=e681]:
+                - paragraph [ref=e683]: Sebastien T.
+                - paragraph [ref=e685]: GRAPHIC DESIGNER
+          - listitem [ref=e686]:
+            - generic [ref=e688]:
+              - paragraph [ref=e690]: Unlike some other image generators like Midjourney, Recraft is highly customizable.
+              - generic [ref=e691]:
+                - paragraph [ref=e693]: Ivan Korzun
+                - paragraph [ref=e695]: DESIGN DIRECTOR AT PLAYGAMA
+          - listitem [ref=e696]:
+            - generic [ref=e698]:
+              - paragraph [ref=e700]: It can generate images directly in vector format. Other AI tools don’t offer this option.
+              - generic [ref=e701]:
+                - paragraph [ref=e703]: Vincent
+                - paragraph [ref=e705]: EMBROIDERY DESIGNER
+          - listitem [ref=e706]:
+            - generic [ref=e708]:
+              - paragraph [ref=e710]: What Recraft was able to generate, I said, ‘Wow' — I think it's one of the reasons I decided to subscribe.
+              - generic [ref=e711]:
+                - paragraph [ref=e713]: Sebastien T.
+                - paragraph [ref=e715]: GRAPHIC DESIGNER
+      - region "About Recraft Studio" [ref=e716]:
+        - generic [ref=e719]:
+          - generic [ref=e721]:
+            - heading "try in recraft studio" [level=2] [ref=e724]:
+              - text: try in recraft
+              - text: studio
+            - paragraph [ref=e726]: The creator’s platform for generating and editing images, vectors, and mockups with Recraft’s models and other top frontier models
+          - link "Try it free" [ref=e729] [cursor=pointer]:
+            - /url: /auth/login?callbackUrl=%2F
+            - paragraph [ref=e731]: Try it free
+    - contentinfo [ref=e735]:
+      - generic [ref=e738]:
+        - generic [ref=e739]:
+          - generic [ref=e740]:
+            - heading "Features" [level=2] [ref=e742]
+            - link "AI Image Generator" [ref=e744] [cursor=pointer]:
+              - /url: https://www.recraft.ai/ai-image-generator
+              - paragraph [ref=e746]: AI Image Generator
+            - link "AI Image Vectorizer" [ref=e748] [cursor=pointer]:
+              - /url: https://www.recraft.ai/ai-image-vectorizer
+              - paragraph [ref=e750]: AI Image Vectorizer
+            - link "AI Vector Generator" [ref=e752] [cursor=pointer]:
+              - /url: https://www.recraft.ai/vector-generator
+              - paragraph [ref=e754]: AI Vector Generator
+            - link "AI Photo Editor" [ref=e756] [cursor=pointer]:
+              - /url: https://www.recraft.ai/ai-photo-editor
+              - paragraph [ref=e758]: AI Photo Editor
+            - link "Mockup Generator" [ref=e760] [cursor=pointer]:
+              - /url: https://www.recraft.ai/mockup-generator
+              - paragraph [ref=e762]: Mockup Generator
+            - link "Image Upscaler" [ref=e764] [cursor=pointer]:
+              - /url: https://www.recraft.ai/image-upscaler
+              - paragraph [ref=e766]: Image Upscaler
+            - link "Background Remover" [ref=e768] [cursor=pointer]:
+              - /url: https://www.recraft.ai/background-remover
+              - paragraph [ref=e770]: Background Remover
+            - link "AI Eraser" [ref=e772] [cursor=pointer]:
+              - /url: https://www.recraft.ai/ai-eraser
+              - paragraph [ref=e774]: AI Eraser
+          - generic [ref=e775]:
+            - heading "Use cases" [level=2] [ref=e777]
+            - link "Logos" [ref=e779] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate/logos
+              - paragraph [ref=e781]: Logos
+            - link "Icons" [ref=e783] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate/logos
+              - paragraph [ref=e785]: Icons
+            - link "Ads" [ref=e787] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate/ads
+              - paragraph [ref=e789]: Ads
+            - link "Characters" [ref=e791] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate/characters
+              - paragraph [ref=e793]: Characters
+            - link "Stock Images" [ref=e795] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate/stock-images
+              - paragraph [ref=e797]: Stock Images
+            - link "Explore all" [ref=e799] [cursor=pointer]:
+              - /url: https://www.recraft.ai/generate
+              - paragraph [ref=e801]: Explore all
+          - generic [ref=e802]:
+            - heading "Resources" [level=2] [ref=e804]
+            - link "Gallery" [ref=e806] [cursor=pointer]:
+              - /url: https://www.recraft.ai/community
+              - paragraph [ref=e808]: Gallery
+            - link "News" [ref=e810] [cursor=pointer]:
+              - /url: https://www.recraft.ai/news
+              - paragraph [ref=e812]: News
+            - link "Pricing" [ref=e814] [cursor=pointer]:
+              - /url: https://www.recraft.ai/pricing
+              - paragraph [ref=e816]: Pricing
+            - link "Feature Requests" [ref=e818] [cursor=pointer]:
+              - /url: https://feedback.recraft.ai/
+              - paragraph [ref=e820]: Feature Requests
+            - link "Subprocessors" [ref=e822] [cursor=pointer]:
+              - /url: https://www.recraft.ai/subprocessors
+              - paragraph [ref=e824]: Subprocessors
+            - link "Status" [ref=e826] [cursor=pointer]:
+              - /url: https://feedback.recraft.ai/
+              - paragraph [ref=e828]: Status
+          - generic [ref=e829]:
+            - heading "Follow us" [level=2] [ref=e831]
+            - link "Instagram" [ref=e833] [cursor=pointer]:
+              - /url: https://www.instagram.com/recraftai/
+              - paragraph [ref=e835]: Instagram
+            - link "YouTube" [ref=e837] [cursor=pointer]:
+              - /url: https://www.youtube.com/@Recraftai
+              - paragraph [ref=e839]: YouTube
+            - link "X" [ref=e841] [cursor=pointer]:
+              - /url: http://x.com/recraftai
+              - paragraph [ref=e843]: X
+            - link "Discord" [ref=e845] [cursor=pointer]:
+              - /url: https://discord.gg/recraft
+              - paragraph [ref=e847]: Discord
+            - link "LinkedIn" [ref=e849] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/89730348
+              - paragraph [ref=e851]: LinkedIn
+        - generic [ref=e852]:
+          - generic [ref=e853]:
+            - heading "How to" [level=2] [ref=e855]
+            - link "How to create AI vector images for your website" [ref=e857] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog/how-to-create-ai-vector-images-for-your-website
+              - paragraph [ref=e859]: How to create AI vector images for your website
+            - link "How to create branded AI images for social media" [ref=e861] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog/how-to-create-branded-ai-images-for-social-media
+              - paragraph [ref=e863]: How to create branded AI images for social media
+            - link "How to generate AI images in specific colors" [ref=e865] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog/how-to-generate-ai-images-in-specific-colors
+              - paragraph [ref=e867]: How to generate AI images in specific colors
+            - link "See all posts →" [ref=e869] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog
+              - paragraph [ref=e871]: See all posts →
+          - generic [ref=e872]:
+            - heading "Company" [level=2] [ref=e874]
+            - link "About" [ref=e876] [cursor=pointer]:
+              - /url: https://www.recraft.ai/about
+              - paragraph [ref=e878]: About
+            - link "Press releases" [ref=e880] [cursor=pointer]:
+              - /url: https://www.recraft.ai/press-releases
+              - paragraph [ref=e882]: Press releases
+            - link "Terms & Conditions" [ref=e884] [cursor=pointer]:
+              - /url: https://www.recraft.ai/terms
+              - paragraph [ref=e886]: Terms & Conditions
+            - link "Privacy Policy" [ref=e888] [cursor=pointer]:
+              - /url: https://www.recraft.ai/privacy
+              - paragraph [ref=e890]: Privacy Policy
+            - link "Contact Us" [ref=e892] [cursor=pointer]:
+              - /url: https://www.recraft.ai/contact
+              - paragraph [ref=e894]: Contact Us
+            - link "Blog" [ref=e896] [cursor=pointer]:
+              - /url: https://www.recraft.ai/blog
+              - paragraph [ref=e898]: Blog
+            - link "Careers" [ref=e900] [cursor=pointer]:
+              - /url: https://www.recraft.ai/careers
+              - paragraph [ref=e902]: Careers
+          - generic [ref=e903]:
+            - link "Download on the App Store" [ref=e904] [cursor=pointer]:
+              - /url: https://apps.apple.com/app/recraft/id6502416347
+            - link "Get it on Google play" [ref=e906] [cursor=pointer]:
+              - /url: https://play.google.com/store/apps/details?id=ai.recraft
+  - complementary [active] [ref=e916]:
+    - generic [ref=e917]:
+      - generic [ref=e918]:
+        - heading "Privacy Settings" [level=2] [ref=e919]
+        - button "Close" [ref=e921] [cursor=pointer]:
+          - img [ref=e922]
+      - button "Open language dropdown" [ref=e926] [cursor=pointer]:
+        - img [ref=e927]
+        - generic [ref=e929]: English
+        - img [ref=e930]
+      - paragraph [ref=e933]: We use cookies to provide you with a better experience. By using our site, you agree to our Privacy Policy and Terms of Service.
+      - generic [ref=e934]:
+        - link "Privacy Policy" [ref=e935] [cursor=pointer]:
+          - /url: https://www.recraft.ai/privacy
+        - link "Terms of Service" [ref=e936] [cursor=pointer]:
+          - /url: https://www.recraft.ai/terms
+      - button "Accept All" [ref=e937] [cursor=pointer]
+      - button "Customize My Choices" [ref=e938] [cursor=pointer]

@@ -1,0 +1,211 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link [ref=e8] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e9]
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - link [ref=e408] [cursor=pointer]:
+              - /url: /t/explore
+              - generic [ref=e19]:
+                - img [ref=e21]
+                - paragraph [ref=e24]: Home
+            - link [ref=e409] [cursor=pointer]:
+              - /url: /apps
+              - generic [ref=e27]:
+                - img [ref=e29]
+                - generic [ref=e33]:
+                  - paragraph [ref=e34]: Apps
+                  - generic [ref=e36]: NEW
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Library
+            - link [ref=e410] [cursor=pointer]:
+              - /url: /library/my-images
+              - generic [ref=e42]:
+                - img [ref=e44]
+                - paragraph [ref=e48]: My images
+            - link [ref=e411] [cursor=pointer]:
+              - /url: /library/collections
+              - generic [ref=e51]:
+                - img [ref=e53]
+                - paragraph [ref=e56]: Collections
+            - link [ref=e412] [cursor=pointer]:
+              - /url: /my-likes
+              - generic [ref=e59]:
+                - img [ref=e61]
+                - paragraph [ref=e64]: My likes
+          - generic [ref=e65]:
+            - paragraph [ref=e66]: Tools
+            - link [ref=e413] [cursor=pointer]:
+              - /url: /element/models
+              - generic [ref=e69]:
+                - img [ref=e71]
+                - paragraph [ref=e74]: Models
+            - link [ref=e414] [cursor=pointer]:
+              - /url: /element/styles
+              - generic [ref=e77]:
+                - img [ref=e79]
+                - paragraph [ref=e82]: Styles
+            - link [ref=e415] [cursor=pointer]:
+              - /url: /element/characters
+              - generic [ref=e85]:
+                - img [ref=e87]
+                - paragraph [ref=e93]: Characters
+            - link [ref=e416] [cursor=pointer]:
+              - /url: /batch
+              - generic [ref=e96]:
+                - img [ref=e98]
+                - paragraph [ref=e102]: Batch
+          - generic [ref=e103]:
+            - paragraph [ref=e104]: API
+            - link [ref=e417] [cursor=pointer]:
+              - /url: /api
+              - generic [ref=e107]:
+                - img [ref=e109]
+                - paragraph [ref=e113]: Dashboard
+            - link [ref=e418] [cursor=pointer]:
+              - /url: https://developer.ideogram.ai
+              - generic [ref=e115]:
+                - generic [ref=e116]:
+                  - img [ref=e118]
+                  - paragraph [ref=e123]: Documentation
+                - img [ref=e126]
+      - generic [ref=e130]:
+        - button [ref=e419] [cursor=pointer]:
+          - paragraph [ref=e132]: Sign in
+        - button [ref=e420] [cursor=pointer]:
+          - paragraph [ref=e134]: Get started
+    - generic [ref=e138]:
+      - paragraph [ref=e141]: What will you create?
+      - generic [ref=e145]:
+        - paragraph [ref=e150]: Generate new or upload & edit...
+        - button [ref=e155] [cursor=pointer]:
+          - img [ref=e157]
+      - generic [ref=e160]:
+        - generic [ref=e163]:
+          - link [ref=e421]:
+            - /url: /t/explore
+            - paragraph [ref=e166]: General
+          - link [ref=e422] [cursor=pointer]:
+            - /url: /t/explore/category/poster
+            - paragraph [ref=e169]: Poster
+          - link [ref=e423] [cursor=pointer]:
+            - /url: /t/explore/category/photography
+            - paragraph [ref=e172]: Photography
+          - link [ref=e424] [cursor=pointer]:
+            - /url: /t/explore/category/t-shirt
+            - paragraph [ref=e175]: T-shirt
+          - link [ref=e425] [cursor=pointer]:
+            - /url: /t/explore/category/logo
+            - paragraph [ref=e178]: Logo
+          - link [ref=e426] [cursor=pointer]:
+            - /url: /t/explore/category/marketing
+            - paragraph [ref=e181]: Marketing
+          - link [ref=e427] [cursor=pointer]:
+            - /url: /t/explore/category/print-on-demand
+            - paragraph [ref=e184]: Print on demand
+        - button [ref=e428] [cursor=pointer]:
+          - img [ref=e187]
+      - generic [ref=e190]:
+        - generic [ref=e194]:
+          - link [ref=e198] [cursor=pointer]:
+            - /url: /g/Sn9tuAl5RHGHZ1IqeHIydA/3
+            - img [ref=e199]
+          - button [ref=e429] [cursor=pointer]:
+            - generic [ref=e201]:
+              - paragraph [ref=e202]: "1"
+              - img [ref=e203]
+        - generic [ref=e208]:
+          - link [ref=e212] [cursor=pointer]:
+            - /url: /g/dg99mppkSUexHslc7a-wIA/1
+            - img [ref=e213]
+          - button [ref=e430] [cursor=pointer]:
+            - generic [ref=e215]:
+              - paragraph [ref=e216]: "1"
+              - img [ref=e217]
+        - generic [ref=e222]:
+          - link [ref=e226] [cursor=pointer]:
+            - /url: /g/IU4qfPLIQKeGYZvZx67bFQ/3
+            - img [ref=e227]
+          - button [ref=e228] [cursor=pointer]:
+            - img [ref=e230]
+        - generic [ref=e235]:
+          - link [ref=e239] [cursor=pointer]:
+            - /url: /g/fiSCyDxpQT6eEFtcqR0d9g/0
+            - img [ref=e240]
+          - button [ref=e241] [cursor=pointer]:
+            - img [ref=e243]
+        - generic [ref=e248]:
+          - link [ref=e252] [cursor=pointer]:
+            - /url: /g/Px1swziHRqWzC6jMHCNnYA/2
+            - img [ref=e253]
+          - button [ref=e431] [cursor=pointer]:
+            - generic [ref=e255]:
+              - paragraph [ref=e256]: "17"
+              - img [ref=e257]
+        - generic [ref=e262]:
+          - link [ref=e266] [cursor=pointer]:
+            - /url: /g/f7NKtO1ASLGllmQuH_NT3Q/2
+            - img [ref=e267]
+          - button [ref=e268] [cursor=pointer]:
+            - img [ref=e270]
+        - generic [ref=e275]:
+          - link [ref=e279] [cursor=pointer]:
+            - /url: /g/MRKXgI57Q4KUtF1iXzv1Ig/0
+            - img [ref=e280]
+          - button [ref=e281] [cursor=pointer]:
+            - img [ref=e283]
+        - generic [ref=e288]:
+          - link [ref=e292] [cursor=pointer]:
+            - /url: /g/IKUQ3MC5Q-ucn6YL0a2p_Q/0
+            - img [ref=e293]
+          - button [ref=e432] [cursor=pointer]:
+            - generic [ref=e295]:
+              - paragraph [ref=e296]: "4"
+              - img [ref=e297]
+        - generic [ref=e302]:
+          - link [ref=e306] [cursor=pointer]:
+            - /url: /g/FDnYxXwhTouvEUrEOt-jDQ/1
+            - img [ref=e307]
+          - button [ref=e433] [cursor=pointer]:
+            - generic [ref=e309]:
+              - paragraph [ref=e310]: "7"
+              - img [ref=e311]
+        - generic [ref=e316]:
+          - link [ref=e320] [cursor=pointer]:
+            - /url: /g/Ul6g2O0bTkCe01PND3Hdjw/2
+            - img [ref=e321]
+          - button [ref=e434] [cursor=pointer]:
+            - generic [ref=e323]:
+              - paragraph [ref=e324]: "8"
+              - img [ref=e325]
+        - generic [ref=e330]:
+          - link [ref=e334] [cursor=pointer]:
+            - /url: /g/MUcdRi6xSqOKxHSR0zulcQ/3
+            - img [ref=e335]
+          - button [ref=e435] [cursor=pointer]:
+            - generic [ref=e337]:
+              - paragraph [ref=e338]: "3"
+              - img [ref=e339]
+  - dialog [ref=e438]:
+    - generic [ref=e439]:
+      - button [ref=e442] [cursor=pointer]:
+        - img [ref=e443]
+      - generic [ref=e445]:
+        - paragraph [ref=e446]: Sign in to generate your own image
+        - paragraph [ref=e447]: Create premium visuals and more with an Ideogram account.
+      - generic [ref=e448]:
+        - button "Continue with Google" [ref=e449] [cursor=pointer]:
+          - generic [ref=e451]:
+            - img [ref=e452]
+            - generic [ref=e458]: Continue with Google
+        - button "Continue with Apple" [ref=e459] [cursor=pointer]:
+          - generic [ref=e461]:
+            - img [ref=e462]
+            - generic [ref=e465]: Continue with Apple
+        - button "Continue with Microsoft" [ref=e466] [cursor=pointer]:
+          - generic [ref=e468]:
+            - img [ref=e469]
+            - generic [ref=e474]: Continue with Microsoft
