@@ -872,9 +872,14 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center gap-4 py-4">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl"
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center"
                     style={{background:'rgba(164,103,19,0.15)',border:'2px solid rgba(164,103,19,0.3)'}}>
-                    🎙
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a46713" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="2" width="6" height="11" rx="3"/>
+                      <path d="M5 10a7 7 0 0 0 14 0"/>
+                      <line x1="12" y1="19" x2="12" y2="22"/>
+                      <line x1="8" y1="22" x2="16" y2="22"/>
+                    </svg>
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{color:'#a46713'}}>{t('wizard.voicePremiumBadge')}</p>
@@ -892,7 +897,12 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                       ))}
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-5xl opacity-60">🔒</div>
+                      <div className="rounded-2xl p-3" style={{background:'rgba(13,43,30,0.7)',backdropFilter:'blur(2px)'}}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(232,217,181,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2"/>
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                   <button
@@ -1694,6 +1704,7 @@ export default function Home() {
             onBack={()=>{
               Object.values(imageCache).forEach(u=>URL.revokeObjectURL(u))
               setImageCache({})
+              setSelectedVoice(null)
               setStatus('idle');setStory(null)
             }}
             onSave={handleSave} alreadySaved={alreadySaved}
