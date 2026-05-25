@@ -1,5 +1,0 @@
-[     379ms] [LOG] JQMIGRATE: Migrate is installed with logging active, version 1.4.1 @ https://www.reg.ru/dist/head-scripts.cc63df69cf71e7401e3c.js:69
-[     494ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
-[     722ms] [ERROR] Manifest: Line: 1, column: 1, Syntax error. @ https://www.reg.ru/manifest.json:0
-[  420796ms] [ERROR] Access to fetch at 'https://sentry.reg.ru/api/30/envelope/?sentry_key=c3c5a9e0867f4e1e94055b371550d5cd&sentry_version=7&sentry_client=sentry.javascript.vue%2F7.120.4' from origin 'https://www.reg.ru' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.reg.ru/buy/domains/?query=skazochnik&place_of_order=domain-new&_csrf=63fb6121cc6d85c54dd60ffaa03caa87:0
-[  420796ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://sentry.reg.ru/api/30/envelope/?sentry_key=c3c5a9e0867f4e1e94055b371550d5cd&sentry_version=7&sentry_client=sentry.javascript.vue%2F7.120.4:0
