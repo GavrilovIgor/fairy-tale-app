@@ -7,6 +7,7 @@ import { AuthModal } from '@/components/AuthModal'
 import { NameModal } from '@/components/NameModal'
 import { ProfileModal } from '@/components/ProfileModal'
 import { UserMenu } from '@/components/UserMenu'
+import { AudioPlayer } from '@/components/AudioPlayer'
 import type { User } from '@supabase/supabase-js'
 
 declare global {
@@ -983,7 +984,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
         </h1>
       </header>
 
-      <div ref={storyRef} className="max-w-[680px] mx-auto pb-10">
+      <div ref={storyRef} className={`max-w-[680px] mx-auto ${voice ? 'pb-28' : 'pb-10'}`}>
         {/* ── Scenes ── */}
         {story.scenes.map((scene, i) => (
           <div key={i}>
@@ -1121,6 +1122,14 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
           </p>
         </section>
       </div>
+
+      {/* ── Audio player ── */}
+      {voice && (
+        <AudioPlayer
+          storyText={story.scenes.map(s => s.text).join('\n\n')}
+          voice={voice}
+        />
+      )}
     </div>
   )
 }
