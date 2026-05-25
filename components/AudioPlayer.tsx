@@ -8,22 +8,36 @@ interface VoiceCharacter {
   emoji: string
   name: string
   ages: string
+  hint?: string  // m1: added optional hint field
 }
 
 interface AudioPlayerProps {
   storyText: string          // Full concatenated story text
   voice: VoiceCharacter
+  // m2: optional i18n labels with Russian defaults
+  labels?: {
+    loading?: string
+    idle?: string
+    replay?: string
+    error?: string
+  }
 }
 
 type PlayerState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'error'
 
-export function AudioPlayer({ storyText, voice }: AudioPlayerProps) {
+export function AudioPlayer({ storyText, voice, labels }: AudioPlayerProps) {
   const [state, setState] = useState<PlayerState>('idle')
   const [progress, setProgress] = useState(0)          // 0–1
   const [duration, setDuration] = useState(0)
   const [errorMsg, setErrorMsg] = useState('')
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioBlobUrl = useRef<string | null>(null)
+  const loadingRef = useRef(false)  // C2: in-flight guard
+
+  // m2: labels with fallback defaults
+  const loadingLabel = labels?.loading ?? 'Готовим озвучку...'
+  const idleLabel = labels?.idle ?? 'Нажми ▶ чтобы слушать'
+  const replayLabel = labels?.replay ?? 'Нажми ▶ чтобы повторить'
 
   // Cleanup blob URL on unmount
   useEffect(() => {
@@ -32,8 +46,12 @@ export function AudioPlayer({ storyText, voice }: AudioPlayerProps) {
     }
   }, [])
 
-  const loadAudio = useCallback(async () => {
-    if (audioBlobUrl.current) return  // Already loaded
+  // C1+C2: loadAudio returns boolean success; guarded against concurrent calls
+  const loadAudio = useCallback(async (): Promise<boolean> => {
+    if (audioBlobUrl.current) return true   // Already loaded
+
+    if (loadingRef.current) return false    // C2: in-flight guard
+    loadingRef.current = true
 
     setState('loading')
     setErrorMsg('')
@@ -73,23 +91,29 @@ export function AudioPlayer({ storyText, voice }: AudioPlayerProps) {
         setErrorMsg('Ошибка воспроизведения')
       })
 
+      // I2: removed audio.load() — new Audio(url) already starts loading;
+      // calling load() again after attaching canplaythrough can reset the element
       await new Promise<void>((resolve, reject) => {
         audio.addEventListener('canplaythrough', () => resolve(), { once: true })
         audio.addEventListener('error', () => reject(new Error('Audio load failed')), { once: true })
-        audio.load()
       })
 
       setState('ready')
+      return true
     } catch (err) {
       setState('error')
       setErrorMsg(err instanceof Error ? err.message : 'Ошибка озвучки')
+      return false
+    } finally {
+      loadingRef.current = false
     }
   }, [storyText, voice.openaiVoice])
 
+  // C1: handlePlay uses boolean return from loadAudio — no stale closure on state
   const handlePlay = async () => {
     if (state === 'idle' || state === 'error') {
-      await loadAudio()
-      if (audioRef.current && state !== 'error') {
+      const ok = await loadAudio()
+      if (ok && audioRef.current) {
         await audioRef.current.play().catch(() => {})
         setState('playing')
       }
@@ -121,7 +145,8 @@ export function AudioPlayer({ storyText, voice }: AudioPlayerProps) {
     return `${m}:${s.toString().padStart(2, '0')}`
   }
 
-  const currentTime = audioRef.current?.currentTime ?? 0
+  // I1: derive currentTime from progress state (consistent with timeupdate events)
+  const currentTime = progress * duration
   const isLoading = state === 'loading'
   const isPlaying = state === 'playing'
   const hasError = state === 'error'
@@ -169,12 +194,17 @@ export function AudioPlayer({ storyText, voice }: AudioPlayerProps) {
             {hasError ? (
               <div className="text-xs" style={{ color: '#ef4444' }}>{errorMsg}</div>
             ) : showProgress ? (
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </div>
+              // I3: show replay hint when ended (paused + progress=0)
+              progress === 0 && state === 'paused' ? (
+                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{replayLabel}</div>
+              ) : (
+                <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
+              )
             ) : (
               <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                {isLoading ? 'Готовим озвучку...' : 'Нажми ▶ чтобы слушать'}
+                {isLoading ? loadingLabel : idleLabel}
               </div>
             )}
           </div>
