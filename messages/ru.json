@@ -53,7 +53,7 @@
       { "id": "umnik",      "openaiVoice": "echo",    "emoji": "🦊", "name": "Нолик-Умник",     "ages": "5–7 лет",  "hint": "Чёткий, любознательный" },
       { "id": "hrabrost",   "openaiVoice": "shimmer", "emoji": "⚔️", "name": "Леди-Храбрость",  "ages": "6–9 лет",  "hint": "Уверенный, благородный" },
       { "id": "superhero",  "openaiVoice": "alloy",   "emoji": "🦸", "name": "Супергерой",      "ages": "7–10 лет", "hint": "Энергичный, бодрый голос" }
-    ]
+    ],
     "childNameLabel": "КАК ЗОВУТ РЕБЁНКА?",
     "childNamePlaceholder": "Как зовут ребёнка?",
     "ageLabel": "СКОЛЬКО ЛЕТ?",

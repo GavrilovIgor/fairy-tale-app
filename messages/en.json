@@ -53,7 +53,7 @@
       { "id": "umnik",      "openaiVoice": "echo",    "emoji": "🦊", "name": "Little Smarty",  "ages": "5–7 y",   "hint": "Clear, curious voice" },
       { "id": "hrabrost",   "openaiVoice": "shimmer", "emoji": "⚔️", "name": "Lady Brave",     "ages": "6–9 y",   "hint": "Confident, noble voice" },
       { "id": "superhero",  "openaiVoice": "alloy",   "emoji": "🦸", "name": "Superhero",      "ages": "7–10 y",  "hint": "Energetic, bold voice" }
-    ]
+    ],
     "childNameLabel": "Your child's name",
     "childNamePlaceholder": "e.g. Emma or Liam",
     "ageLabel": "How old are they?",
