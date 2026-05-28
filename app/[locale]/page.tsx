@@ -477,7 +477,7 @@ function getLastChild():{name:string;age:string}{
 }
 function saveLastChild(name:string,age:string){ try{localStorage.setItem(LAST_CHILD_KEY,JSON.stringify({name,age}))}catch{} }
 
-function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
+function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile,user}:{onGenerate:(f:FormData,mode?:StoryMode)=>Promise<void>;isLoading:boolean;onOpenLibrary?:()=>void;onShowAuth?:()=>void;onShowProfile?:()=>void;user?:User|null}) {
   const t = useTranslations()
   const [form,setForm] = useState<FormData>({childName:'',age:'',hero:'',situation:'',situationType:'fear',favorites:'',lesson:''})
   const wizardRef = useRef<HTMLElement>(null)
@@ -1431,37 +1431,39 @@ export default function Home() {
     return ()=>subscription.unsubscribe()
   },[])
 
-  const generate = async(data:FormData)=>{
+  const generate = async(data:FormData, mode:StoryMode = 'classic')=>{
     if(!canGenerate()){setShowPaywall(true);return}
     setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName)
     setImageCache({})
     try{
-      const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data, locale})})
+      const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data, locale, mode})})
       const json=await res.json()
       if(!res.ok){setError(json.error||'Ошибка генерации');setStatus('idle');return}
 
-      // Pre-load all illustrations with retry — user stays on loading screen until ready
+      // Pre-load картинок только для classic — в interactive картинок нет
       const cache:Record<number,string>={}
-      const fetchImg=async(url:string):Promise<Blob|null>=>{
-        try{
-          const r=await fetch(url)
-          if(r.ok)return await r.blob()
-        }catch{}
-        return null
-      }
-      const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
-        const base=imgUrl(scene.imagePrompt,i,json.storySeed??0)
-        // Try up to 4 times — Pollinations can be slow
-        for(let attempt=0;attempt<3;attempt++){
-          const url=attempt===0?base:`${base}&t=${Date.now()}`
-          const blob=await fetchImg(url)
-          if(blob){cache[i]=URL.createObjectURL(blob);return}
-          if(attempt<3)await new Promise(r=>setTimeout(r,3000*(attempt+1)))
+      if (json.mode !== 'interactive') {
+        const fetchImg=async(url:string):Promise<Blob|null>=>{
+          try{
+            const r=await fetch(url)
+            if(r.ok)return await r.blob()
+          }catch{}
+          return null
         }
-        // After 4 failed attempts — use universal fallback illustration
-        cache[i] = `/story-fallback-${i%2}.jpg`
-      })
-      await Promise.allSettled(loaders)
+        const loaders=(json.scenes as Scene[]).map(async(scene,i)=>{
+          const base=imgUrl(scene.imagePrompt,i,json.storySeed??0)
+          // Try up to 4 times — Pollinations can be slow
+          for(let attempt=0;attempt<3;attempt++){
+            const url=attempt===0?base:`${base}&t=${Date.now()}`
+            const blob=await fetchImg(url)
+            if(blob){cache[i]=URL.createObjectURL(blob);return}
+            if(attempt<3)await new Promise(r=>setTimeout(r,3000*(attempt+1)))
+          }
+          // After 4 failed attempts — use universal fallback illustration
+          cache[i] = `/story-fallback-${i%2}.jpg`
+        })
+        await Promise.allSettled(loaders)
+      }
 
       const ex=getExtra()
       if(ex>0){setExtra(ex-1);setExtraState(ex-1)}else{incUsage();setUsageCount(getAnonUsed())}
