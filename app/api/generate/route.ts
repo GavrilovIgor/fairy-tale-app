@@ -311,7 +311,8 @@ Return ONLY valid JSON, no markdown, no \`\`\`json wrapper:
 }
 
 export async function POST(req: NextRequest) {
-  const { childName, age, hero, situation, situationType, favorites, lesson, locale = 'ru' } = await req.json()
+  const { childName, age, hero, situation, situationType, favorites, lesson, locale = 'ru', mode = 'classic' } = await req.json()
+  const storyMode: 'classic' | 'interactive' = mode === 'interactive' ? 'interactive' : 'classic'
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
@@ -327,9 +328,11 @@ export async function POST(req: NextRequest) {
   const scenarioHint = SCENARIO_INSTRUCTIONS[situationType] ?? SCENARIO_INSTRUCTIONS.fun
 
   const isEn = locale === 'en'
-  const prompt = isEn
-    ? buildEnPrompt({ childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint })
-    : buildRuPrompt({ childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint })
+  const baseParams = { childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint }
+  const { count: blankCount, hintStyle } = getBlankDensity(age, isEn ? 'en' : 'ru')
+  const prompt = storyMode === 'interactive'
+    ? (isEn ? buildEnInteractivePrompt({ ...baseParams, blankCount, hintStyle }) : buildRuInteractivePrompt({ ...baseParams, blankCount, hintStyle }))
+    : (isEn ? buildEnPrompt(baseParams) : buildRuPrompt(baseParams))
 
   for (const modelName of MODELS) {
     try {
@@ -345,18 +348,40 @@ export async function POST(req: NextRequest) {
 
       if (story.scenes) {
         story.storySeed = Math.floor(Math.random() * 99991)
-        story.scenes = story.scenes.map((scene: { text: string; imagePrompt: string }) => ({
-          ...scene,
-          text: scene.text?.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/_{1,2}(.+?)_{1,2}/g, '$1') ?? '',
-          imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
-        }))
-        prefetchImages(story.scenes, story.storySeed)
+        story.mode = storyMode
+
+        if (storyMode === 'interactive') {
+          story.scenes = story.scenes.map((scene: { segments?: Array<{ type: string; value?: string; hint?: string }>; imagePrompt?: string }, sceneIdx: number) => {
+            const segments = Array.isArray(scene.segments) ? scene.segments : []
+            let blankCounter = 0
+            const cleaned = segments
+              .filter((s) => s && (s.type === 'text' || s.type === 'blank'))
+              .map((s) => {
+                if (s.type === 'text') {
+                  const value = (s.value ?? '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/_{1,2}(.+?)_{1,2}/g, '$1')
+                  return { type: 'text' as const, value }
+                }
+                const hint = (s.hint ?? '...').slice(0, 60)
+                const id = `s${sceneIdx}-b${blankCounter++}`
+                return { type: 'blank' as const, hint, id }
+              })
+            return { segments: cleaned, imagePrompt: '' }
+          })
+          // НЕ вызываем prefetchImages — картинок нет в interactive
+        } else {
+          story.scenes = story.scenes.map((scene: { text: string; imagePrompt: string }) => ({
+            ...scene,
+            text: scene.text?.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/_{1,2}(.+?)_{1,2}/g, '$1') ?? '',
+            imagePrompt: scene.imagePrompt?.slice(0, 120) ?? '',
+          }))
+          prefetchImages(story.scenes, story.storySeed)
+        }
 
         const ph = getPostHog()
         ph.capture({
           distinctId: `server-${req.headers.get('x-forwarded-for') ?? 'unknown'}`,
           event: 'story_generated',
-          properties: { age, hero, situationType, locale, model: modelName },
+          properties: { age, hero, situationType, locale, model: modelName, mode: storyMode },
         })
         await ph.flush()
       }
