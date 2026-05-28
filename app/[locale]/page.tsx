@@ -35,8 +35,10 @@ function loadSaved(): SavedStory[] { try { return JSON.parse(localStorage.getIte
 function saveTos(s:SavedStory[]) { localStorage.setItem(K.stories,JSON.stringify(s)) }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-interface Scene { text:string; imagePrompt:string }
-interface Story { title:string; scenes:Scene[]; discussion?:string[]; anchor?:{title:string;description:string}; storySeed?:number }
+type StoryMode = 'classic' | 'interactive'
+type Segment = { type:'text'; value:string } | { type:'blank'; hint:string; id:string }
+interface Scene { text?:string; segments?:Segment[]; imagePrompt:string }
+interface Story { title:string; scenes:Scene[]; mode?:StoryMode; discussion?:string[]; anchor?:{title:string;description:string}; storySeed?:number }
 interface SavedStory { id:string; savedAt:string; childName:string; story:Story; images?:Record<number,string> }
 type SituationType = 'fear'|'emotion'|'adaptation'|'behavior'|'preparation'|'fun'
 interface FormData { childName:string; age:string; hero:string; situation:string; situationType:SituationType; favorites:string; lesson:string }
