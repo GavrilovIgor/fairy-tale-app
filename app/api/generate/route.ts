@@ -27,24 +27,26 @@ function getAgeProfile(ageStr: string) {
   }
 }
 
-function getBlankDensity(ageStr: string): { count: string; hintStyle: string } {
+function getBlankDensity(ageStr: string, locale: 'ru' | 'en' = 'ru'): { count: string; hintStyle: string } {
   const n = parseInt(ageStr) || 0
-  if (n <= 4) return {
-    count: '2–3 пропуска на сцену',
-    hintStyle: 'Подсказки в 1–2 слова, очень конкретные: "какого цвета?", "кто это?", "что сказал?", "куда побежал?". Только то, на что ребёнок может ответить одним словом.',
+  if (n <= 4) {
+    return locale === 'en'
+      ? { count: '2–3 blanks per scene', hintStyle: 'Hints of 1–2 words, very concrete: "what color?", "who is this?", "what did he say?", "where did he run?". Only what the child can answer with a single word.' }
+      : { count: '2–3 пропуска на сцену', hintStyle: 'Подсказки в 1–2 слова, очень конкретные: "какого цвета?", "кто это?", "что сказал?", "куда побежал?". Только то, на что ребёнок может ответить одним словом.' }
   }
-  if (n <= 6) return {
-    count: '4–5 пропусков на сцену',
-    hintStyle: 'Подсказки в 2–3 слова: "что почувствовал?", "как поступил?", "куда побежал?", "что увидел?". Допускают ответ из 1–3 слов.',
+  if (n <= 6) {
+    return locale === 'en'
+      ? { count: '4–5 blanks per scene', hintStyle: 'Hints of 2–3 words: "what did he feel?", "how did he act?", "where did he run?", "what did he see?". Allow answers of 1–3 words.' }
+      : { count: '4–5 пропусков на сцену', hintStyle: 'Подсказки в 2–3 слова: "что почувствовал?", "как поступил?", "куда побежал?", "что увидел?". Допускают ответ из 1–3 слов.' }
   }
-  if (n <= 9) return {
-    count: '5–7 пропусков на сцену',
-    hintStyle: 'Подсказки открытые, 2–5 слов: "почему он так решил?", "что было дальше?", "как он это придумал?". Поощряют развёрнутые ответы.',
+  if (n <= 9) {
+    return locale === 'en'
+      ? { count: '5–7 blanks per scene', hintStyle: 'Hints are open-ended, 2–5 words: "why did he decide this?", "what happened next?", "how did he figure it out?". Encourage developed answers.' }
+      : { count: '5–7 пропусков на сцену', hintStyle: 'Подсказки открытые, 2–5 слов: "почему он так решил?", "что было дальше?", "как он это придумал?". Поощряют развёрнутые ответы.' }
   }
-  return {
-    count: '4–6 пропусков на сцену',
-    hintStyle: 'Подсказки на сюжетные развилки, 3–6 слов: "какое решение принял?", "что увидел за поворотом?", "как объяснил себе это?". Стимулируют сюжетное мышление.',
-  }
+  return locale === 'en'
+    ? { count: '4–6 blanks per scene', hintStyle: 'Hints on plot decisions, 3–6 words: "what decision did he make?", "what did he see around the corner?", "how did he explain this to himself?". Stimulate narrative thinking.' }
+    : { count: '4–6 пропусков на сцену', hintStyle: 'Подсказки на сюжетные развилки, 3–6 слов: "какое решение принял?", "что увидел за поворотом?", "как объяснил себе это?". Стимулируют сюжетное мышление.' }
 }
 
 const SCENARIO_INSTRUCTIONS: Record<string, string> = {
@@ -171,8 +173,8 @@ ${p.scenarioHint}
       ],
       "imagePrompt": ""
     },
-    { "segments": [/* ... */], "imagePrompt": "" },
-    { "segments": [/* ... */], "imagePrompt": "" }
+    { "segments": [...], "imagePrompt": "" },
+    { "segments": [...], "imagePrompt": "" }
   ]
 }
 
@@ -227,8 +229,8 @@ RESPONSE FORMAT — STRICT JSON:
       ],
       "imagePrompt": ""
     },
-    { "segments": [/* ... */], "imagePrompt": "" },
-    { "segments": [/* ... */], "imagePrompt": "" }
+    { "segments": [...], "imagePrompt": "" },
+    { "segments": [...], "imagePrompt": "" }
   ]
 }
 
