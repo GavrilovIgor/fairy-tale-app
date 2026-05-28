@@ -32,6 +32,7 @@
     "create": "✨ Create my story",
     "creating": "Creating...",
     "skip": "Skip and create →",
+    "createInteractive": "Story Dialogue",
     "step1Label": "About your child",
     "step2Label": "Choose a hero",
     "step3Label": "What's going on?",
@@ -110,6 +111,10 @@
     "emptyTitle": "Nothing here yet...",
     "emptyHint": "Create your first story and it will appear here.",
     "yourStories": "Your stories"
+  },
+  "interactive": {
+    "badge": "💬 dialogue",
+    "subtitle": "Child completes blanks with their own words"
   },
   "footer": {
     "logo": "Magic Fairy Tales",
