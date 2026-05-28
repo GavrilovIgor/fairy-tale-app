@@ -931,7 +931,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
                 fontFamily:serif,fontSize:19,lineHeight:2.0,color:'#1f2937',
                 textAlign:'justify',hyphens:'auto'
               }}>
-                {scene.text}
+                {scene.text ?? ''}
               </p>
             </section>
           </div>
