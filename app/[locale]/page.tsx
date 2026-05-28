@@ -853,11 +853,22 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 </button>
               )}
               {step===4&&(
-                <button type="button" onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form)}} disabled={isLoading}
-                  className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
-                  style={{background:'#a46713'}}>
-                  {isLoading ? t('wizard.creating') : t('wizard.create')}
-                </button>
+                <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                  <button type="button"
+                    onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form,'classic')}}
+                    disabled={isLoading}
+                    className="flex-1 py-3 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40"
+                    style={{background:'#a46713'}}>
+                    {isLoading ? t('wizard.creating') : t('wizard.create')}
+                  </button>
+                  <button type="button"
+                    onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form,'interactive')}}
+                    disabled={isLoading}
+                    className="flex-1 py-3 rounded-xl font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 border-2"
+                    style={{background:'transparent',borderColor:'#a46713',color:'#a46713'}}>
+                    💬 {t('wizard.createInteractive')}
+                  </button>
+                </div>
               )}
             </div>
             {step===4&&(
