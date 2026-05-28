@@ -7,6 +7,7 @@ import { AuthModal } from '@/components/AuthModal'
 import { NameModal } from '@/components/NameModal'
 import { ProfileModal } from '@/components/ProfileModal'
 import { UserMenu } from '@/components/UserMenu'
+import { InteractiveScene } from '@/components/InteractiveScene'
 import type { User } from '@supabase/supabase-js'
 
 declare global {
@@ -915,7 +916,9 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
 
       <div ref={storyRef} className="max-w-[680px] mx-auto pb-10">
         {/* ── Scenes ── */}
-        {story.scenes.map((scene, i) => (
+        {story.scenes.map((scene, i) => {
+          const isInteractive = story.mode === 'interactive' && Array.isArray(scene.segments)
+          return (
           <div key={i}>
             {/* Chapter header */}
             <section className="text-center pt-8 pb-5 px-6">
@@ -930,23 +933,31 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
             </section>
 
             {/* Full-width illustration — no rounded corners, bleeds to edges */}
-            <section className="w-full border-b border-gray-200">
-              <div className="w-full bg-[#fdfaf5]" style={{aspectRatio:'4/3'}}>
-                <StoryImage prompt={scene.imagePrompt} index={i} sharp preloadedSrc={imageCache?.[i]} storySeed={story.storySeed}/>
-              </div>
-            </section>
+            {!isInteractive && (
+              <section className="w-full border-b border-gray-200">
+                <div className="w-full bg-[#fdfaf5]" style={{aspectRatio:'4/3'}}>
+                  <StoryImage prompt={scene.imagePrompt} index={i} sharp preloadedSrc={imageCache?.[i]} storySeed={story.storySeed}/>
+                </div>
+              </section>
+            )}
 
             {/* Story text */}
             <section className="px-6 py-6 print:py-4">
-              <p className={i===0?'drop-cap':''} style={{
-                fontFamily:serif,fontSize:19,lineHeight:2.0,color:'#1f2937',
-                textAlign:'justify',hyphens:'auto'
-              }}>
-                {scene.text ?? ''}
-              </p>
+              {isInteractive
+                ? <InteractiveScene segments={scene.segments!} />
+                : (
+                  <p className={i===0?'drop-cap':''} style={{
+                    fontFamily:serif,fontSize:19,lineHeight:2.0,color:'#1f2937',
+                    textAlign:'justify',hyphens:'auto'
+                  }}>
+                    {scene.text ?? ''}
+                  </p>
+                )
+              }
             </section>
           </div>
-        ))}
+          )
+        })}
 
         {/* ── Discussion questions (Stitch 403e6050) ── */}
         {story.discussion && story.discussion.length > 0 && (
