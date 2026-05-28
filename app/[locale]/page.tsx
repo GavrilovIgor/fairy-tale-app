@@ -1069,6 +1069,7 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
 // ── Library screen (mobile) ───────────────────────────────────────────────────
 function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];onOpen:(s:SavedStory)=>void;onDelete:(id:string)=>void;onCreateNew?:()=>void}) {
   const t = useTranslations('library')
+  const tInteractive = useTranslations('interactive')
   return (
     <div className="relative min-h-screen overflow-hidden" style={{background:'#0d2b1e'}}>
       {/* Bokeh */}
@@ -1149,7 +1150,14 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
                       style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:'center 30%'}}/>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm truncate mb-0.5" style={{color:'#0d2b1e'}}>{s.story.title}</div>
+                    <div className="font-bold text-sm truncate mb-0.5 flex items-center" style={{color:'#0d2b1e'}}>
+                      <span className="truncate">{s.story.title}</span>
+                      {s.story.mode === 'interactive' && (
+                        <span className="ml-2 inline-block flex-shrink-0 px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-900 align-middle">
+                          {tInteractive('badge')}
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs" style={{color:'#9ca3af'}}>{s.childName} · {s.savedAt}</div>
                   </div>
                   <button onClick={e=>{e.stopPropagation();onDelete(s.id)}}
