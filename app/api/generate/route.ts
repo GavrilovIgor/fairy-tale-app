@@ -27,6 +27,26 @@ function getAgeProfile(ageStr: string) {
   }
 }
 
+function getBlankDensity(ageStr: string): { count: string; hintStyle: string } {
+  const n = parseInt(ageStr) || 0
+  if (n <= 4) return {
+    count: '2–3 пропуска на сцену',
+    hintStyle: 'Подсказки в 1–2 слова, очень конкретные: "какого цвета?", "кто это?", "что сказал?", "куда побежал?". Только то, на что ребёнок может ответить одним словом.',
+  }
+  if (n <= 6) return {
+    count: '4–5 пропусков на сцену',
+    hintStyle: 'Подсказки в 2–3 слова: "что почувствовал?", "как поступил?", "куда побежал?", "что увидел?". Допускают ответ из 1–3 слов.',
+  }
+  if (n <= 9) return {
+    count: '5–7 пропусков на сцену',
+    hintStyle: 'Подсказки открытые, 2–5 слов: "почему он так решил?", "что было дальше?", "как он это придумал?". Поощряют развёрнутые ответы.',
+  }
+  return {
+    count: '4–6 пропусков на сцену',
+    hintStyle: 'Подсказки на сюжетные развилки, 3–6 слов: "какое решение принял?", "что увидел за поворотом?", "как объяснил себе это?". Стимулируют сюжетное мышление.',
+  }
+}
+
 const SCENARIO_INSTRUCTIONS: Record<string, string> = {
   fear: 'Герой встречает источник своего страха. Через знакомство — а не бегство — делает один маленький шаг навстречу и открывает: страх меньше, чем казался. Важно: герой не перестаёт бояться мгновенно, он делает шаг несмотря на страх — и это и есть смелость.',
   emotion: 'Героя захлёстывает сильная эмоция — злость, обида, ревность или грусть. Ключевой момент: эмоция принята ("это злость, она имеет право быть"), затем найден способ выразить её не причиняя вред. Решение — не "успокойся", а "выскажи/нарисуй/пробеги".',
@@ -108,6 +128,123 @@ ${p.scenarioHint}
     "description": "Предмет: [простой предмет легко найти дома]. Ритуал: [одно физическое действие]. Фраза-активация: '[3–5 слов]'. Когда использовать: [конкретная ситуация связанная с '${p.situation}']."
   }
 }`
+}
+
+interface InteractivePromptParams extends PromptParams {
+  blankCount: string
+  hintStyle: string
+}
+
+function buildRuInteractivePrompt(p: InteractivePromptParams): string {
+  return `Ты — мастер сказкотерапии и детской литературы. Создай ИНТЕРАКТИВНУЮ терапевтическую сказку на русском языке, в которой ребёнок завершает пропуски своим словом.
+
+ДАННЫЕ:
+- Имя ребёнка: ${p.childName}
+- Возраст: ${p.age}
+- Главный герой: ${p.hero}
+- Ситуация/запрос: ${p.situation}
+- Любимые вещи: ${p.favorites || 'не указано'}
+- Урок: ${p.lesson || 'определи по ситуации'}
+
+ВОЗРАСТНАЯ АДАПТАЦИЯ:
+- Суммарная длина текста: ${p.words} слов
+- Языковой стиль: ${p.style}
+
+ПЛОТНОСТЬ ПРОПУСКОВ:
+- ${p.blankCount}
+- ${p.hintStyle}
+
+СЦЕНАРИЙ:
+${p.scenarioHint}
+
+ФОРМАТ ОТВЕТА — СТРОГО JSON:
+{
+  "title": "Название сказки (2–5 слов)",
+  "scenes": [
+    {
+      "segments": [
+        {"type":"text","value":"Полноценный связный текст сцены до пропуска. "},
+        {"type":"blank","hint":"какого цвета?"},
+        {"type":"text","value":" текст после пропуска до следующего пропуска. "},
+        {"type":"blank","hint":"что сделал?"},
+        {"type":"text","value":" заключительный текст сцены."}
+      ],
+      "imagePrompt": ""
+    },
+    { "segments": [/* ... */], "imagePrompt": "" },
+    { "segments": [/* ... */], "imagePrompt": "" }
+  ]
+}
+
+ПРАВИЛА ИНТЕРАКТИВНОСТИ:
+1. Ровно 3 сцены.
+2. В каждой сцене — массив segments в порядке чтения.
+3. Первый и последний сегмент в каждой сцене — type:"text" (нельзя начинать или заканчивать пропуском).
+4. Сегменты type:"text" — связный литературный текст. НИКАКИХ "___" или плейсхолдеров внутри value.
+5. Пропуски (type:"blank") — в естественных местах, где ребёнок может вставить слово/фразу: цвет предмета, имя нового персонажа, эмоция героя, что он сделал, куда пошёл.
+6. Hint — короткий наводящий вопрос, не дающий ответа. Не повторять подряд один и тот же hint.
+7. imagePrompt — пустая строка "" (картинки в этом режиме не используются).
+8. Полная сказка должна читаться связно даже если читать только text-сегменты подряд (пропуски — украшение, а не каркас).
+9. Имя ребёнка "${p.childName}" органично упоминается в финале.
+10. НИКАКОГО Markdown — никаких **, *, _ — только чистый текст в value.
+
+Ответ — ТОЛЬКО JSON, без markdown-обёртки.`
+}
+
+function buildEnInteractivePrompt(p: InteractivePromptParams): string {
+  return `You are a master of therapeutic storytelling for children. Create an INTERACTIVE therapeutic story in English where the child completes blanks with their own word.
+
+DATA:
+- Child's name: ${p.childName}
+- Age: ${p.age}
+- Main hero: ${p.hero}
+- Situation/request: ${p.situation}
+- Favorites: ${p.favorites || 'not specified'}
+- Lesson: ${p.lesson || 'determine from situation'}
+
+AGE ADAPTATION:
+- Total word count: ${p.words} words
+- Language style: ${p.style}
+
+BLANK DENSITY:
+- ${p.blankCount}
+- ${p.hintStyle}
+
+SCENARIO:
+${p.scenarioHint}
+
+RESPONSE FORMAT — STRICT JSON:
+{
+  "title": "Story title (2-5 words)",
+  "scenes": [
+    {
+      "segments": [
+        {"type":"text","value":"Coherent text of the scene before the blank. "},
+        {"type":"blank","hint":"what color?"},
+        {"type":"text","value":" text after the blank until the next blank. "},
+        {"type":"blank","hint":"what did he do?"},
+        {"type":"text","value":" closing text of the scene."}
+      ],
+      "imagePrompt": ""
+    },
+    { "segments": [/* ... */], "imagePrompt": "" },
+    { "segments": [/* ... */], "imagePrompt": "" }
+  ]
+}
+
+INTERACTIVITY RULES:
+1. Exactly 3 scenes.
+2. Each scene contains segments[] in reading order.
+3. First and last segment of each scene MUST be type:"text" (never start or end with a blank).
+4. type:"text" segments — coherent literary text. NO "___" or placeholders inside value.
+5. Blanks (type:"blank") — at natural insertion points: object color, new character name, hero's emotion, what they did, where they went.
+6. Hint — short leading question that does NOT give the answer. Do not repeat the same hint consecutively.
+7. imagePrompt — empty string "" (images are not used in this mode).
+8. The full story must read coherently even if only text-segments are read in sequence (blanks are flavor, not skeleton).
+9. Child's name "${p.childName}" appears organically in the ending.
+10. NO Markdown — no **, *, _ — pure text in value only.
+
+Output — JSON ONLY, no markdown wrapper.`
 }
 
 function buildEnPrompt(p: PromptParams): string {
