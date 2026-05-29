@@ -1647,6 +1647,22 @@ export default function Home() {
 
       {status==='loading'&&<LoadingScreen childName={currentChildName}/>}
 
+      {/* Ошибка генерации — показываем поверх формы */}
+      {status==='idle'&&error&&(
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100%-2rem)]"
+          style={{filter:'drop-shadow(0 4px 24px rgba(0,0,0,0.18))'}}>
+          <div className="flex items-start gap-3 px-4 py-3 rounded-2xl"
+            style={{background:'#fff1f0',border:'1.5px solid #fca5a5'}}>
+            <span style={{fontSize:18,flexShrink:0}}>⚠️</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium" style={{color:'#991b1b'}}>{error}</p>
+              <p className="text-xs mt-0.5" style={{color:'#b91c1c',opacity:0.7}}>Попробуйте ещё раз через минуту</p>
+            </div>
+            <button onClick={()=>setError('')} className="cursor-pointer flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity" style={{color:'#991b1b',fontSize:18,lineHeight:1}}>×</button>
+          </div>
+        </div>
+      )}
+
       {(status==='done'||status==='reading')&&story&&(
         <>
           <StoryReading
