@@ -1176,7 +1176,7 @@ function LibraryScreen({saved,onOpen,onDelete,onCreateNew}:{saved:SavedStory[];o
 }
 
 // ── Loading screen ────────────────────────────────────────────────────────────
-function LoadingScreen({ childName }: { childName?: string }) {
+function LoadingScreen({ childName, mode }: { childName?: string; mode?: string }) {
   const t = useTranslations('loading')
   const [progress, setProgress] = useState(0)
 
@@ -1194,7 +1194,7 @@ function LoadingScreen({ childName }: { childName?: string }) {
   }, [])
 
   const activeStep = progress < 33 ? 0 : progress < 66 ? 1 : 2
-  const steps = [t('step1'), t('step2'), t('step3')]
+  const steps = [t('step1'), t('step2'), mode === 'interactive' ? t('step3Interactive') : t('step3')]
   const fireflies = [
     {top:'10%',left:'7%', w:3,delay:'0s',  dur:'9s' },
     {top:'22%',left:'83%',w:4,delay:'1.5s',dur:'11s'},
@@ -1315,6 +1315,7 @@ export default function Home() {
   const [status,setStatus] = useState<'idle'|'loading'|'done'|'reading'>('idle')
   const [story,setStory] = useState<Story|null>(null)
   const [currentChildName,setCurrentChildName] = useState('')
+  const [currentMode,setCurrentMode] = useState<StoryMode>('classic')
   const [imageCache,setImageCache] = useState<Record<number,string>>({})
   const [error,setError] = useState('')
   const [saved,setSaved] = useState<SavedStory[]>([])
@@ -1465,7 +1466,7 @@ export default function Home() {
 
   const generate = async(data:FormData, mode:StoryMode = 'classic')=>{
     if(!canGenerate()){setShowPaywall(true);return}
-    setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName)
+    setStatus('loading'); setError(''); setAlreadySaved(false); setCurrentChildName(data.childName); setCurrentMode(mode)
     setImageCache({})
     try{
       const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data, locale, mode})})
@@ -1645,7 +1646,7 @@ export default function Home() {
         </>
       )}
 
-      {status==='loading'&&<LoadingScreen childName={currentChildName}/>}
+      {status==='loading'&&<LoadingScreen childName={currentChildName} mode={currentMode}/>}
 
       {/* Ошибка генерации — показываем поверх формы */}
       {status==='idle'&&error&&(

@@ -161,6 +161,7 @@ function buildRuInteractivePrompt(p: InteractivePromptParams): string {
 ✓ "Медвежонок заплакал, потому что ___." — любое объяснение работает
 ✗ "пахло его собственным ___" — здесь один правильный ответ, ребёнку тяжело
 ✗ "сделал шаг ___" / "пробежал холодок ___" — это устойчивые идиомы, не ломай их пропуском
+✗ Текст ПОСЛЕ пропуска не должен раскрывать что туда вписать: "маленький красный ___! Точь-в-точь как его мячик" — слово "мячик" после пропуска даёт ответ
 
 ${p.blankCount}
 ${p.blankExamples}
@@ -187,6 +188,7 @@ Blank goes at the END of an open phrase where ANY child's answer works. Child CO
 ✓ "The bear cried because ___." — any explanation fits
 ✗ "it smelled of his own ___" — only one answer fits, too hard
 ✗ "took a step ___" / "a chill ran ___" — fixed idioms, don't break them with a blank
+✗ Text AFTER a blank must not reveal the answer: "a little red ___! Just like his ball" — "ball" after the blank gives it away
 
 ${p.blankCount}
 ${p.blankExamples}
