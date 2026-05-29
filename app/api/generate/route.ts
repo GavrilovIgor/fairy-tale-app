@@ -27,12 +27,37 @@ function getAgeProfile(ageStr: string) {
   }
 }
 
-function getBlankDensity(ageStr: string): { count: string } {
+function getBlankProfile(ageStr: string): { count: string; examples: string } {
   const n = parseInt(ageStr) || 0
-  if (n <= 4) return { count: '2–3 пропуска на сцену. Только цвета, имена, простые предметы.' }
-  if (n <= 6) return { count: '3–4 пропуска на сцену. Цвета, имена, простые действия, предметы.' }
-  if (n <= 9) return { count: '4–5 пропусков на сцену. Прилагательные, короткие действия, характеристики.' }
-  return { count: '4–5 пропусков на сцену. Прилагательные, действия, эмоциональные состояния.' }
+  if (n <= 4) return {
+    count: '2–3 пропуска на сцену',
+    examples: `Возраст 3–4: пропуски только там где ребёнок заканчивает фразу одним словом — предметом или именем.
+  ✓ "Он нашёл в траве ___." → "гриб", "жука", "монетку"
+  ✓ "Лисёнок сказал: ___!" → "привет", "мама", "ура"
+  ✓ "Зайка взял с собой ___." → "игрушку", "морковку", "мяч"`,
+  }
+  if (n <= 6) return {
+    count: '3–4 пропуска на сцену',
+    examples: `Возраст 5–6: пропуски в конце фразы — предмет, действие или простое чувство.
+  ✓ "Он увидел большого ___." → "медведя", "великана", "кота"
+  ✓ "Медвежонок вдруг почувствовал себя ___." → "смелым", "грустным", "счастливым"
+  ✓ "Он решил ___." → "убежать", "помочь", "спрятаться"
+  ✓ "Медвежонок заплакал, потому что ___." → "было страшно", "потерял друга"`,
+  }
+  if (n <= 9) return {
+    count: '4–5 пропусков на сцену',
+    examples: `Возраст 7–9: пропуски — продолжение мысли, действие или объяснение.
+  ✓ "Герой понял, что ___." → "не надо бояться", "друзья важнее"
+  ✓ "Он сделал шаг вперёд и ___." → "увидел свет", "не упал"
+  ✓ "Самое страшное оказалось ___." → "просто тенью", "пустяком"`,
+  }
+  return {
+    count: '4–5 пропусков на сцену',
+    examples: `Возраст 10+: пропуски — мысль, решение, вывод.
+  ✓ "Он понял, что настоящая смелость — это ___."
+  ✓ "Самое важное, что он узнал: ___."
+  ✓ "Герой решил, что теперь будет ___."`,
+  }
 }
 
 const SCENARIO_INSTRUCTIONS: Record<string, string> = {
@@ -120,152 +145,57 @@ ${p.scenarioHint}
 
 interface InteractivePromptParams extends PromptParams {
   blankCount: string
+  blankExamples: string
 }
 
 function buildRuInteractivePrompt(p: InteractivePromptParams): string {
-  return `Ты — мастер сказкотерапии и детской литературы. Создай ИНТЕРАКТИВНУЮ сказку на русском языке. Родитель читает вслух, и в нужных местах ребёнок вставляет своё слово.
+  return `Создай интерактивную сказку на русском языке. Родитель читает вслух — на пропусках ребёнок говорит своё слово.
 
-ДАННЫЕ:
-- Имя ребёнка: ${p.childName}
-- Возраст: ${p.age}
-- Главный герой: ${p.hero}
-- Ситуация/запрос: ${p.situation}
-- Любимые вещи: ${p.favorites || 'не указано'}
-- Урок: ${p.lesson || 'определи по ситуации'}
+Герой: ${p.hero}. Ребёнок: ${p.childName}, ${p.age} лет. Ситуация: ${p.situation}. Любимое: ${p.favorites || 'не указано'}.
+Длина: ${p.words} слов. Стиль: ${p.style}.
+Сценарий: ${p.scenarioHint}
 
-ВОЗРАСТНАЯ АДАПТАЦИЯ:
-- Суммарная длина текста: ${p.words} слов
-- Языковой стиль: ${p.style}
+ГЛАВНЫЙ ПРИНЦИП ПРОПУСКОВ:
+Пропуск — в конце открытой фразы, где ЛЮБОЙ ответ ребёнка подходит. Ребёнок ПРОДОЛЖАЕТ мысль, не угадывает слово.
+✓ "Он нашёл в траве ___." — скажи что хочешь: гриб, жука, монетку
+✓ "Медвежонок заплакал, потому что ___." — любое объяснение работает
+✗ "пахло его собственным ___" — здесь один правильный ответ, ребёнку тяжело
 
-КОЛИЧЕСТВО ПРОПУСКОВ: ${p.blankCount}
+${p.blankCount}
+${p.blankExamples}
+hint = короткий пример ответа (1–3 слова, без вопросов): "гриб", "убежать", "стало страшно"
 
-СЦЕНАРИЙ:
-${p.scenarioHint}
+Первый пропуск — самый простой. Сказка без пропусков читается связно. Имя "${p.childName}" в финале.
 
-ФОРМАТ ОТВЕТА — СТРОГО JSON:
-{
-  "title": "Название сказки (2–5 слов)",
-  "scenes": [
-    {
-      "segments": [
-        {"type":"text","value":"Лисёнок нашёл красивый "},
-        {"type":"blank","hint":"рыжий"},
-        {"type":"text","value":" камешек и положил его в карман. Потом он увидел "},
-        {"type":"blank","hint":"бабочку"},
-        {"type":"text","value":" и побежал за ней."}
-      ],
-      "imagePrompt": ""
-    },
-    { "segments": [...], "imagePrompt": "" },
-    { "segments": [...], "imagePrompt": "" }
-  ]
-}
+ФОРМАТ — СТРОГО JSON, без markdown:
+{"title":"...","scenes":[{"segments":[{"type":"text","value":"Текст до пропуска "},{"type":"blank","hint":"пример ответа"},{"type":"text","value":" текст после."}],"imagePrompt":""},{"segments":[...],"imagePrompt":""},{"segments":[...],"imagePrompt":""}]}
 
-ПРАВИЛА — ЧИТАЙ ВНИМАТЕЛЬНО:
-
-ПРАВИЛО 1. ПРОПУСК = одно конкретное слово которое ребёнок легко придумает:
-   ✓ прилагательные: цвет, размер, настроение ("рыжий", "маленький", "грустный")
-   ✓ существительные: имя, предмет, животное ("Мурзик", "цветок", "птица")
-   ✓ простое действие: "побежал", "засмеялся", "спрятался"
-   ✗ НЕ абстракции: "как он себя чувствовал", "что он думал"
-
-ПРАВИЛО 2. ПРОПУСК СТОИТ ТАМ, ГДЕ БЫЛО СЛОВО — не после него:
-   ✓ "Он нашёл ___ камешек" (пропуск = прилагательное перед словом)
-   ✗ "Он нашёл камешек, ___ цвета" (пропуск болтается после)
-   ✗ "Он хотел ___, но испугался и убежал" (ответ уже дан в том же предложении!)
-
-ПРАВИЛО 3. hint = ПРИМЕР ОТВЕТА который ребёнок мог бы сказать (1–3 слова, без вопросов):
-   ✓ "рыжий", "Мурзик", "громко засмеялся", "большой"
-   ✗ "какого цвета?", "что сделал?", "как его зовут?"
-
-ПРАВИЛО 4. Первый пропуск в сказке — самый простой (цвет или имя).
-
-ПРАВИЛО 5. Сказка без пропусков должна читаться связно и иметь смысл.
-
-ПРАВИЛО 6. Первый и последний сегмент каждой сцены — type:"text".
-
-ПРАВИЛО 7. Внутри value сегментов type:"text" — НИКАКИХ "___", только чистый текст.
-
-ПРАВИЛО 8. imagePrompt — всегда пустая строка "".
-
-ПРАВИЛО 9. Имя "${p.childName}" органично упоминается в финале.
-
-ПРАВИЛО 10. Никакого Markdown внутри value.
-
-Ответ — ТОЛЬКО JSON, без markdown-обёртки.`
+Правила: 3 сцены. Первый и последний сегмент каждой сцены — type:text. Внутри value нет "___". imagePrompt всегда "".`
 }
 
 function buildEnInteractivePrompt(p: InteractivePromptParams): string {
-  return `You are a master of therapeutic storytelling for children. Create an INTERACTIVE story in English. A parent reads aloud, and at the right moments the child fills in a word.
+  return `Create an interactive story in English. Parent reads aloud — at blanks the child says their own word.
 
-DATA:
-- Child's name: ${p.childName}
-- Age: ${p.age}
-- Main hero: ${p.hero}
-- Situation/request: ${p.situation}
-- Favorites: ${p.favorites || 'not specified'}
-- Lesson: ${p.lesson || 'determine from situation'}
+Hero: ${p.hero}. Child: ${p.childName}, age ${p.age}. Situation: ${p.situation}. Favorites: ${p.favorites || 'not specified'}.
+Length: ${p.words} words. Style: ${p.style}.
+Scenario: ${p.scenarioHint}
 
-AGE ADAPTATION:
-- Total word count: ${p.words} words
-- Language style: ${p.style}
+KEY PRINCIPLE FOR BLANKS:
+Blank goes at the END of an open phrase where ANY child's answer works. Child CONTINUES the thought, doesn't guess.
+✓ "He found something in the grass ___." — mushroom, bug, coin, dragon — all work
+✓ "The bear cried because ___." — any explanation fits
+✗ "it smelled of his own ___" — only one answer fits, too hard
 
-NUMBER OF BLANKS: ${p.blankCount}
+${p.blankCount}
+${p.blankExamples}
+hint = short example answer (1–3 words, no questions): "a mushroom", "to run away", "felt scared"
 
-SCENARIO:
-${p.scenarioHint}
+First blank = simplest. Story reads coherently without blanks. Child's name "${p.childName}" in the ending.
 
-RESPONSE FORMAT — STRICT JSON:
-{
-  "title": "Story title (2-5 words)",
-  "scenes": [
-    {
-      "segments": [
-        {"type":"text","value":"The little fox found a beautiful "},
-        {"type":"blank","hint":"golden"},
-        {"type":"text","value":" pebble and put it in his pocket. Then he saw a "},
-        {"type":"blank","hint":"butterfly"},
-        {"type":"text","value":" and ran after it."}
-      ],
-      "imagePrompt": ""
-    },
-    { "segments": [...], "imagePrompt": "" },
-    { "segments": [...], "imagePrompt": "" }
-  ]
-}
+FORMAT — STRICT JSON, no markdown:
+{"title":"...","scenes":[{"segments":[{"type":"text","value":"Text before blank "},{"type":"blank","hint":"example answer"},{"type":"text","value":" text after."}],"imagePrompt":""},{"segments":[...],"imagePrompt":""},{"segments":[...],"imagePrompt":""}]}
 
-RULES — READ CAREFULLY:
-
-RULE 1. BLANK = one concrete word a child can easily say:
-   ✓ adjectives: color, size, mood ("golden", "tiny", "sad")
-   ✓ nouns: name, object, animal ("Fluffy", "flower", "bird")
-   ✓ simple action: "ran", "laughed", "hid"
-   ✗ NOT abstract: "how he felt", "what he thought"
-
-RULE 2. BLANK GOES WHERE THE WORD WAS — not floating after the thought:
-   ✓ "He found a ___ pebble" (blank = adjective before the noun)
-   ✗ "He found a pebble, ___ color" (blank dangling after)
-   ✗ "He wanted to ___, but got scared and ran away" (answer already revealed in same sentence!)
-
-RULE 3. hint = EXAMPLE ANSWER the child could give (1–3 words, no questions):
-   ✓ "golden", "Fluffy", "laughed loudly", "huge"
-   ✗ "what color?", "what did he do?", "what's his name?"
-
-RULE 4. First blank in the story — the simplest (a color or a name).
-
-RULE 5. Story without blanks must read coherently and make sense.
-
-RULE 6. First and last segment of each scene must be type:"text".
-
-RULE 7. Inside value of type:"text" segments — NO "___", clean text only.
-
-RULE 8. imagePrompt — always empty string "".
-
-RULE 9. Child's name "${p.childName}" appears organically in the ending.
-
-RULE 10. No Markdown inside value.
-
-Output — JSON ONLY, no markdown wrapper.`
+Rules: 3 scenes. First and last segment of each scene must be type:text. No "___" inside value. imagePrompt always "".`
 }
 
 function buildEnPrompt(p: PromptParams): string {
@@ -348,9 +278,9 @@ export async function POST(req: NextRequest) {
 
   const isEn = locale === 'en'
   const baseParams = { childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint }
-  const { count: blankCount } = getBlankDensity(age)
+  const { count: blankCount, examples: blankExamples } = getBlankProfile(age)
   const prompt = storyMode === 'interactive'
-    ? (isEn ? buildEnInteractivePrompt({ ...baseParams, blankCount }) : buildRuInteractivePrompt({ ...baseParams, blankCount }))
+    ? (isEn ? buildEnInteractivePrompt({ ...baseParams, blankCount, blankExamples }) : buildRuInteractivePrompt({ ...baseParams, blankCount, blankExamples }))
     : (isEn ? buildEnPrompt(baseParams) : buildRuPrompt(baseParams))
 
   for (const modelName of MODELS) {
