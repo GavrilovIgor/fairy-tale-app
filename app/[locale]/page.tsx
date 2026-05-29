@@ -1649,8 +1649,6 @@ export default function Home() {
 
       {(status==='done'||status==='reading')&&story&&(
         <>
-          {/* Desktop nav for reading */}
-          <DesktopNav activeTab="library" onTabChange={()=>{}} user={user} onShowAuth={()=>setShowAuth(true)} onSignOut={handleSignOut} onEditProfile={()=>setShowProfile(true)} onMyStories={()=>{setStatus('idle');setMobileTab('library');setDesktopTab('library')}}/>
           <StoryReading
             story={story} storyRef={storyRef}
             imageCache={imageCache}
