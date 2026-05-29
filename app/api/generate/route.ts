@@ -160,6 +160,7 @@ function buildRuInteractivePrompt(p: InteractivePromptParams): string {
 ✓ "Он нашёл в траве ___." — скажи что хочешь: гриб, жука, монетку
 ✓ "Медвежонок заплакал, потому что ___." — любое объяснение работает
 ✗ "пахло его собственным ___" — здесь один правильный ответ, ребёнку тяжело
+✗ "сделал шаг ___" / "пробежал холодок ___" — это устойчивые идиомы, не ломай их пропуском
 
 ${p.blankCount}
 ${p.blankExamples}
@@ -185,6 +186,7 @@ Blank goes at the END of an open phrase where ANY child's answer works. Child CO
 ✓ "He found something in the grass ___." — mushroom, bug, coin, dragon — all work
 ✓ "The bear cried because ___." — any explanation fits
 ✗ "it smelled of his own ___" — only one answer fits, too hard
+✗ "took a step ___" / "a chill ran ___" — fixed idioms, don't break them with a blank
 
 ${p.blankCount}
 ${p.blankExamples}
