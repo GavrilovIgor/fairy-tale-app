@@ -27,26 +27,12 @@ function getAgeProfile(ageStr: string) {
   }
 }
 
-function getBlankDensity(ageStr: string, locale: 'ru' | 'en' = 'ru'): { count: string; hintStyle: string } {
+function getBlankDensity(ageStr: string): { count: string } {
   const n = parseInt(ageStr) || 0
-  if (n <= 4) {
-    return locale === 'en'
-      ? { count: '2–3 blanks per scene', hintStyle: 'Hints of 1–2 words, very concrete: "what color?", "who is this?", "what did he say?", "where did he run?". Only what the child can answer with a single word.' }
-      : { count: '2–3 пропуска на сцену', hintStyle: 'Подсказки в 1–2 слова, очень конкретные: "какого цвета?", "кто это?", "что сказал?", "куда побежал?". Только то, на что ребёнок может ответить одним словом.' }
-  }
-  if (n <= 6) {
-    return locale === 'en'
-      ? { count: '4–5 blanks per scene', hintStyle: 'Hints of 2–3 words: "what did he feel?", "how did he act?", "where did he run?", "what did he see?". Allow answers of 1–3 words.' }
-      : { count: '4–5 пропусков на сцену', hintStyle: 'Подсказки в 2–3 слова: "что почувствовал?", "как поступил?", "куда побежал?", "что увидел?". Допускают ответ из 1–3 слов.' }
-  }
-  if (n <= 9) {
-    return locale === 'en'
-      ? { count: '5–7 blanks per scene', hintStyle: 'Hints are open-ended, 2–5 words: "why did he decide this?", "what happened next?", "how did he figure it out?". Encourage developed answers.' }
-      : { count: '5–7 пропусков на сцену', hintStyle: 'Подсказки открытые, 2–5 слов: "почему он так решил?", "что было дальше?", "как он это придумал?". Поощряют развёрнутые ответы.' }
-  }
-  return locale === 'en'
-    ? { count: '4–6 blanks per scene', hintStyle: 'Hints on plot decisions, 3–6 words: "what decision did he make?", "what did he see around the corner?", "how did he explain this to himself?". Stimulate narrative thinking.' }
-    : { count: '4–6 пропусков на сцену', hintStyle: 'Подсказки на сюжетные развилки, 3–6 слов: "какое решение принял?", "что увидел за поворотом?", "как объяснил себе это?". Стимулируют сюжетное мышление.' }
+  if (n <= 4) return { count: '2–3 пропуска на сцену. Только цвета, имена, простые предметы.' }
+  if (n <= 6) return { count: '3–4 пропуска на сцену. Цвета, имена, простые действия, предметы.' }
+  if (n <= 9) return { count: '4–5 пропусков на сцену. Прилагательные, короткие действия, характеристики.' }
+  return { count: '4–5 пропусков на сцену. Прилагательные, действия, эмоциональные состояния.' }
 }
 
 const SCENARIO_INSTRUCTIONS: Record<string, string> = {
@@ -134,11 +120,10 @@ ${p.scenarioHint}
 
 interface InteractivePromptParams extends PromptParams {
   blankCount: string
-  hintStyle: string
 }
 
 function buildRuInteractivePrompt(p: InteractivePromptParams): string {
-  return `Ты — мастер сказкотерапии и детской литературы. Создай ИНТЕРАКТИВНУЮ терапевтическую сказку на русском языке, в которой ребёнок завершает пропуски своим словом.
+  return `Ты — мастер сказкотерапии и детской литературы. Создай ИНТЕРАКТИВНУЮ сказку на русском языке. Родитель читает вслух, и в нужных местах ребёнок вставляет своё слово.
 
 ДАННЫЕ:
 - Имя ребёнка: ${p.childName}
@@ -152,9 +137,7 @@ function buildRuInteractivePrompt(p: InteractivePromptParams): string {
 - Суммарная длина текста: ${p.words} слов
 - Языковой стиль: ${p.style}
 
-ПЛОТНОСТЬ ПРОПУСКОВ:
-- ${p.blankCount}
-- ${p.hintStyle}
+КОЛИЧЕСТВО ПРОПУСКОВ: ${p.blankCount}
 
 СЦЕНАРИЙ:
 ${p.scenarioHint}
@@ -165,11 +148,11 @@ ${p.scenarioHint}
   "scenes": [
     {
       "segments": [
-        {"type":"text","value":"Полноценный связный текст сцены до пропуска. "},
-        {"type":"blank","hint":"какого цвета?"},
-        {"type":"text","value":" текст после пропуска до следующего пропуска. "},
-        {"type":"blank","hint":"что сделал?"},
-        {"type":"text","value":" заключительный текст сцены."}
+        {"type":"text","value":"Лисёнок нашёл красивый "},
+        {"type":"blank","hint":"рыжий"},
+        {"type":"text","value":" камешек и положил его в карман. Потом он увидел "},
+        {"type":"blank","hint":"бабочку"},
+        {"type":"text","value":" и побежал за ней."}
       ],
       "imagePrompt": ""
     },
@@ -178,23 +161,42 @@ ${p.scenarioHint}
   ]
 }
 
-ПРАВИЛА ИНТЕРАКТИВНОСТИ:
-1. Ровно 3 сцены.
-2. В каждой сцене — массив segments в порядке чтения.
-3. Первый и последний сегмент в каждой сцене — type:"text" (нельзя начинать или заканчивать пропуском).
-4. Сегменты type:"text" — связный литературный текст. НИКАКИХ "___" или плейсхолдеров внутри value.
-5. Пропуски (type:"blank") — в естественных местах, где ребёнок может вставить слово/фразу: цвет предмета, имя нового персонажа, эмоция героя, что он сделал, куда пошёл.
-6. Hint — короткий наводящий вопрос, не дающий ответа. Не повторять подряд один и тот же hint.
-7. imagePrompt — пустая строка "" (картинки в этом режиме не используются).
-8. Полная сказка должна читаться связно даже если читать только text-сегменты подряд (пропуски — украшение, а не каркас).
-9. Имя ребёнка "${p.childName}" органично упоминается в финале.
-10. НИКАКОГО Markdown — никаких **, *, _ — только чистый текст в value.
+ПРАВИЛА — ЧИТАЙ ВНИМАТЕЛЬНО:
+
+ПРАВИЛО 1. ПРОПУСК = одно конкретное слово которое ребёнок легко придумает:
+   ✓ прилагательные: цвет, размер, настроение ("рыжий", "маленький", "грустный")
+   ✓ существительные: имя, предмет, животное ("Мурзик", "цветок", "птица")
+   ✓ простое действие: "побежал", "засмеялся", "спрятался"
+   ✗ НЕ абстракции: "как он себя чувствовал", "что он думал"
+
+ПРАВИЛО 2. ПРОПУСК СТОИТ ТАМ, ГДЕ БЫЛО СЛОВО — не после него:
+   ✓ "Он нашёл ___ камешек" (пропуск = прилагательное перед словом)
+   ✗ "Он нашёл камешек, ___ цвета" (пропуск болтается после)
+   ✗ "Он хотел ___, но испугался и убежал" (ответ уже дан в том же предложении!)
+
+ПРАВИЛО 3. hint = ПРИМЕР ОТВЕТА который ребёнок мог бы сказать (1–3 слова, без вопросов):
+   ✓ "рыжий", "Мурзик", "громко засмеялся", "большой"
+   ✗ "какого цвета?", "что сделал?", "как его зовут?"
+
+ПРАВИЛО 4. Первый пропуск в сказке — самый простой (цвет или имя).
+
+ПРАВИЛО 5. Сказка без пропусков должна читаться связно и иметь смысл.
+
+ПРАВИЛО 6. Первый и последний сегмент каждой сцены — type:"text".
+
+ПРАВИЛО 7. Внутри value сегментов type:"text" — НИКАКИХ "___", только чистый текст.
+
+ПРАВИЛО 8. imagePrompt — всегда пустая строка "".
+
+ПРАВИЛО 9. Имя "${p.childName}" органично упоминается в финале.
+
+ПРАВИЛО 10. Никакого Markdown внутри value.
 
 Ответ — ТОЛЬКО JSON, без markdown-обёртки.`
 }
 
 function buildEnInteractivePrompt(p: InteractivePromptParams): string {
-  return `You are a master of therapeutic storytelling for children. Create an INTERACTIVE therapeutic story in English where the child completes blanks with their own word.
+  return `You are a master of therapeutic storytelling for children. Create an INTERACTIVE story in English. A parent reads aloud, and at the right moments the child fills in a word.
 
 DATA:
 - Child's name: ${p.childName}
@@ -208,9 +210,7 @@ AGE ADAPTATION:
 - Total word count: ${p.words} words
 - Language style: ${p.style}
 
-BLANK DENSITY:
-- ${p.blankCount}
-- ${p.hintStyle}
+NUMBER OF BLANKS: ${p.blankCount}
 
 SCENARIO:
 ${p.scenarioHint}
@@ -221,11 +221,11 @@ RESPONSE FORMAT — STRICT JSON:
   "scenes": [
     {
       "segments": [
-        {"type":"text","value":"Coherent text of the scene before the blank. "},
-        {"type":"blank","hint":"what color?"},
-        {"type":"text","value":" text after the blank until the next blank. "},
-        {"type":"blank","hint":"what did he do?"},
-        {"type":"text","value":" closing text of the scene."}
+        {"type":"text","value":"The little fox found a beautiful "},
+        {"type":"blank","hint":"golden"},
+        {"type":"text","value":" pebble and put it in his pocket. Then he saw a "},
+        {"type":"blank","hint":"butterfly"},
+        {"type":"text","value":" and ran after it."}
       ],
       "imagePrompt": ""
     },
@@ -234,17 +234,36 @@ RESPONSE FORMAT — STRICT JSON:
   ]
 }
 
-INTERACTIVITY RULES:
-1. Exactly 3 scenes.
-2. Each scene contains segments[] in reading order.
-3. First and last segment of each scene MUST be type:"text" (never start or end with a blank).
-4. type:"text" segments — coherent literary text. NO "___" or placeholders inside value.
-5. Blanks (type:"blank") — at natural insertion points: object color, new character name, hero's emotion, what they did, where they went.
-6. Hint — short leading question that does NOT give the answer. Do not repeat the same hint consecutively.
-7. imagePrompt — empty string "" (images are not used in this mode).
-8. The full story must read coherently even if only text-segments are read in sequence (blanks are flavor, not skeleton).
-9. Child's name "${p.childName}" appears organically in the ending.
-10. NO Markdown — no **, *, _ — pure text in value only.
+RULES — READ CAREFULLY:
+
+RULE 1. BLANK = one concrete word a child can easily say:
+   ✓ adjectives: color, size, mood ("golden", "tiny", "sad")
+   ✓ nouns: name, object, animal ("Fluffy", "flower", "bird")
+   ✓ simple action: "ran", "laughed", "hid"
+   ✗ NOT abstract: "how he felt", "what he thought"
+
+RULE 2. BLANK GOES WHERE THE WORD WAS — not floating after the thought:
+   ✓ "He found a ___ pebble" (blank = adjective before the noun)
+   ✗ "He found a pebble, ___ color" (blank dangling after)
+   ✗ "He wanted to ___, but got scared and ran away" (answer already revealed in same sentence!)
+
+RULE 3. hint = EXAMPLE ANSWER the child could give (1–3 words, no questions):
+   ✓ "golden", "Fluffy", "laughed loudly", "huge"
+   ✗ "what color?", "what did he do?", "what's his name?"
+
+RULE 4. First blank in the story — the simplest (a color or a name).
+
+RULE 5. Story without blanks must read coherently and make sense.
+
+RULE 6. First and last segment of each scene must be type:"text".
+
+RULE 7. Inside value of type:"text" segments — NO "___", clean text only.
+
+RULE 8. imagePrompt — always empty string "".
+
+RULE 9. Child's name "${p.childName}" appears organically in the ending.
+
+RULE 10. No Markdown inside value.
 
 Output — JSON ONLY, no markdown wrapper.`
 }
@@ -329,9 +348,9 @@ export async function POST(req: NextRequest) {
 
   const isEn = locale === 'en'
   const baseParams = { childName, age, hero, situation, situationType, favorites, lesson, words, style, scenarioHint }
-  const { count: blankCount, hintStyle } = getBlankDensity(age, isEn ? 'en' : 'ru')
+  const { count: blankCount } = getBlankDensity(age)
   const prompt = storyMode === 'interactive'
-    ? (isEn ? buildEnInteractivePrompt({ ...baseParams, blankCount, hintStyle }) : buildRuInteractivePrompt({ ...baseParams, blankCount, hintStyle }))
+    ? (isEn ? buildEnInteractivePrompt({ ...baseParams, blankCount }) : buildRuInteractivePrompt({ ...baseParams, blankCount }))
     : (isEn ? buildEnPrompt(baseParams) : buildRuPrompt(baseParams))
 
   for (const modelName of MODELS) {
