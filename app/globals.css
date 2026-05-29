@@ -360,24 +360,24 @@ body {
 @media print {
   body { background:white !important; }
   .print\:hidden { display:none !important; }
-  .interactive-blank {
-    background: transparent !important;
-    color: #000 !important;
-    text-decoration: none !important;
-    opacity: 1 !important;
-    padding: 0 !important;
-    border: none !important;
-    border-bottom: 1px solid #000 !important;
-    border-radius: 0 !important;
+  /* Пробел (подчёркивание) */
+  .interactive-blank > span {
+    border-bottom: 1.5px solid #000 !important;
     min-width: 3em;
     display: inline-block;
-    font-style: normal;
   }
-  .interactive-blank::after {
-    content: " (" attr(data-hint) ")";
-    font-size: 0.7em;
+  /* Подсказка — всегда раскрытая в печати */
+  .interactive-blank > button {
+    font-size: 0.78em;
     font-style: italic;
-    color: #666;
-    margin-left: 0.25em;
+    color: #444;
+    text-decoration: none !important;
+    background: none !important;
+  }
+  .interactive-blank > button::before {
+    content: "(";
+  }
+  .interactive-blank > button::after {
+    content: ")";
   }
 }
