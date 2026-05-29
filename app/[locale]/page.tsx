@@ -1042,11 +1042,13 @@ function StoryReading({story,onBack,onSave,alreadySaved,onShare,shareStatus,onDo
               style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
               {alreadySaved ? t('saved') : t('save')}
             </button>
-            <button onClick={onDownloadPDF} disabled={pdfLoading}
-              className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
-              style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
-              {pdfLoading ? t('pdfCreating') : t('pdfDownload')}
-            </button>
+            {story.mode !== 'interactive' && (
+              <button onClick={onDownloadPDF} disabled={pdfLoading}
+                className="flex-1 flex items-center justify-center cursor-pointer disabled:opacity-50 active:scale-[0.98] transition-transform"
+                style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff',fontFamily:sans,fontSize:14,fontWeight:600}}>
+                {pdfLoading ? t('pdfCreating') : t('pdfDownload')}
+              </button>
+            )}
             <button onClick={onShare} aria-label="Поделиться"
               className="flex-1 flex items-center justify-center cursor-pointer active:scale-[0.98] transition-transform"
               style={{height:44,border:'1px solid #0d2b1e',color:'#0d2b1e',borderRadius:4,background:'#fff'}}>
@@ -1537,7 +1539,11 @@ export default function Home() {
 
   const handleShare=async()=>{
     if(!story)return
-    const text=`${story.title}\n\n${story.scenes.map(s=>s.text??'').join('\n\n')}`
+    // Для interactive — собираем текст из сегментов, пропуски заменяем на "___"
+    const sceneToText=(s:Scene):string => Array.isArray(s.segments)
+      ? s.segments.map(seg => seg.type==='text' ? seg.value : '___').join('')
+      : (s.text ?? '')
+    const text=`${story.title}\n\n${story.scenes.map(sceneToText).join('\n\n')}`
     // Всегда пробуем нативный share sheet (iOS/Android/desktop Safari)
     if(navigator.share){
       try{ await navigator.share({title:story.title,text,url:window.location.href}); return }

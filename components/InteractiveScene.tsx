@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type Segment = { type:'text'; value:string } | { type:'blank'; hint:string; id:string }
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function InteractiveScene({ segments }: Props) {
+  const t = useTranslations('interactive')
   const [read, setRead] = useState<Set<string>>(() => new Set())
 
   const toggle = (id: string) => {
@@ -33,7 +35,7 @@ export function InteractiveScene({ segments }: Props) {
             type="button"
             onClick={() => toggle(seg.id)}
             aria-pressed={isRead}
-            aria-label={isRead ? `Прочитано: ${seg.hint}` : `Пропуск: ${seg.hint}`}
+            aria-label={isRead ? `${t('readLabel')}: ${seg.hint}` : `${t('blankLabel')}: ${seg.hint}`}
             data-hint={seg.hint}
             className={[
               'interactive-blank',

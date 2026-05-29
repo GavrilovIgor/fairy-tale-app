@@ -114,7 +114,9 @@
   },
   "interactive": {
     "badge": "💬 dialogue",
-    "subtitle": "Child completes blanks with their own words"
+    "subtitle": "Child completes blanks with their own words",
+    "readLabel": "Read",
+    "blankLabel": "Blank"
   },
   "footer": {
     "logo": "Magic Fairy Tales",
