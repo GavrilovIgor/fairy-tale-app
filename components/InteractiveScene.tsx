@@ -21,7 +21,7 @@ export function InteractiveScene({ segments }: Props) {
   }
 
   return (
-    <p className="text-lg sm:text-xl leading-relaxed">
+    <p className="text-lg sm:text-xl leading-relaxed" style={{textAlign:'justify',hyphens:'auto'}}>
       {segments.map((seg, i) => {
         if (seg.type === 'text') {
           return <span key={i}>{seg.value}</span>
