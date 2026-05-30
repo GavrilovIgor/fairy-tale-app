@@ -854,28 +854,27 @@ function CreateForm({onGenerate,isLoading,onOpenLibrary,onShowAuth,onShowProfile
                 </button>
               )}
               {step===4&&(
-                <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 flex flex-col gap-2.5">
                   <button type="button"
                     onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form,'classic')}}
                     disabled={isLoading}
-                    className="flex-1 py-3 px-4 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 px-5 rounded-xl text-white font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2.5"
                     style={{background:'#a46713'}}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 3.5C2 2.67 2.67 2 3.5 2h9C13.33 2 14 2.67 14 3.5v9c0 .83-.67 1.5-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9Z" stroke="white" strokeWidth="1.25" strokeLinejoin="round"/>
-                      <path d="M5 6.5h6M5 9h4" stroke="white" strokeWidth="1.25" strokeLinecap="round"/>
-                      <circle cx="11.5" cy="4.5" r="1" fill="white"/>
-                      <path d="M8 4v2.5" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{flexShrink:0}}>
+                      <rect x="2" y="2" width="14" height="14" rx="2.5" stroke="white" strokeWidth="1.3"/>
+                      <path d="M5 12l2.8-3.5 2.2 2.8 1.5-2L14 12" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="6.5" cy="6.5" r="1.3" fill="white"/>
                     </svg>
                     {isLoading ? t('wizard.creating') : t('wizard.create')}
                   </button>
                   <button type="button"
                     onClick={()=>{saveLastChild(form.childName,form.age);onGenerate(form,'interactive')}}
                     disabled={isLoading}
-                    className="flex-1 py-3 px-4 rounded-xl font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 border-2 flex items-center justify-center gap-2"
-                    style={{background:'transparent',borderColor:'#a46713',color:'#a46713'}}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3.5a2 2 0 0 1-2 2H7.5L5 11.5V9.5H4a2 2 0 0 1-2-2V4Z" stroke="#a46713" strokeWidth="1.25" strokeLinejoin="round"/>
-                      <path d="M10 7.5h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v2l-2.5-2H6a2 2 0 0 1-2-2" stroke="#a46713" strokeWidth="1.25" strokeLinejoin="round"/>
+                    className="w-full py-3.5 px-5 rounded-xl font-bold text-sm cursor-pointer transition-all hover:opacity-90 disabled:opacity-40 flex items-center justify-center gap-2.5"
+                    style={{border:'1.5px solid #a46713',color:'#a46713',background:'rgba(164,103,19,0.06)'}}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{flexShrink:0}}>
+                      <path d="M2 5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3.5a2 2 0 0 1-2 2H7.5L5 13V10.5H4a2 2 0 0 1-2-2V5Z" stroke="#a46713" strokeWidth="1.3" strokeLinejoin="round"/>
+                      <path d="M11 8.5h1.5a2 2 0 0 1 2 2V13a2 2 0 0 1-2 2H12v2l-2.5-2H8a2 2 0 0 1-1.8-1.1" stroke="#a46713" strokeWidth="1.3" strokeLinejoin="round"/>
                     </svg>
                     {t('wizard.createInteractive')}
                   </button>
