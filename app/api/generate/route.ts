@@ -31,10 +31,13 @@ function getBlankProfile(ageStr: string): { count: string; examples: string } {
   const n = parseInt(ageStr) || 0
   if (n <= 4) return {
     count: '2–3 пропуска на сцену',
-    examples: `Возраст 3–4: пропуски только там где ребёнок заканчивает фразу одним словом — предметом или именем.
-  ✓ "Он нашёл в траве ___." → "гриб", "жука", "монетку"
-  ✓ "Лисёнок сказал: ___!" → "привет", "мама", "ура"
-  ✓ "Зайка взял с собой ___." → "игрушку", "морковку", "мяч"`,
+    examples: `Возраст 3–4: только конкретные предметы, животные, цвета — то что можно потрогать или увидеть. Никаких сравнений и абстракций.
+  ✓ "Он нашёл в траве ___." → "гриб", "жука", "монетку", "палочку"
+  ✓ "Зайка взял с собой ___." → "игрушку", "морковку", "мяч"
+  ✓ "Мишка увидел большую ___." → "лягушку", "бабочку", "лужу"
+  ✓ "Он был ___." (цвет или размер) → "маленький", "рыжий", "пушистый"
+  ✗ НЕ "Как будто ___" — это метафора, слишком сложно
+  ✗ НЕ "Он чувствовал себя как ___" — абстракция`,
   }
   if (n <= 6) return {
     count: '3–4 пропуска на сцену',
@@ -162,6 +165,8 @@ function buildRuInteractivePrompt(p: InteractivePromptParams): string {
 ✗ "пахло его собственным ___" — здесь один правильный ответ, ребёнку тяжело
 ✗ "сделал шаг ___" / "пробежал холодок ___" — это устойчивые идиомы, не ломай их пропуском
 ✗ Текст ПОСЛЕ пропуска не должен раскрывать что туда вписать: "маленький красный ___! Точь-в-точь как его мячик" — слово "мячик" после пропуска даёт ответ
+✗ ЗАПРЕЩЕНЫ метафорические пропуски: "как будто ___", "словно ___", "похоже на ___", "немножко ___" — ребёнок не умеет создавать сравнения, он думает конкретными предметами
+✗ ЗАПРЕЩЕНЫ абстрактные пропуски где нужно придумать образ или сравнение — только то что можно потрогать, увидеть, назвать одним простым словом
 
 ${p.blankCount}
 ${p.blankExamples}
@@ -189,6 +194,8 @@ Blank goes at the END of an open phrase where ANY child's answer works. Child CO
 ✗ "it smelled of his own ___" — only one answer fits, too hard
 ✗ "took a step ___" / "a chill ran ___" — fixed idioms, don't break them with a blank
 ✗ Text AFTER a blank must not reveal the answer: "a little red ___! Just like his ball" — "ball" after the blank gives it away
+✗ NO metaphorical blanks: "like ___", "as if ___", "kind of like ___" — children think in concrete objects, not comparisons
+✗ NO abstract blanks requiring imagination of an image — only things you can touch, see, name with one simple word
 
 ${p.blankCount}
 ${p.blankExamples}
