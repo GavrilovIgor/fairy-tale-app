@@ -1,31 +1,38 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-const BOT_USERNAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? ''
+const BOT_ID = process.env.NEXT_PUBLIC_TELEGRAM_BOT_ID ?? ''
 
 export function AuthModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-  const telegramRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
-  // Telegram Login Widget
+  // Подгружаем telegram-widget.js один раз — нужен для window.Telegram.Login.auth
   useEffect(() => {
-    if (!BOT_USERNAME || !telegramRef.current) return
+    if (!BOT_ID || document.getElementById('tg-widget-script')) return
     const script = document.createElement('script')
+    script.id = 'tg-widget-script'
     script.src = 'https://telegram.org/js/telegram-widget.js?22'
     script.async = true
-    script.setAttribute('data-telegram-login', BOT_USERNAME)
-    script.setAttribute('data-size', 'large')
-    script.setAttribute('data-auth-url', `${window.location.origin}/api/auth/telegram/callback`)
-    script.setAttribute('data-request-access', 'write')
-    script.setAttribute('data-userpic', 'false')
-    telegramRef.current.appendChild(script)
+    document.body.appendChild(script)
   }, [])
+
+  // Telegram: официальный попап (надёжнее, чем прозрачный iframe-виджет поверх иконки)
+  const signInWithTelegram = () => {
+    const TG = (window as unknown as { Telegram?: { Login?: { auth: (o: object, cb: (u: Record<string, string> | false) => void) => void } } }).Telegram
+    if (!TG?.Login) { setError('Telegram ещё загружается, попробуйте ещё раз'); return }
+    setLoading('telegram'); setError('')
+    TG.Login.auth({ bot_id: BOT_ID, request_access: 'write' }, (user) => {
+      if (!user) { setLoading(null); return }
+      const params = new URLSearchParams(user).toString()
+      window.location.href = `/api/auth/telegram/callback?${params}`
+    })
+  }
 
   const signInWithGoogle = async () => {
     setLoading('google'); setError('')
@@ -134,27 +141,14 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
                 </svg>
               </IconButton>
 
-              {/* Telegram: иконка + поверх opacity:0 виджет (прозрачный, но кликабельный) */}
-              {BOT_USERNAME && (
-                <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, cursor: 'pointer' }}>
-                  {/* Видимая иконка (некликабельна — клики уходят в виджет) */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    borderRadius: 12, border: '1.5px solid #e0e0e0',
-                    pointerEvents: 'none',
-                  }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="12" fill="#29a0d8"/>
-                      <path d="M17.93 6.89L15.25 18.82c-.19.88-.7 1.1-1.42.68l-3.93-2.9-1.9 1.83c-.21.21-.39.39-.8.39l.29-4.04 7.39-6.68c.32-.29-.07-.45-.5-.16L5.9 13.63 2.03 12.42c-.86-.27-.88-.86.18-1.27L16.77 5.65c.72-.27 1.35.16 1.16 1.24z" fill="white"/>
-                    </svg>
-                  </div>
-                  {/* opacity:0 — невидим, но кликабелен (стандарт CSS) */}
-                  <div ref={telegramRef} style={{
-                    position: 'absolute', inset: 0,
-                    overflow: 'hidden', opacity: 0, zIndex: 1,
-                  }} />
-                </div>
+              {/* Telegram */}
+              {BOT_ID && (
+                <IconButton onClick={signInWithTelegram} label="Telegram" disabled={!!loading} loading={loading === 'telegram'}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="12" fill="#29a0d8"/>
+                    <path d="M17.93 6.89L15.25 18.82c-.19.88-.7 1.1-1.42.68l-3.93-2.9-1.9 1.83c-.21.21-.39.39-.8.39l.29-4.04 7.39-6.68c.32-.29-.07-.45-.5-.16L5.9 13.63 2.03 12.42c-.86-.27-.88-.86.18-1.27L16.77 5.65c.72-.27 1.35.16 1.16 1.24z" fill="white"/>
+                  </svg>
+                </IconButton>
               )}
             </div>
           </>
