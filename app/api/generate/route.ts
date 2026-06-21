@@ -286,6 +286,14 @@ export async function POST(req: NextRequest) {
 
   const genAI = new GoogleGenerativeAI(apiKey)
 
+  // Релей для регионов, где Google Gemini недоступен напрямую (напр. РФ-сервер).
+  // Без GEMINI_BASE_URL запрос идёт прямо в Google (Vercel/локально) — поведение не меняется.
+  const relayBaseUrl = process.env.GEMINI_BASE_URL
+  const relaySecret = process.env.GEMINI_RELAY_SECRET
+  const requestOptions = relayBaseUrl
+    ? { baseUrl: relayBaseUrl, ...(relaySecret ? { customHeaders: { 'x-relay-secret': relaySecret } } : {}) }
+    : undefined
+
   const { words, style } = getAgeProfile(age)
   const scenarioHint = SCENARIO_INSTRUCTIONS[situationType] ?? SCENARIO_INSTRUCTIONS.fun
 
@@ -298,7 +306,7 @@ export async function POST(req: NextRequest) {
 
   for (const modelName of MODELS) {
     try {
-      const model = genAI.getGenerativeModel({ model: modelName })
+      const model = genAI.getGenerativeModel({ model: modelName }, requestOptions)
       const result = await model.generateContent(prompt)
       const text = result.response.text().trim()
 
